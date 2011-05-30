@@ -29,7 +29,6 @@
 
 package ru.wapstart.plus1.sdk;
 
-import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
 
 import android.content.Context;
@@ -41,12 +40,14 @@ import android.content.SharedPreferences;
  */
 public final class Plus1BannerRequest {
 	public static enum Gender {Unknown, Male, Female;}
+	public static enum Type {XML, JSON};
 	
 	private static final String ROTATOR_URI =
-		"http://ro.plus1.wapstart.ru/?area=application";
+		"http://ro.plus1.wapstart.ru/?area=";
 
 	private static final String PREFERENCES_STORAGE = "WapstartPlus1";
 	private static final String PREFERENCES_KEY		= "session";
+	private static final Integer VERSION			= 2;
 
 	private int age					= 0;
 	private int applicationId		= 0;
@@ -56,6 +57,8 @@ public final class Plus1BannerRequest {
 	private String clientSessionId	= null;
 
 	private Context context			= null;
+	
+	private Type type				= Type.XML;
 	
 	public Plus1BannerRequest(Context context) {
 		this.context = context;
@@ -108,15 +111,23 @@ public final class Plus1BannerRequest {
 	public void setGender(Gender sex) {
 		this.gender = sex;
 	}
+	
+	public Type getType() {
+		return type;
+	}
 
+	public void setType(Type type) {
+		this.type = type;
+	}
 	public String getRequestUri() {
 
 		String url = ROTATOR_URI
-				+ "&site=" + this.getApplicationId()
-				+ "&pageId=" + this.getPageId()
-				+ "&clientSession=" + this.getClientSessionId()
-				+ "&userAgent=" + URLEncoder.encode(this.getUserAgent());
-
+				+ getControllerByType()
+				+ "&version=" + VERSION
+				+ "&id=" + getApplicationId()
+				+ "&pageId=" + getPageId()
+				+ "&clientSession=" + getClientSessionId();
+				
 		if (!this.getGender().equals(Gender.Unknown))
 			url += "&sex=" + this.getGender().ordinal();
 
@@ -126,6 +137,15 @@ public final class Plus1BannerRequest {
 		return url;
 	}
 
+	private String getControllerByType() {
+		String controllerName = "viewBannerXml"; 
+		
+		if (type == Type.JSON)
+			controllerName = "viewBannerJson";
+		
+		return controllerName;
+	}
+	
 	private String getPageId() {
 		try {
 			if (pageId == null)
@@ -157,15 +177,6 @@ public final class Plus1BannerRequest {
 		}
 
 		return clientSessionId;
-	}
-
-	// TODO: find out needs of our network
-	private String getUserAgent() {
-		return
-			"Android "
-			+ android.os.Build.VERSION.RELEASE + " "
-			+ android.os.Build.DEVICE + " "
-			+ android.os.Build.MODEL;
 	}
 
 }

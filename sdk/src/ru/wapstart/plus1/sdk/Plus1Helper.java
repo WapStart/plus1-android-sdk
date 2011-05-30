@@ -54,4 +54,15 @@ public final class Plus1Helper {
 
 		return new BigInteger(sha1.digest()).abs().toString(16);
 	}
+	
+	// TODO: find out needs of our network
+	public static String getUserAgent() {
+		return
+			"Android "
+			+ android.os.Build.VERSION.RELEASE + " "
+			+ android.os.Build.DEVICE + " "
+			+ android.os.Build.MODEL;
+	}
+
+	
 }
