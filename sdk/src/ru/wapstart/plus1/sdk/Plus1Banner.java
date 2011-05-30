@@ -35,7 +35,7 @@ import android.graphics.Bitmap;
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2010, Wapstart
  */
-public final class Plus1Banner {
+final class Plus1Banner {
 	private int id;
 	private String title;
 	private String content;

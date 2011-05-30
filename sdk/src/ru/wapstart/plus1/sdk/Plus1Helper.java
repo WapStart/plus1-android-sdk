@@ -39,7 +39,7 @@ import java.util.Random;
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2010, Wapstart
  */
-public final class Plus1Helper {
+final class Plus1Helper {
 
 	private Plus1Helper() { /*_*/ }
 
