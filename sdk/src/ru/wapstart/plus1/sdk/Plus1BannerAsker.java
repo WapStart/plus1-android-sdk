@@ -55,8 +55,7 @@ public class Plus1BannerAsker {
 		BaseBannerDownloader downloader = null;
 		
 		if (request.getType() == Plus1BannerRequest.Type.JSON)
-			// FIXME XXX: implement json realization
-			downloader = null;
+			downloader = new JSONBannerDownloader(context);
 		else
 			downloader = new XMLBannerDownloader(context);
 		

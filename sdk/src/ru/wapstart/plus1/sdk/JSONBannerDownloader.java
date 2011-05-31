@@ -26,71 +26,39 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package ru.wapstart.plus1.sdk;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 import android.content.Context;
 import android.util.Log;
-import android.util.Xml;
+
+import java.util.Iterator;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
-final class XMLBannerDownloader extends BaseBannerDownloader {
-	
-	public XMLBannerDownloader(Context context) {
+final class JSONBannerDownloader extends BaseBannerDownloader {
+
+	public JSONBannerDownloader(Context context) {
 		super(context);
 	}
 
 	@Override
 	protected Plus1Banner parse(String answer) {
-		XMLHandler handler = new XMLHandler();
-		
 		try {
-			Xml.parse(answer, handler);
-		} catch (SAXException e) {
-			Log.e(getClass().getName(), "Answer is not a suitable xml");
+			JSONObject jsonObject = new JSONObject(answer);
+			Iterator<String> iterator = jsonObject.keys();
+			
+			while (iterator.hasNext())
+				jsonObject.get(iterator.next());			
+			
+			return new Plus1Banner();
+		} catch (JSONException e) {
+			Log.e(getClass().getName(), "Can't handle json answer");
 		}
 		
-		return new Plus1Banner();
-	}
-
-	private final class XMLHandler extends DefaultHandler 
-	{
-		private String currentElement;
-		private StringBuffer buffer;
-		
-		@Override
-		public void startElement(
-			String uri, 
-			String localName, 
-			String qName,
-			Attributes attributes
-		) throws SAXException 
-		{
-			this.currentElement = localName;
-			this.buffer = new StringBuffer();
-		}
-		
-		@Override
-		public void endElement(String uri, String localName, String qName) 
-			throws SAXException 
-		{
-			currentElement = null;
-			buffer = null;
-		}
-		
-		@Override
-		public void characters(char[] ch, int start, int length) 
-			throws SAXException 
-		{
-			if (currentElement != null)
-				buffer.append(ch, start, length);
-		}
+		return null;
 	}
 }
