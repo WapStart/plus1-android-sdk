@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 
+import android.content.Context;
 import android.util.Log;
 
 /**
@@ -40,6 +41,12 @@ import android.util.Log;
  * @copyright Copyright (c) 2011, Wapstart
  */
 abstract class BaseBannerDownloader extends BaseDownloader {
+	
+	protected Context context = null;
+	
+	public BaseBannerDownloader(Context context) {
+		this.context = context;
+	}
 	
 	@Override
 	protected Plus1Banner doInBackground(String... url) {
@@ -62,6 +69,10 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 	@Override
 	protected void modifyConnection(HttpURLConnection connection) {
 		connection.setRequestProperty("User-Agent", Plus1Helper.getUserAgent());
+		connection.setRequestProperty(
+			"Cookies", 
+			"wssid="+Plus1Helper.getClientSessionId(context)
+		);
 	}
 	
 	abstract protected Plus1Banner parse(String answer);

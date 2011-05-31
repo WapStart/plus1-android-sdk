@@ -31,9 +31,6 @@ package ru.wapstart.plus1.sdk;
 
 import java.security.NoSuchAlgorithmException;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2010, Wapstart
@@ -45,8 +42,6 @@ public final class Plus1BannerRequest {
 	private static final String ROTATOR_URI =
 		"http://ro.plus1.wapstart.ru/?area=";
 
-	private static final String PREFERENCES_STORAGE = "WapstartPlus1";
-	private static final String PREFERENCES_KEY		= "session";
 	private static final Integer VERSION			= 2;
 
 	private int age					= 0;
@@ -54,35 +49,23 @@ public final class Plus1BannerRequest {
 	private Gender gender			= Gender.Unknown;
 
 	private String pageId			= null;
-	private String clientSessionId	= null;
-
-	private Context context			= null;
-	
 	private Type type				= Type.XML;
 	
-	public Plus1BannerRequest(Context context) {
-		this.context = context;
-	}
-
-	public Plus1BannerRequest(Context context, int applicationId) {
-		this.context = context;
+	public Plus1BannerRequest(int applicationId) {
 		this.applicationId = applicationId;
 	}
 
-	public Plus1BannerRequest(Context context, int applicationId, int age) {
-		this.context = context;
+	public Plus1BannerRequest(int applicationId, int age) {
 		this.applicationId = applicationId;
 		this.age = age;
 	}
 
-	public Plus1BannerRequest(Context context, int applicationId, Gender gender) {
-		this.context = context;
+	public Plus1BannerRequest(int applicationId, Gender gender) {
 		this.applicationId = applicationId;
 		this.gender = gender;
 	}
 
-	public Plus1BannerRequest(Context context, int applicationId, int age, Gender gender) {
-		this.context = context;
+	public Plus1BannerRequest(int applicationId, int age, Gender gender) {
 		this.applicationId = applicationId;
 		this.age = age;
 		this.gender = gender;
@@ -125,8 +108,7 @@ public final class Plus1BannerRequest {
 				+ getControllerByType()
 				+ "&version=" + VERSION
 				+ "&id=" + getApplicationId()
-				+ "&pageId=" + getPageId()
-				+ "&clientSession=" + getClientSessionId();
+				+ "&pageId=" + getPageId();
 				
 		if (!this.getGender().equals(Gender.Unknown))
 			url += "&sex=" + this.getGender().ordinal();
@@ -156,27 +138,4 @@ public final class Plus1BannerRequest {
 
 		return pageId;
 	}
-
-	private String getClientSessionId() {
-		SharedPreferences preferences =
-			context.getSharedPreferences(PREFERENCES_STORAGE, 0);
-		
-		if (clientSessionId == null)
-			clientSessionId = preferences.getString(PREFERENCES_KEY, null);
-
-		try {
-			if (clientSessionId == null) {
-				clientSessionId = Plus1Helper.getUniqueHash();
-
-				SharedPreferences.Editor editor = preferences.edit();
-				editor.putString(PREFERENCES_KEY, clientSessionId);
-				editor.commit();
-			}
-		} catch (NoSuchAlgorithmException e) {
-			// FIXME: log errors
-		}
-
-		return clientSessionId;
-	}
-
 }

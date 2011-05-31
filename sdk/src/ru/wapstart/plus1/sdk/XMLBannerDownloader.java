@@ -33,6 +33,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import android.content.Context;
 import android.util.Log;
 import android.util.Xml;
 
@@ -42,6 +43,23 @@ import android.util.Xml;
  */
 class XMLBannerDownloader extends BaseBannerDownloader {
 	
+	public XMLBannerDownloader(Context context) {
+		super(context);
+	}
+
+	@Override
+	protected Plus1Banner parse(String answer) {
+		XMLHandler handler = new XMLHandler();
+		
+		try {
+			Xml.parse(answer, handler);
+		} catch (SAXException e) {
+			Log.e(getClass().getName(), "Answer is not a suitable xml");
+		}
+		
+		return new Plus1Banner();
+	}
+
 	private final class XMLHandler extends DefaultHandler 
 	{
 		private String currentElement;
@@ -71,21 +89,8 @@ class XMLBannerDownloader extends BaseBannerDownloader {
 		public void characters(char[] ch, int start, int length) 
 			throws SAXException 
 		{
-			buffer.append(ch, start, length);
+			if (currentElement != null)
+				buffer.append(ch, start, length);
 		}
 	}
-	
-	@Override
-	protected Plus1Banner parse(String answer) {
-		XMLHandler handler = new XMLHandler();
-		
-		try {
-			Xml.parse(answer, handler);
-		} catch (SAXException e) {
-			Log.e(getClass().getName(), "Answer is not a suitable xml");
-		}
-		
-		return new Plus1Banner();
-	}
-
 }

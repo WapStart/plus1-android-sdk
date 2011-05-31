@@ -35,12 +35,20 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.Random;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2010, Wapstart
  */
 final class Plus1Helper {
 
+	private static final String PREFERENCES_STORAGE = "WapstartPlus1";
+	private static final String PREFERENCES_KEY		= "session";
+	
+	private static String clientSessionId = null;
+	
 	private Plus1Helper() { /*_*/ }
 
 	public static String getUniqueHash() throws NoSuchAlgorithmException {
@@ -64,5 +72,27 @@ final class Plus1Helper {
 			+ android.os.Build.MODEL;
 	}
 
+	public static String getClientSessionId(Context context) {
+		SharedPreferences preferences =
+			context.getSharedPreferences(PREFERENCES_STORAGE, 0);
+		
+		if (clientSessionId == null)
+			clientSessionId = preferences.getString(PREFERENCES_KEY, null);
+
+		try {
+			if (clientSessionId == null) {
+				clientSessionId = getUniqueHash();
+
+				SharedPreferences.Editor editor = preferences.edit();
+				editor.putString(PREFERENCES_KEY, clientSessionId);
+				editor.commit();
+			}
+		} catch (NoSuchAlgorithmException e) {
+			// FIXME: log errors
+		}
+
+		return clientSessionId;		
+	}
+	
 	
 }
