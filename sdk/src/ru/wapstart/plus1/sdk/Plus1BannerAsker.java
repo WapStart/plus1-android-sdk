@@ -29,20 +29,38 @@
 
 package ru.wapstart.plus1.sdk;
 
+import android.content.Context;
+
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
 public class Plus1BannerAsker {
 	private Plus1BannerRequest request;
+	private Context context;
 
-	public static Plus1BannerAsker create(Plus1BannerRequest request) {
-		return new Plus1BannerAsker(request);
+	public static Plus1BannerAsker create(
+		Plus1BannerRequest request, Context context
+	) {
+		return new Plus1BannerAsker(request, context);
 	}
 
-	public Plus1BannerAsker(Plus1BannerRequest request) {
+	public Plus1BannerAsker(Plus1BannerRequest request, Context context) {
 		this.request = request;
+		this.context = context;
 	}
 
+	public void start()
+	{
+		BaseBannerDownloader downloader = null;
+		
+		if (request.getType() == Plus1BannerRequest.Type.JSON)
+			// FIXME XXX: implement json realization
+			downloader = null;
+		else
+			downloader = new XMLBannerDownloader(context);
+		
+		downloader.execute(request.getRequestUri());
+	}
 
 }
