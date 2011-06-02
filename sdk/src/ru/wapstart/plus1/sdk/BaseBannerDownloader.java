@@ -29,10 +29,10 @@
 
 package ru.wapstart.plus1.sdk;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-
 import android.content.Context;
 import android.util.Log;
 
@@ -41,6 +41,8 @@ import android.util.Log;
  * @copyright Copyright (c) 2011, Wapstart
  */
 abstract class BaseBannerDownloader extends BaseDownloader {
+	private static final Integer BUFFER_SIZE = 8192;
+	private static final String NO_BANNER = "<!-- i4jgij4pfd4ssd -->";
 	
 	protected Context context = null;
 	
@@ -50,20 +52,29 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 	
 	@Override
 	protected Plus1Banner doInBackground(String... url) {
-		InputStream stream = (InputStream) super.doInBackground(url);
-		StringBuffer result = new StringBuffer();
+		BufferedInputStream stream = 
+			new BufferedInputStream (
+				(InputStream) super.doInBackground(url),
+				BUFFER_SIZE
+			);
+		
+		String result = new String();
 
 		try {
-			byte[] buffer = new byte[1024];
+			byte[] buffer = new byte[BUFFER_SIZE];
+			int count = 0;
 			
 			if (stream != null)
-				while (stream.read(buffer) != -1)
-					result.append(buffer);
+				while ((count = stream.read(buffer)) != -1)
+					result += new String(buffer, 0, count);
+			
 		} catch (IOException e) {
 			Log.e(getClass().getName(), "IOException in InputStream");
 		}
 		
-		return parse(result.toString());
+		Log.d(getClass().getName(), "answer: " + result.toString());
+		
+		return (result.equals(NO_BANNER)) ? null : parse(result);
 	}
 
 	@Override
