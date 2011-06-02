@@ -33,6 +33,9 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+
+import android.app.Activity;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
 /**
@@ -89,6 +92,24 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 			"Cookies", 
 			"wssid="+Plus1Helper.getClientSessionId(view.getContext())
 		);
+		connection.setRequestProperty(
+			"x-display-metrics", 
+			getDisplayMetrics()
+		);
+	}
+	
+	protected String getDisplayMetrics()
+	{
+		DisplayMetrics metrics = new DisplayMetrics();
+		
+		((Activity)view.getContext()).
+			getWindowManager().
+			getDefaultDisplay().
+			getMetrics(metrics);
+		
+		return 
+			String.valueOf(metrics.widthPixels) + "x" 
+			+ String.valueOf(metrics.heightPixels);
 	}
 	
 	abstract protected Plus1Banner parse(String answer);
