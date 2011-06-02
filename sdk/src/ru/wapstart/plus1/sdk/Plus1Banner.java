@@ -29,7 +29,11 @@
 
 package ru.wapstart.plus1.sdk;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import android.graphics.Bitmap;
+import android.util.Log;
 
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
@@ -93,5 +97,34 @@ final class Plus1Banner {
 		}
 
 		return image;
+	}
+	
+	public void setProperty(String propertyName, String propertyValue) {
+		try {
+			Method method = 
+				getClass().getMethod(
+					"set" 
+					+ propertyName.substring(0, 1).toUpperCase()
+					+ propertyName.substring(1),
+					Object.class
+				);
+			
+			method.invoke(this, propertyValue);
+		} catch (NoSuchMethodException e) {
+			Log.e(
+				getClass().getName(), 
+				"No found method for " + propertyName
+			);
+		} catch (IllegalAccessException e) {
+			Log.e(
+				getClass().getName(),
+				"Illegal access exception"
+			);
+		} catch (InvocationTargetException e) {
+			Log.e(
+				getClass().getName(),
+				"Ivocation target exception"
+			);
+		}
 	}
 }
