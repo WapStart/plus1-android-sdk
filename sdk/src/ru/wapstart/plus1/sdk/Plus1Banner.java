@@ -40,11 +40,14 @@ import android.util.Log;
  * @copyright Copyright (c) 2010, Wapstart
  */
 final class Plus1Banner {
-	private int id;
+	private Integer id;
 	private String title;
 	private String content;
+	private String singleLineContent;
 	private String link;
-	private String imageLink;
+	private String pictureUrl;
+	private String pictureUrlPng;
+	private String cookieSetterUrl;
 	private Bitmap image;
 
 	public static Plus1Banner create() {
@@ -55,7 +58,7 @@ final class Plus1Banner {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -75,6 +78,14 @@ final class Plus1Banner {
 		this.content = content;
 	}
 
+	public String getSingleLineContent() {
+		return singleLineContent;
+	}
+	
+	public void setSingleLineContent(String singleLineContent) {
+		this.singleLineContent = singleLineContent;
+	}
+	
 	public String getLink() {
 		return link;
 	}
@@ -83,16 +94,32 @@ final class Plus1Banner {
 		this.link = link;
 	}
 
-	public String getImageLink() {
-		return imageLink;
+	public String getPictureUrl() {
+		return pictureUrl;
 	}
 
-	public void setImageLink(String imageLink) {
-		this.imageLink = imageLink;
+	public void setPictureUrl(String pictureUrl) {
+		this.pictureUrl = pictureUrl;
+	}
+
+	public String getPictureUrlPng() {
+		return pictureUrlPng;
+	}
+
+	public void setPictureUrlPng(String pictureUrlPng) {
+		this.pictureUrlPng = pictureUrlPng;
+	}
+	
+	public String getCookieSetterUrl() {
+		return cookieSetterUrl;
+	}
+
+	public void setCookieSetterUrl(String cookieSetterUrl) {
+		this.cookieSetterUrl = cookieSetterUrl;
 	}
 
 	public Bitmap getImage() {
-		if ((image == null) && (imageLink != null)) {
+		if ((image == null) && (pictureUrl != null)) {
 			// FIXME: getting image in thread
 		}
 
@@ -106,10 +133,17 @@ final class Plus1Banner {
 					"set" 
 					+ propertyName.substring(0, 1).toUpperCase()
 					+ propertyName.substring(1),
-					Object.class
+					propertyName.equals("id")
+						? Integer.class
+						: String.class
 				);
 			
-			method.invoke(this, propertyValue);
+			method.invoke(
+				this, 
+				propertyName.equals("id")
+					? Integer.parseInt(propertyValue)
+					: propertyValue
+			);
 		} catch (NoSuchMethodException e) {
 			Log.e(
 				getClass().getName(), 
