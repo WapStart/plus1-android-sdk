@@ -10,6 +10,8 @@ import android.widget.ImageView;
 import java.util.Random;
 import java.util.Date;
 
+import ru.wapstart.plus1.sdk.*;
+
 public class BartActivity extends Activity implements View.OnClickListener
 {
 	private MediaPlayer mp;
@@ -34,6 +36,12 @@ public class BartActivity extends Activity implements View.OnClickListener
 		imageView.setImageResource(R.drawable.bartsimpson);
 
 		imageView.setOnClickListener(this);
+		
+		new Plus1BannerAsker(
+			new Plus1BannerRequest(1273), 
+			getApplicationContext()
+		)
+		.start();
     }
 
 	public void onClick(View view) {
