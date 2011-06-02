@@ -33,7 +33,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import android.content.Context;
 import android.util.Log;
 import android.util.Xml;
 
@@ -43,8 +42,8 @@ import android.util.Xml;
  */
 final class XMLBannerDownloader extends BaseBannerDownloader {
 	
-	public XMLBannerDownloader(Context context) {
-		super(context);
+	public XMLBannerDownloader(Plus1BannerView view) {
+		super(view);
 	}
 
 	@Override

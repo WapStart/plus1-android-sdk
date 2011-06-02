@@ -28,7 +28,6 @@
  */
 package ru.wapstart.plus1.sdk;
 
-import android.content.Context;
 import android.util.Log;
 
 import java.util.Iterator;
@@ -41,8 +40,8 @@ import org.json.JSONObject;
  */
 final class JSONBannerDownloader extends BaseBannerDownloader {
 
-	public JSONBannerDownloader(Context context) {
-		super(context);
+	public JSONBannerDownloader(Plus1BannerView view) {
+		super(view);
 	}
 
 	@Override

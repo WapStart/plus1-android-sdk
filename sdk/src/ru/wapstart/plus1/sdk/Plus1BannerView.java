@@ -67,7 +67,10 @@ public class Plus1BannerView extends ImageView {
 	@Override
 	protected void onDraw(Canvas canvas)
 	{
-		if (banner == null) {
+		if (
+			(banner == null)
+			|| (banner.getId() == 0)
+		) {
 			Log.d("Plus1", "no have banners");
 
 			return;
@@ -85,6 +88,8 @@ public class Plus1BannerView extends ImageView {
 		canvas.drawText(banner.getContent(), 10, getDip(20f), paint);
 
 		canvas.drawBitmap(shild, new Matrix(), paint);
+		
+		canvas.restore();
 	}
 
 	public Plus1Banner getBanner() {
@@ -93,6 +98,8 @@ public class Plus1BannerView extends ImageView {
 
 	public void setBanner(Plus1Banner banner) {
 		this.banner = banner;
+		
+		refreshDrawableState();
 	}
 
 	private void init() {

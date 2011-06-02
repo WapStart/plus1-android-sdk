@@ -38,8 +38,8 @@ public class BartActivity extends Activity implements View.OnClickListener
 		imageView.setOnClickListener(this);
 		
 		new Plus1BannerAsker(
-			new Plus1BannerRequest(1273), 
-			getApplicationContext()
+			new Plus1BannerRequest(1273),
+			(Plus1BannerView) findViewById(R.id.plus1BannerView)
 		)
 		.start();
     }

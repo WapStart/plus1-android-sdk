@@ -29,35 +29,36 @@
 
 package ru.wapstart.plus1.sdk;
 
-import android.content.Context;
-
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
 public class Plus1BannerAsker {
 	private Plus1BannerRequest request;
-	private Context context;
+	private Plus1BannerView view;
 
 	public static Plus1BannerAsker create(
-		Plus1BannerRequest request, Context context
+		Plus1BannerRequest request, Plus1BannerView view
 	) {
-		return new Plus1BannerAsker(request, context);
+		return new Plus1BannerAsker(request, view);
 	}
 
-	public Plus1BannerAsker(Plus1BannerRequest request, Context context) {
+	public Plus1BannerAsker(Plus1BannerRequest request, Plus1BannerView view) {
 		this.request = request;
-		this.context = context;
+		this.view = view;
 	}
 
 	public void start()
 	{
+		if ((request == null) || (view == null))
+			return;
+		
 		BaseBannerDownloader downloader = null;
 		
 		if (request.getType() == Plus1BannerRequest.Type.JSON)
-			downloader = new JSONBannerDownloader(context);
+			downloader = new JSONBannerDownloader(view);
 		else
-			downloader = new XMLBannerDownloader(context);
+			downloader = new XMLBannerDownloader(view);
 		
 		downloader.execute(request.getRequestUri());
 	}

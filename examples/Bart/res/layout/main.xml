@@ -11,6 +11,7 @@
 		/>
 		
 	<ru.wapstart.plus1.sdk.Plus1BannerView
+			android:id="@+id/plus1BannerView"
 			android:layout_width="300dip"
 			android:layout_height="59dip"
 			android:layout_gravity="top|right"

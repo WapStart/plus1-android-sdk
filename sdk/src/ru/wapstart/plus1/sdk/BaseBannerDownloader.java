@@ -33,7 +33,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import android.content.Context;
 import android.util.Log;
 
 /**
@@ -44,10 +43,10 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 	private static final Integer BUFFER_SIZE = 8192;
 	private static final String NO_BANNER = "<!-- i4jgij4pfd4ssd -->";
 	
-	protected Context context = null;
+	protected Plus1BannerView view = null;
 	
-	public BaseBannerDownloader(Context context) {
-		this.context = context;
+	public BaseBannerDownloader(Plus1BannerView view) {
+		this.view = view;
 	}
 	
 	@Override
@@ -59,7 +58,7 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 			);
 		
 		String result = new String();
-
+		
 		try {
 			byte[] buffer = new byte[BUFFER_SIZE];
 			int count = 0;
@@ -76,13 +75,19 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		
 		return (result.equals(NO_BANNER)) ? null : parse(result);
 	}
-
+	
+	@Override
+	protected void onPostExecute(Object result) {
+		if (result != null)
+			view.setBanner((Plus1Banner) result);
+	}
+	
 	@Override
 	protected void modifyConnection(HttpURLConnection connection) {
 		connection.setRequestProperty("User-Agent", Plus1Helper.getUserAgent());
 		connection.setRequestProperty(
 			"Cookies", 
-			"wssid="+Plus1Helper.getClientSessionId(context)
+			"wssid="+Plus1Helper.getClientSessionId(view.getContext())
 		);
 	}
 	
