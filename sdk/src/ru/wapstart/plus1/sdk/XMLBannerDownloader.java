@@ -29,6 +29,9 @@
 
 package ru.wapstart.plus1.sdk;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -57,13 +60,23 @@ final class XMLBannerDownloader extends BaseBannerDownloader {
 			Log.e(getClass().getName(), "Answer is not a suitable xml");
 		}
 		
-		return new Plus1Banner();
+		return handler.getBanner();
 	}
 
 	private final class XMLHandler extends DefaultHandler 
 	{
 		private String currentElement;
 		private StringBuffer buffer;
+		private Plus1Banner banner;
+		
+		public XMLHandler() {
+			this.banner = new Plus1Banner();
+		}
+		
+		public Plus1Banner getBanner()
+		{
+			return banner;
+		}
 		
 		@Override
 		public void startElement(
@@ -81,6 +94,33 @@ final class XMLBannerDownloader extends BaseBannerDownloader {
 		public void endElement(String uri, String localName, String qName) 
 			throws SAXException 
 		{
+			try {
+				Method method = 
+					banner.getClass().getMethod(
+						"set" 
+						+ currentElement.substring(0, 1).toUpperCase()
+						+ currentElement.substring(1),
+						Object.class
+					);
+				
+				method.invoke(banner, buffer.toString());
+			} catch (NoSuchMethodException e) {
+				Log.e(
+					getClass().getName(), 
+					"No found method for " + currentElement
+				);
+			} catch (IllegalAccessException e) {
+				Log.e(
+					getClass().getName(),
+					"Illegal access exception"
+				);
+			} catch (InvocationTargetException e) {
+				Log.e(
+					getClass().getName(),
+					"Ivocation target exception"
+				);
+			}
+			
 			currentElement = null;
 			buffer = null;
 		}
