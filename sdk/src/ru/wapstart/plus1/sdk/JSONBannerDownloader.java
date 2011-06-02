@@ -47,18 +47,25 @@ final class JSONBannerDownloader extends BaseBannerDownloader {
 
 	@Override
 	protected Plus1Banner parse(String answer) {
+		Plus1Banner banner = new Plus1Banner();
+		
 		try {
 			JSONObject jsonObject = new JSONObject(answer);
 			Iterator<String> iterator = jsonObject.keys();
+			String propertyName = null;
 			
-			while (iterator.hasNext())
-				jsonObject.get(iterator.next());			
-			
-			return new Plus1Banner();
+			while (iterator.hasNext()) {
+				propertyName = iterator.next();
+				
+				banner.setProperty(
+					propertyName, 
+					jsonObject.get(propertyName).toString()
+				);
+			}
 		} catch (JSONException e) {
 			Log.e(getClass().getName(), "Can't handle json answer");
 		}
 		
-		return null;
+		return banner;
 	}
 }
