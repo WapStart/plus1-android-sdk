@@ -122,15 +122,6 @@ public class Plus1BannerView extends ImageView {
 				}
 			}
 		);
-		
-		// FIXME: debug stuff
-		Plus1Banner banner = new Plus1Banner();
-		banner.setId(1);
-		banner.setTitle("12345678901234567890123456789012");
-		banner.setContent("12345678901234567890123456789012");
-		banner.setLink("http://ya.ru/");
-
-		setBanner(banner);
 	}
 	
 	private float getDip(float pixels)
