@@ -31,8 +31,6 @@ package ru.wapstart.plus1.sdk;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import android.graphics.Bitmap;
 import android.util.Log;
 
 /**
@@ -51,7 +49,6 @@ final class Plus1Banner {
 	private String pictureUrlPng = null;
 	private String cookieSetterUrl = null;
 	private ResponseType responseType = ResponseType.UNKNOWN;
-	private Bitmap image = null;
 
 	public static Plus1Banner create() {
 		return new Plus1Banner();
@@ -143,14 +140,6 @@ final class Plus1Banner {
 			default:
 				this.responseType = ResponseType.UNKNOWN;
 		}
-	}
-	
-	public Bitmap getImage() {
-		if ((image == null) && (pictureUrl != null)) {
-			// FIXME: getting image in thread
-		}
-
-		return image;
 	}
 	
 	public void setProperty(String propertyName, String propertyValue) {
