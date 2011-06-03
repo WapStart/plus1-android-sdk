@@ -31,14 +31,11 @@ package ru.wapstart.plus1.sdk;
 
 import android.content.Context;
 import android.content.Intent;
-import android.view.Gravity;
 
 import android.graphics.*;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -56,8 +53,6 @@ public class Plus1BannerView extends LinearLayout {
 	private TextView title;
 	private TextView content;
 	private ImageView image;
-	
-	private Boolean bannerChanged = false;
 	
 	private Animation hideAnimation = null;
 	private Animation showAnimation = null;
@@ -82,15 +77,26 @@ public class Plus1BannerView extends LinearLayout {
 		this.banner = banner;
 		
 		if ((banner != null) && (banner.getId() > 0)) {
+			if (getVisibility() == INVISIBLE) {
+				startAnimation(showAnimation);
+			
+				setVisibility(VISIBLE);
+			}
+				
 			title.setText(banner.getTitle());
 			content.setText(banner.getTitle());
 			
-			bannerChanged = true;
+			String imageUrl = null;
 			
-			startAnimation(showAnimation);
+			if (!banner.getPictureUrlPng().equals(""))
+				imageUrl = banner.getPictureUrlPng();
+			else if (!banner.getPictureUrl().equals(""))
+				imageUrl = banner.getPictureUrl();
 			
-			setVisibility(VISIBLE);
-		} else {
+			new ImageDowloader(this.image).execute(imageUrl);
+			
+		} else if (getVisibility() == VISIBLE) {
+			startAnimation(hideAnimation);
 			setVisibility(INVISIBLE);
 		}
 	}
@@ -149,11 +155,12 @@ public class Plus1BannerView extends LinearLayout {
 		);
 		showAnimation.setDuration(500);
 		
+		this.hideAnimation = new TranslateAnimation(
+				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
+				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, -1f
+		);
+		hideAnimation.setDuration(500);
+		
 		setVisibility(INVISIBLE);
-	}
-	
-	private float getDip(float pixels)
-	{
-		return pixels * (getContext().getResources().getDisplayMetrics().density + 0.5f);
 	}
 }

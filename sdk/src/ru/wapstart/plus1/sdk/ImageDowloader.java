@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 
 import android.graphics.drawable.Drawable;
+import android.widget.ImageView;
 
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
@@ -39,6 +40,12 @@ import android.graphics.drawable.Drawable;
  */
 final class ImageDowloader extends BaseDownloader {
 
+	private ImageView imageView = null;
+	
+	public ImageDowloader(ImageView imageView) {
+		this.imageView = imageView;
+	}
+	
 	@Override
 	protected Drawable doInBackground(String... url) {
 		InputStream stream = (InputStream) super.doInBackground(url);
@@ -48,6 +55,12 @@ final class ImageDowloader extends BaseDownloader {
 			drawable = Drawable.createFromStream(stream, "src");
 		
 		return drawable; 
+	}
+	
+	@Override
+	protected void onPostExecute(Object result) {
+		if (result != null)
+			imageView.setImageDrawable((Drawable) result);
 	}
 	
 	@Override
