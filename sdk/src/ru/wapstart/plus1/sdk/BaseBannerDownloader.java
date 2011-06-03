@@ -33,6 +33,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.util.DisplayMetrics;
@@ -90,14 +91,29 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 	
 	@Override
 	protected void modifyConnection(HttpURLConnection connection) {
-		connection.setRequestProperty("User-Agent", Plus1Helper.getUserAgent());
+		connection.setRequestProperty(
+			"User-Agent", 
+			Plus1Helper.getUserAgent()
+		);
+		
 		connection.setRequestProperty(
 			"Cookies", 
 			"wssid="+Plus1Helper.getClientSessionId(view.getContext())
 		);
+		
 		connection.setRequestProperty(
 			"x-display-metrics", 
 			getDisplayMetrics()
+		);
+		
+		connection.setRequestProperty(
+			"x-application-type",
+			"android"
+		);
+		
+		connection.setRequestProperty(
+			"x-preffered-locale",
+			Locale.getDefault().getDisplayName(Locale.US)
 		);
 	}
 	
