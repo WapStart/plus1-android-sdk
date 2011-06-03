@@ -31,20 +31,36 @@ package ru.wapstart.plus1.sdk;
 
 import android.content.Context;
 import android.content.Intent;
+import android.view.Gravity;
+
 import android.graphics.*;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.LinearLayout;
+
 
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
-public class Plus1BannerView extends ImageView {
+public class Plus1BannerView extends LinearLayout {
 
 	private Plus1Banner banner;
-	private Bitmap shild;
+
+	private TextView title;
+	private TextView content;
+	private ImageView image;
+	
+	private Boolean bannerChanged = false;
+	
+	private Animation hideAnimation = null;
+	private Animation showAnimation = null;
 
 	public Plus1BannerView(Context context) {
 		super(context);
@@ -58,40 +74,6 @@ public class Plus1BannerView extends ImageView {
 		init();
 	}
 
-	public Plus1BannerView(Context context, AttributeSet attr, int defStyle) {
-		super(context, attr, defStyle);
-
-		init();
-	}
-
-	@Override
-	protected void onDraw(Canvas canvas)
-	{
-		if (
-			(banner == null)
-			|| (banner.getId() == 0)
-		) {
-			Log.d("Plus1", "no have banners");
-
-			return;
-		}
-
-		Paint paint = new Paint();
-		paint.setAntiAlias(true);
-		paint.setColor(Color.WHITE);
-		paint.setTextSize(getDip(10f));
-		paint.setFakeBoldText(true);
-		canvas.drawText(banner.getTitle(), 10, getDip(10f), paint);
-
-		paint.setTextSize(getDip(8f));
-		paint.setFakeBoldText(false);
-		canvas.drawText(banner.getContent(), 10, getDip(20f), paint);
-
-		canvas.drawBitmap(shild, new Matrix(), paint);
-		
-		canvas.restore();
-	}
-
 	public Plus1Banner getBanner() {
 		return banner;
 	}
@@ -99,18 +81,48 @@ public class Plus1BannerView extends ImageView {
 	public void setBanner(Plus1Banner banner) {
 		this.banner = banner;
 		
-		refreshDrawableState();
+		if ((banner != null) && (banner.getId() > 0)) {
+			title.setText(banner.getTitle());
+			content.setText(banner.getTitle());
+			
+			bannerChanged = true;
+			
+			startAnimation(showAnimation);
+			
+			setVisibility(VISIBLE);
+		} else {
+			setVisibility(INVISIBLE);
+		}
 	}
 
 	private void init() {
 		setBackgroundResource(R.drawable.wp_banner_background);
 
-		this.shild = 
-			BitmapFactory.decodeResource(
-				getContext().getResources(), 
-				R.drawable.wp_banner_shild
-			);
-
+		ImageView shild = new ImageView(getContext());
+		shild.setImageResource(R.drawable.wp_banner_shild);
+		shild.setMaxWidth(9);
+		addView(shild);
+		
+		LinearLayout ll = new LinearLayout(getContext());
+		ll.setOrientation(VERTICAL);
+		
+		this.title = new TextView(getContext());
+		title.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
+		title.setTextSize(14f);
+		title.setTextColor(Color.WHITE);
+		ll.addView(title);
+		
+		this.content = new TextView(getContext());
+		content.setTypeface(Typeface.SANS_SERIF);
+		content.setTextSize(13f);
+		content.setTextColor(Color.WHITE);
+		ll.addView(content);
+		
+		this.image = new ImageView(getContext());
+		ll.addView(image);
+		
+		addView(ll);
+		
 		setOnClickListener(
 			new OnClickListener() {
 				public void onClick(View view) {
@@ -130,6 +142,14 @@ public class Plus1BannerView extends ImageView {
 				}
 			}
 		);
+		
+		this.showAnimation = new TranslateAnimation(
+			Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
+			Animation.RELATIVE_TO_SELF, -1f, Animation.RELATIVE_TO_SELF, 0f
+		);
+		showAnimation.setDuration(500);
+		
+		setVisibility(INVISIBLE);
 	}
 	
 	private float getDip(float pixels)
