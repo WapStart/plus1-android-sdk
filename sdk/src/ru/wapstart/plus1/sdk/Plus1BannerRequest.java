@@ -40,7 +40,7 @@ public final class Plus1BannerRequest {
 	public static enum Type {XML, JSON};
 	
 	private static final String ROTATOR_URI =
-		"http://ro.plus1.wapstart.ru/?area=";
+		"http://ro.plus1.wapstart.ru/?area=application";
 
 	private static final Integer VERSION			= 2;
 
@@ -105,9 +105,8 @@ public final class Plus1BannerRequest {
 	public String getRequestUri() {
 
 		String url = ROTATOR_URI
-				+ getControllerByType()
 				+ "&version=" + VERSION
-				+ "&id=" + getApplicationId()
+				+ "&site=" + getApplicationId()
 				+ "&pageId=" + getPageId();
 				
 		if (!this.getGender().equals(Gender.Unknown))
@@ -115,19 +114,13 @@ public final class Plus1BannerRequest {
 
 		if (this.getAge() != 0)
 			url += "&age=" + this.getAge();
-
+		
+		if (this.getType() == Type.JSON)
+			url += "&json=1";
+		
 		return url;
 	}
 
-	private String getControllerByType() {
-		String controllerName = "viewBannerXml"; 
-		
-		if (type == Type.JSON)
-			controllerName = "viewBannerJson";
-		
-		return controllerName;
-	}
-	
 	private String getPageId() {
 		try {
 			if (pageId == null)

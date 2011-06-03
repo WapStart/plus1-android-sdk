@@ -40,6 +40,8 @@ import android.util.Log;
  * @copyright Copyright (c) 2010, Wapstart
  */
 final class Plus1Banner {
+	private static enum ResponseType { UNKNOWN, LINK, CALL};
+	
 	private Integer id;
 	private String title;
 	private String content;
@@ -48,6 +50,7 @@ final class Plus1Banner {
 	private String pictureUrl;
 	private String pictureUrlPng;
 	private String cookieSetterUrl;
+	private ResponseType responseType;
 	private Bitmap image;
 
 	public static Plus1Banner create() {
@@ -117,7 +120,31 @@ final class Plus1Banner {
 	public void setCookieSetterUrl(String cookieSetterUrl) {
 		this.cookieSetterUrl = cookieSetterUrl;
 	}
+	
+	public ResponseType getResponseType()
+	{
+		return responseType;
+	}
 
+	public void setResponseType(ResponseType responseType)
+	{
+		this.responseType = responseType;
+	}
+	
+	public void setResponseType(Integer responseType)
+	{
+		switch (responseType) {
+			case 1:
+				this.responseType = ResponseType.LINK;
+				break;
+			case 2: 
+				this.responseType = ResponseType.CALL;
+				break;
+			default:
+				this.responseType = ResponseType.UNKNOWN;
+		}
+	}
+	
 	public Bitmap getImage() {
 		if ((image == null) && (pictureUrl != null)) {
 			// FIXME: getting image in thread
@@ -133,14 +160,14 @@ final class Plus1Banner {
 					"set" 
 					+ propertyName.substring(0, 1).toUpperCase()
 					+ propertyName.substring(1),
-					propertyName.equals("id")
+					isIntegerProperty(propertyName)
 						? Integer.class
 						: String.class
 				);
 			
 			method.invoke(
 				this, 
-				propertyName.equals("id")
+				isIntegerProperty(propertyName)
 					? Integer.parseInt(propertyValue)
 					: propertyValue
 			);
@@ -161,4 +188,9 @@ final class Plus1Banner {
 			);
 		}
 	}
+	
+	private Boolean isIntegerProperty(String propertyName) {
+		return propertyName.equals("id") || propertyName.equals("responseType");
+	}
+	
 }

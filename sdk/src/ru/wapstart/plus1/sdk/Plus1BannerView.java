@@ -120,6 +120,7 @@ public class Plus1BannerView extends ImageView {
 					)
 						return;
 
+					// TODO: click2call
 					getContext().startActivity(
 						new Intent(
 							Intent.ACTION_VIEW,
