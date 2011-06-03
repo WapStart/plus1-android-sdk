@@ -76,7 +76,10 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		
 		Log.d(getClass().getName(), "answer: " + result.toString());
 		
-		return (result.equals(NO_BANNER)) ? null : parse(result);
+		return 
+			(result.equals("") || result.equals(NO_BANNER)) 
+				? null 
+				: parse(result);
 	}
 	
 	@Override
