@@ -42,16 +42,16 @@ import android.util.Log;
 final class Plus1Banner {
 	private static enum ResponseType { UNKNOWN, LINK, CALL};
 	
-	private Integer id;
-	private String title;
-	private String content;
-	private String singleLineContent;
-	private String link;
-	private String pictureUrl;
-	private String pictureUrlPng;
-	private String cookieSetterUrl;
-	private ResponseType responseType;
-	private Bitmap image;
+	private Integer id = 0;
+	private String title = null;
+	private String content = null;
+	private String singleLineContent = null;
+	private String link = null;
+	private String pictureUrl = null;
+	private String pictureUrlPng = null;
+	private String cookieSetterUrl = null;
+	private ResponseType responseType = ResponseType.UNKNOWN;
+	private Bitmap image = null;
 
 	public static Plus1Banner create() {
 		return new Plus1Banner();
