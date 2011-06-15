@@ -112,7 +112,7 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		);
 		
 		connection.setRequestProperty(
-			"x-preffered-locale",
+			"x-preferred-locale",
 			Locale.getDefault().getDisplayName(Locale.US)
 		);
 	}
