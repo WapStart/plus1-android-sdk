@@ -131,7 +131,7 @@ public class Plus1BannerView extends LinearLayout {
 				new SpannableStringBuilder(banner.getTitle());
 			text.setSpan(new UnderlineSpan(), 0, banner.getTitle().length(), 0);				
 			title.setText(text);
-			content.setText(banner.getTitle());
+			content.setText(banner.getContent());
 			
 			String imageUrl = null;
 			
