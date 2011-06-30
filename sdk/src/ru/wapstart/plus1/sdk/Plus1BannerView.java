@@ -33,6 +33,8 @@ import android.content.Context;
 import android.content.Intent;
 
 import android.graphics.*;
+import android.text.SpannableStringBuilder;
+import android.text.style.UnderlineSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -110,7 +112,9 @@ public class Plus1BannerView extends LinearLayout {
 				Log.d(getClass().getName(), "title empty");
 				title.setVisibility(INVISIBLE);
 			} else {
-				title.setText(banner.getTitle());
+				SpannableStringBuilder text = new SpannableStringBuilder(banner.getTitle());
+				text.setSpan(new UnderlineSpan(), 0, banner.getTitle().length(), 0);				
+				title.setText(text);
 				title.setVisibility(VISIBLE);
 			}
 			
@@ -159,9 +163,8 @@ public class Plus1BannerView extends LinearLayout {
 		this.title = new TextView(getContext());
 		title.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
 		title.setTextSize(14f);
-		title.setTextColor(Color.WHITE);
+		title.setTextColor(Color.rgb(115, 154, 208));
 		title.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-		title.setMinHeight(getHeight() / 2);
 		ll.addView(title);
 		
 		this.content = new TextView(getContext());
@@ -169,7 +172,6 @@ public class Plus1BannerView extends LinearLayout {
 		content.setTextSize(13f);
 		content.setTextColor(Color.WHITE);
 		content.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-		content.setMinHeight(getHeight() / 2);
 		ll.addView(content);
 		
 		this.image = new ImageView(getContext());
@@ -178,7 +180,7 @@ public class Plus1BannerView extends LinearLayout {
 		addView(
 			ll, 			
 			new LinearLayout.LayoutParams(
-				LayoutParams.FILL_PARENT, 
+				LayoutParams.FILL_PARENT,
 				LayoutParams.FILL_PARENT,
 				0.90625f + (isHaveCloseButton() ? 0f : 0.0625f)
 			)
