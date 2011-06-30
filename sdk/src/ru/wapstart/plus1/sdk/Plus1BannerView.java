@@ -34,6 +34,8 @@ import android.content.Intent;
 
 import android.graphics.*;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
@@ -82,9 +84,22 @@ public class Plus1BannerView extends LinearLayout {
 			
 				setVisibility(VISIBLE);
 			}
-				
-			title.setText(banner.getTitle());
-			content.setText(banner.getTitle());
+			
+			if (banner.getTitle().equals("")) {
+				Log.d(getClass().getName(), "title empty");
+				title.setVisibility(INVISIBLE);
+			} else {
+				title.setText(banner.getTitle());
+				title.setVisibility(VISIBLE);
+			}
+			
+			if (banner.getContent().equals("")) {
+				Log.d(getClass().getName(), "content empty");
+				content.setVisibility(INVISIBLE);
+			} else {
+				content.setText(banner.getTitle());
+				content.setVisibility(VISIBLE);
+			}
 			
 			String imageUrl = null;
 			
@@ -112,17 +127,27 @@ public class Plus1BannerView extends LinearLayout {
 		
 		LinearLayout ll = new LinearLayout(getContext());
 		ll.setOrientation(VERTICAL);
+		ll.setLayoutParams(
+			new LayoutParams(
+				LayoutParams.FILL_PARENT, 
+				LayoutParams.FILL_PARENT
+			)
+		);
 		
 		this.title = new TextView(getContext());
 		title.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
 		title.setTextSize(14f);
 		title.setTextColor(Color.WHITE);
+		title.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+		title.setMinHeight(getHeight() / 2);
 		ll.addView(title);
 		
 		this.content = new TextView(getContext());
 		content.setTypeface(Typeface.SANS_SERIF);
 		content.setTextSize(13f);
 		content.setTextColor(Color.WHITE);
+		content.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+		content.setMinHeight(getHeight() / 2);
 		ll.addView(content);
 		
 		this.image = new ImageView(getContext());
