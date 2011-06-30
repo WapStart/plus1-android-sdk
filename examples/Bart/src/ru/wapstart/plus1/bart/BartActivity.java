@@ -39,7 +39,6 @@ public class BartActivity extends Activity implements View.OnClickListener
 		
 		Plus1BannerView bannerView = 
 			(Plus1BannerView) findViewById(R.id.plus1BannerView);
-		bannerView.enableAnimationFromTop();
 		
 		new Plus1BannerAsker(
 			Plus1BannerRequest
@@ -47,6 +46,8 @@ public class BartActivity extends Activity implements View.OnClickListener
 				.setApplicationId( 4457 /* 1273 */ )
 				.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/"),
 			bannerView
+				.enableAnimationFromTop()
+				.enableCloseButton()
 		)
 		.start();
     }

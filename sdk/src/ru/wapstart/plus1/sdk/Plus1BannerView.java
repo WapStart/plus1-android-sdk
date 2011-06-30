@@ -64,17 +64,14 @@ public class Plus1BannerView extends LinearLayout {
 	
 	private boolean haveCloseButton	= false;
 	private boolean closed			= false;
+	private boolean initialized		= false;
 
 	public Plus1BannerView(Context context) {
 		super(context);
-
-		init();
 	}
 
 	public Plus1BannerView(Context context, AttributeSet attr) {
 		super(context, attr);
-
-		init();
 	}
 
 	public boolean isHaveCloseButton()
@@ -82,12 +79,16 @@ public class Plus1BannerView extends LinearLayout {
 		return haveCloseButton;
 	}
 	
-	public void setHaveCloseButton() {
+	public Plus1BannerView enableCloseButton() {
 		this.haveCloseButton = true;
+		
+		return this;
 	}
 	
-	public void setHaveCloseButton(boolean haveCloseButton) {
-		this.haveCloseButton = haveCloseButton;
+	public Plus1BannerView setCloseButtonEnabled(boolean closeButtonEnabled) {
+		this.haveCloseButton = closeButtonEnabled;
+		
+		return this;
 	}
 	
 	public boolean isClosed() {
@@ -98,20 +99,25 @@ public class Plus1BannerView extends LinearLayout {
 		return banner;
 	}
 	
-	public void enableAnimationFromTop() {
-		enableAnimation(-1f);
+	public Plus1BannerView enableAnimationFromTop() {
+		return enableAnimation(-1f);
 	}
 	
-	public void enableAnimationFromBottom() {
-		enableAnimation(1f);
+	public Plus1BannerView enableAnimationFromBottom() {
+		return enableAnimation(1f);
 	}
 	
-	public void disableAnimation() {
+	public Plus1BannerView disableAnimation() {
 		this.showAnimation = null;
 		this.hideAnimation = null;
+		
+		return this;
 	}
 
 	public void setBanner(Plus1Banner banner) {
+		if (!initialized)
+			init();
+		
 		this.banner = banner;
 		
 		if ((banner != null) && (banner.getId() > 0)) {
@@ -159,6 +165,9 @@ public class Plus1BannerView extends LinearLayout {
 	}
 
 	private void init() {
+		if (initialized)
+			return;
+		
 		setBackgroundResource(R.drawable.wp_banner_background);
 
 		ImageView shild = new ImageView(getContext());
@@ -252,9 +261,11 @@ public class Plus1BannerView extends LinearLayout {
 		);
 	
 		setVisibility(INVISIBLE);
+		
+		initialized = true;
 	}
 	
-	private void enableAnimation(float toYDelta) {
+	private Plus1BannerView enableAnimation(float toYDelta) {
 		this.showAnimation = new TranslateAnimation(
 				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
 				Animation.RELATIVE_TO_SELF, toYDelta, Animation.RELATIVE_TO_SELF, 0f
@@ -266,5 +277,7 @@ public class Plus1BannerView extends LinearLayout {
 				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, toYDelta
 		);
 		hideAnimation.setDuration(500);
+		
+		return this;
 	}
 }
