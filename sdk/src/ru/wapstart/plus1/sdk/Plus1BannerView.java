@@ -39,6 +39,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.LinearLayout;
@@ -58,6 +59,9 @@ public class Plus1BannerView extends LinearLayout {
 	
 	private Animation hideAnimation = null;
 	private Animation showAnimation = null;
+	
+	private boolean haveCloseButton	= false;
+	private boolean closed			= false;
 
 	public Plus1BannerView(Context context) {
 		super(context);
@@ -71,6 +75,23 @@ public class Plus1BannerView extends LinearLayout {
 		init();
 	}
 
+	public boolean isHaveCloseButton()
+	{
+		return haveCloseButton;
+	}
+	
+	public void setHaveCloseButton() {
+		this.haveCloseButton = true;
+	}
+	
+	public void setHaveCloseButton(boolean haveCloseButton) {
+		this.haveCloseButton = haveCloseButton;
+	}
+	
+	public boolean isClosed() {
+		return closed;
+	}
+	
 	public Plus1Banner getBanner() {
 		return banner;
 	}
@@ -133,7 +154,7 @@ public class Plus1BannerView extends LinearLayout {
 				LayoutParams.FILL_PARENT
 			)
 		);
-		
+
 		this.title = new TextView(getContext());
 		title.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
 		title.setTextSize(14f);
@@ -154,6 +175,26 @@ public class Plus1BannerView extends LinearLayout {
 		ll.addView(image);
 		
 		addView(ll);
+		
+		if (this.isHaveCloseButton()) {
+			Button closeButton = new Button(getContext());
+			closeButton.setBackgroundResource(R.drawable.wp_banner_close);
+			
+			closeButton.setOnClickListener(
+				new OnClickListener() {
+					public void onClick(View v) {
+						closed = true;
+						
+						if (getVisibility() == VISIBLE) {
+							startAnimation(hideAnimation);
+							setVisibility(INVISIBLE);	
+						}
+					}
+				}
+			);
+			
+			addView(closeButton, new LayoutParams(18, 17));
+		}
 		
 		setOnClickListener(
 			new OnClickListener() {
