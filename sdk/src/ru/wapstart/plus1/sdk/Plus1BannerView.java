@@ -88,10 +88,10 @@ public class Plus1BannerView extends LinearLayout {
 			
 			String imageUrl = null;
 			
-			if (!banner.getPictureUrlPng().equals(""))
-				imageUrl = banner.getPictureUrlPng();
-			else if (!banner.getPictureUrl().equals(""))
+			if (!banner.getPictureUrl().equals(""))
 				imageUrl = banner.getPictureUrl();
+			else if (!banner.getPictureUrlPng().equals(""))
+				imageUrl = banner.getPictureUrlPng();
 			
 			new ImageDowloader(this.image).execute(imageUrl);
 			
