@@ -93,7 +93,8 @@ public class Plus1BannerView extends LinearLayout {
 			else if (!banner.getPictureUrlPng().equals(""))
 				imageUrl = banner.getPictureUrlPng();
 			
-			new ImageDowloader(this.image).execute(imageUrl);
+			if (imageUrl != null)
+				new ImageDowloader(this.image).execute(imageUrl);
 			
 		} else if (getVisibility() == VISIBLE) {
 			startAnimation(hideAnimation);
