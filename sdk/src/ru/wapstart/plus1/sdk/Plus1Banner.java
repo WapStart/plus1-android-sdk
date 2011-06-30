@@ -178,6 +178,16 @@ final class Plus1Banner {
 		}
 	}
 	
+	public boolean isImageBanner() {
+		return 
+			getTitle().equals("")
+			&& getContent().equals("")
+			&& (
+				!getPictureUrl().equals("")
+				|| !getPictureUrlPng().equals("")
+			);
+	}
+	
 	private Boolean isIntegerProperty(String propertyName) {
 		return propertyName.equals("id") || propertyName.equals("responseType");
 	}

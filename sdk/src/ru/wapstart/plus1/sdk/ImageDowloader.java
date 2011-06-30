@@ -32,7 +32,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 
 import android.graphics.drawable.Drawable;
-import android.widget.ImageView;
 
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
@@ -40,10 +39,10 @@ import android.widget.ImageView;
  */
 final class ImageDowloader extends BaseDownloader {
 
-	private ImageView imageView = null;
+	private Plus1BannerView bannerView = null;
 	
-	public ImageDowloader(ImageView imageView) {
-		this.imageView = imageView;
+	public ImageDowloader(Plus1BannerView bannerView) {
+		this.bannerView = bannerView;
 	}
 	
 	@Override
@@ -60,7 +59,7 @@ final class ImageDowloader extends BaseDownloader {
 	@Override
 	protected void onPostExecute(Object result) {
 		if (result != null)
-			imageView.setImageDrawable((Drawable) result);
+			bannerView.setImage((Drawable) result);
 	}
 	
 	@Override

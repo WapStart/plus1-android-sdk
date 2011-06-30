@@ -33,18 +33,20 @@ import android.content.Context;
 import android.content.Intent;
 
 import android.graphics.*;
+import android.graphics.drawable.Drawable;
 import android.text.SpannableStringBuilder;
 import android.text.style.UnderlineSpan;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.LinearLayout;
+import android.widget.ViewFlipper;
 
 
 /**
@@ -58,6 +60,8 @@ public class Plus1BannerView extends LinearLayout {
 	private TextView title;
 	private TextView content;
 	private ImageView image;
+	
+	private ViewFlipper flipper		= null;
 	
 	private Animation hideAnimation = null;
 	private Animation showAnimation = null;
@@ -121,30 +125,13 @@ public class Plus1BannerView extends LinearLayout {
 		this.banner = banner;
 		
 		if ((banner != null) && (banner.getId() > 0)) {
-			if (getVisibility() == INVISIBLE) {
-				if (showAnimation != null)
-					startAnimation(showAnimation);
+			flipper.stopFlipping();
 			
-				setVisibility(VISIBLE);
-			}
-			
-			if (banner.getTitle().equals("")) {
-				Log.d(getClass().getName(), "title empty");
-				title.setVisibility(INVISIBLE);
-			} else {
-				SpannableStringBuilder text = new SpannableStringBuilder(banner.getTitle());
-				text.setSpan(new UnderlineSpan(), 0, banner.getTitle().length(), 0);				
-				title.setText(text);
-				title.setVisibility(VISIBLE);
-			}
-			
-			if (banner.getContent().equals("")) {
-				Log.d(getClass().getName(), "content empty");
-				content.setVisibility(INVISIBLE);
-			} else {
-				content.setText(banner.getTitle());
-				content.setVisibility(VISIBLE);
-			}
+			SpannableStringBuilder text = 
+				new SpannableStringBuilder(banner.getTitle());
+			text.setSpan(new UnderlineSpan(), 0, banner.getTitle().length(), 0);				
+			title.setText(text);
+			content.setText(banner.getTitle());
 			
 			String imageUrl = null;
 			
@@ -154,7 +141,14 @@ public class Plus1BannerView extends LinearLayout {
 				imageUrl = banner.getPictureUrlPng();
 			
 			if (imageUrl != null)
-				new ImageDowloader(this.image).execute(imageUrl);
+				new ImageDowloader(this).execute(imageUrl);
+
+			if (!banner.isImageBanner()) {
+				if (flipper.getCurrentView().equals(image))
+					flipper.showNext();
+				
+				show();
+			}
 			
 		} else if (getVisibility() == VISIBLE) {
 			if (hideAnimation != null)
@@ -164,6 +158,18 @@ public class Plus1BannerView extends LinearLayout {
 		}
 	}
 
+	public void setImage(Drawable drawable) {
+		image.setImageDrawable(drawable);
+
+		if (banner.isImageBanner()) {
+			if (!flipper.getCurrentView().equals(image))
+				flipper.showNext();
+		} else
+			flipper.startFlipping();
+		
+		show();
+	}
+	
 	private void init() {
 		if (initialized)
 			return;
@@ -179,6 +185,21 @@ public class Plus1BannerView extends LinearLayout {
 				LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT,
 				0.03125f
+			)
+		);
+		
+		this.flipper = new ViewFlipper(getContext());
+		flipper.setFlipInterval(3000);
+		flipper.setInAnimation(
+			AnimationUtils.loadAnimation(
+				getContext(), 
+				android.R.anim.fade_in
+			)
+		);
+		flipper.setOutAnimation(
+			AnimationUtils.loadAnimation(
+				getContext(), 
+				android.R.anim.fade_out
 			)
 		);
 		
@@ -198,19 +219,20 @@ public class Plus1BannerView extends LinearLayout {
 		content.setTextColor(Color.WHITE);
 		content.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
 		ll.addView(content);
+		flipper.addView(ll);
 		
 		this.image = new ImageView(getContext());
-		ll.addView(image);
+		flipper.addView(image);
 		
 		addView(
-			ll, 			
+			flipper, 			
 			new LinearLayout.LayoutParams(
 				LayoutParams.FILL_PARENT,
 				LayoutParams.FILL_PARENT,
 				0.90625f + (isHaveCloseButton() ? 0f : 0.0625f)
 			)
 		);
-		
+
 		if (isHaveCloseButton()) {
 			Button closeButton = new Button(getContext());
 			closeButton.setBackgroundResource(R.drawable.wp_banner_close);
@@ -219,6 +241,7 @@ public class Plus1BannerView extends LinearLayout {
 				new OnClickListener() {
 					public void onClick(View v) {
 						closed = true;
+						flipper.stopFlipping();
 						
 						if (getVisibility() == VISIBLE) {
 							if (hideAnimation != null)
@@ -279,5 +302,14 @@ public class Plus1BannerView extends LinearLayout {
 		hideAnimation.setDuration(500);
 		
 		return this;
+	}
+	
+	private void show() {
+		if (getVisibility() == INVISIBLE) {
+			if (showAnimation != null)
+				startAnimation(showAnimation);
+		
+			setVisibility(VISIBLE);
+		}
 	}
 }
