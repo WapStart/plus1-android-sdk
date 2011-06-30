@@ -31,6 +31,8 @@ package ru.wapstart.plus1.sdk;
 
 import java.security.NoSuchAlgorithmException;
 
+import android.location.Location;
+
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2010, Wapstart
@@ -48,6 +50,7 @@ public final class Plus1BannerRequest {
 
 	private String pageId			= null;
 	private Type type				= Type.XML;
+	private Location location		= null;
 	
 	public static Plus1BannerRequest create() {
 		return new Plus1BannerRequest();
@@ -106,6 +109,16 @@ public final class Plus1BannerRequest {
 		return this;
 	}
 	
+	public Location getLocation() {
+		return location;
+	}
+	
+	public Plus1BannerRequest setLocation(Location location) {
+		this.location = location;
+		
+		return this;
+	}
+	
 	public String getRequestUri() {
 
 		String url = 
@@ -115,14 +128,19 @@ public final class Plus1BannerRequest {
 			+ "&site=" + getApplicationId()
 			+ "&pageId=" + getPageId();
 				
-		if (!this.getGender().equals(Gender.Unknown))
-			url += "&sex=" + this.getGender().ordinal();
+		if (!getGender().equals(Gender.Unknown))
+			url += "&sex=" + getGender().ordinal();
 
-		if (this.getAge() != 0)
-			url += "&age=" + this.getAge();
+		if (getAge() != 0)
+			url += "&age=" + getAge();
 		
-		if (this.getType() == Type.JSON)
+		if (getType() == Type.JSON)
 			url += "&json=1";
+		
+		if (getLocation() != null)
+			url += 
+				"&location=" + getLocation().getLatitude() 
+				+ ";" + getLocation().getLongitude();
 		
 		return url;
 	}

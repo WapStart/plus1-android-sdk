@@ -47,10 +47,15 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 	private static final Integer BUFFER_SIZE = 8192;
 	private static final String NO_BANNER = "<!-- i4jgij4pfd4ssd -->";
 	
-	protected Plus1BannerView view = null;
+	protected Plus1BannerView view	= null;
+	protected String deviceId		= null;		
 	
 	public BaseBannerDownloader(Plus1BannerView view) {
 		this.view = view;
+	}
+	
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
 	}
 	
 	@Override
@@ -115,6 +120,9 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 			"x-preferred-locale",
 			Locale.getDefault().getDisplayName(Locale.US)
 		);
+		
+		if ((deviceId != null) && !deviceId.equals(""))
+			connection.setRequestProperty("x-device-imei", deviceId);
 	}
 	
 	protected String getDisplayMetrics()

@@ -29,14 +29,22 @@
 
 package ru.wapstart.plus1.sdk;
 
+import android.content.Context;
+import android.location.LocationManager;
+import android.telephony.TelephonyManager;
+
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
 public class Plus1BannerAsker {
-	private Plus1BannerRequest request;
-	private Plus1BannerView view;
-
+	private Plus1BannerRequest request			= null;
+	private Plus1BannerView view				= null;
+	
+	private String deviceId						= null;
+	private boolean disableDispatchIMEI			= false;
+	private boolean disableAutoDetectLocation	= false;	
+	
 	public static Plus1BannerAsker create(
 		Plus1BannerRequest request, Plus1BannerView view
 	) {
@@ -48,10 +56,52 @@ public class Plus1BannerAsker {
 		this.view = view;
 	}
 
-	public void start()
-	{
+	public boolean isDisabledIMEIDispatch() {
+		return disableDispatchIMEI;
+	}
+
+	public Plus1BannerAsker disableDispatchIMEI(boolean disable) {
+		this.disableDispatchIMEI = disable;
+
+		return this;
+	}
+
+	public boolean isDisabledAutoDetectLocation() {
+		return disableAutoDetectLocation;
+	}
+	
+	public Plus1BannerAsker disableAutoDetectLocation(boolean disable) {
+		this.disableAutoDetectLocation = disable;
+
+		return this;
+	}
+
+	public void start() {
 		if ((request == null) || (view == null))
 			return;
+
+		if (!isDisabledAutoDetectLocation()) {
+			LocationManager locationManager = 
+				(LocationManager) view.getContext().getSystemService(
+					Context.LOCATION_SERVICE
+				);
+			
+			locationManager.requestLocationUpdates(
+				LocationManager.GPS_PROVIDER,
+				1000,
+				500f,
+				new Plus1LocationListener(request)
+			);
+		}
+		
+		if (!isDisabledIMEIDispatch()) {
+			TelephonyManager telephonyManager = 
+				(TelephonyManager) view.getContext().getSystemService(
+					Context.TELEPHONY_SERVICE
+				);
+			
+			this.deviceId = telephonyManager.getDeviceId();
+		}
 		
 		BaseBannerDownloader downloader = null;
 		
@@ -60,7 +110,8 @@ public class Plus1BannerAsker {
 		else
 			downloader = new XMLBannerDownloader(view);
 		
+		downloader.setDeviceId(deviceId);		
 		downloader.execute(request.getRequestUri());
 	}
-
 }
+	
