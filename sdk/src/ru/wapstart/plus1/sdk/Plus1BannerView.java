@@ -144,17 +144,18 @@ public class Plus1BannerView extends LinearLayout {
 		ImageView shild = new ImageView(getContext());
 		shild.setImageResource(R.drawable.wp_banner_shild);
 		shild.setMaxWidth(9);
-		addView(shild);
+		addView(
+			shild,
+			new LinearLayout.LayoutParams(
+				LayoutParams.WRAP_CONTENT,
+				LayoutParams.WRAP_CONTENT,
+				0.03125f
+			)
+		);
 		
 		LinearLayout ll = new LinearLayout(getContext());
 		ll.setOrientation(VERTICAL);
-		ll.setLayoutParams(
-			new LayoutParams(
-				LayoutParams.FILL_PARENT, 
-				LayoutParams.FILL_PARENT
-			)
-		);
-
+		
 		this.title = new TextView(getContext());
 		title.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
 		title.setTextSize(14f);
@@ -174,9 +175,16 @@ public class Plus1BannerView extends LinearLayout {
 		this.image = new ImageView(getContext());
 		ll.addView(image);
 		
-		addView(ll);
+		addView(
+			ll, 			
+			new LinearLayout.LayoutParams(
+				LayoutParams.FILL_PARENT, 
+				LayoutParams.FILL_PARENT,
+				0.90625f + (isHaveCloseButton() ? 0f : 0.0625f)
+			)
+		);
 		
-		if (this.isHaveCloseButton()) {
+		if (isHaveCloseButton()) {
 			Button closeButton = new Button(getContext());
 			closeButton.setBackgroundResource(R.drawable.wp_banner_close);
 			
@@ -193,7 +201,14 @@ public class Plus1BannerView extends LinearLayout {
 				}
 			);
 			
-			addView(closeButton, new LayoutParams(18, 17));
+			addView(
+				closeButton, 
+				new LinearLayout.LayoutParams(
+						18,
+						17,
+						0.0625f
+					)
+			);
 		}
 		
 		setOnClickListener(
