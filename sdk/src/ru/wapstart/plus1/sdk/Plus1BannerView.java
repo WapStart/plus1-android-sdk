@@ -97,13 +97,27 @@ public class Plus1BannerView extends LinearLayout {
 	public Plus1Banner getBanner() {
 		return banner;
 	}
+	
+	public void enableAnimationFromTop() {
+		enableAnimation(-1f);
+	}
+	
+	public void enableAnimationFromBottom() {
+		enableAnimation(1f);
+	}
+	
+	public void disableAnimation() {
+		this.showAnimation = null;
+		this.hideAnimation = null;
+	}
 
 	public void setBanner(Plus1Banner banner) {
 		this.banner = banner;
 		
 		if ((banner != null) && (banner.getId() > 0)) {
 			if (getVisibility() == INVISIBLE) {
-				startAnimation(showAnimation);
+				if (showAnimation != null)
+					startAnimation(showAnimation);
 			
 				setVisibility(VISIBLE);
 			}
@@ -137,7 +151,9 @@ public class Plus1BannerView extends LinearLayout {
 				new ImageDowloader(this.image).execute(imageUrl);
 			
 		} else if (getVisibility() == VISIBLE) {
-			startAnimation(hideAnimation);
+			if (hideAnimation != null)
+				startAnimation(hideAnimation);
+			
 			setVisibility(INVISIBLE);
 		}
 	}
@@ -196,7 +212,9 @@ public class Plus1BannerView extends LinearLayout {
 						closed = true;
 						
 						if (getVisibility() == VISIBLE) {
-							startAnimation(hideAnimation);
+							if (hideAnimation != null)
+								startAnimation(hideAnimation);
+							
 							setVisibility(INVISIBLE);	
 						}
 					}
@@ -232,19 +250,21 @@ public class Plus1BannerView extends LinearLayout {
 				}
 			}
 		);
-		
+	
+		setVisibility(INVISIBLE);
+	}
+	
+	private void enableAnimation(float toYDelta) {
 		this.showAnimation = new TranslateAnimation(
-			Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
-			Animation.RELATIVE_TO_SELF, -1f, Animation.RELATIVE_TO_SELF, 0f
-		);
+				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
+				Animation.RELATIVE_TO_SELF, toYDelta, Animation.RELATIVE_TO_SELF, 0f
+			);
 		showAnimation.setDuration(500);
 		
 		this.hideAnimation = new TranslateAnimation(
 				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
-				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, -1f
+				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, toYDelta
 		);
 		hideAnimation.setDuration(500);
-		
-		setVisibility(INVISIBLE);
 	}
 }

@@ -36,13 +36,17 @@ public class BartActivity extends Activity implements View.OnClickListener
 		imageView.setImageResource(R.drawable.bartsimpson);
 
 		imageView.setOnClickListener(this);
-			
+		
+		Plus1BannerView bannerView = 
+			(Plus1BannerView) findViewById(R.id.plus1BannerView);
+		bannerView.enableAnimationFromTop();
+		
 		new Plus1BannerAsker(
 			Plus1BannerRequest
 				.create()
 				.setApplicationId( 4457 /* 1273 */ )
 				.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/"),
-			(Plus1BannerView) findViewById(R.id.plus1BannerView)
+			bannerView
 		)
 		.start();
     }
