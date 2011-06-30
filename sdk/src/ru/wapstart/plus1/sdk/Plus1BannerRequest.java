@@ -39,11 +39,9 @@ public final class Plus1BannerRequest {
 	public static enum Gender {Unknown, Male, Female;}
 	public static enum Type {XML, JSON};
 	
-	private static final String ROTATOR_URI =
-		"http://ro.plus1.wapstart.ru/?area=application";
-
 	private static final Integer VERSION			= 2;
 
+	private String rotatorUrl		= "http://ro.plus1.wapstart.ru/";
 	private int age					= 0;
 	private int applicationId		= 0;
 	private Gender gender			= Gender.Unknown;
@@ -51,63 +49,71 @@ public final class Plus1BannerRequest {
 	private String pageId			= null;
 	private Type type				= Type.XML;
 	
-	public Plus1BannerRequest(int applicationId) {
-		this.applicationId = applicationId;
+	public static Plus1BannerRequest create() {
+		return new Plus1BannerRequest();
 	}
-
-	public Plus1BannerRequest(int applicationId, int age) {
-		this.applicationId = applicationId;
-		this.age = age;
-	}
-
-	public Plus1BannerRequest(int applicationId, Gender gender) {
-		this.applicationId = applicationId;
-		this.gender = gender;
-	}
-
-	public Plus1BannerRequest(int applicationId, int age, Gender gender) {
-		this.applicationId = applicationId;
-		this.age = age;
-		this.gender = gender;
-	}
+	
+	public Plus1BannerRequest() {}
 
 	public int getAge() {
 		return age;
 	}
 
-	public void setAge(int age) {
+	public Plus1BannerRequest setAge(int age) {
 		this.age = age;
+		
+		return this;
 	}
 
 	public int getApplicationId() {
 		return applicationId;
 	}
 
-	public void setApplicationId(int applicationId) {
+	public Plus1BannerRequest setApplicationId(int applicationId) {
 		this.applicationId = applicationId;
+		
+		return this;
 	}
 
 	public Gender getGender() {
 		return gender;
 	}
 
-	public void setGender(Gender sex) {
+	public Plus1BannerRequest setGender(Gender sex) {
 		this.gender = sex;
+		
+		return this;
 	}
 	
 	public Type getType() {
 		return type;
 	}
 
-	public void setType(Type type) {
-		this.type = type;
+	public Plus1BannerRequest setType(Type type) throws Exception {
+		throw new Exception("types not supported while");
+		/* this.type = type;
+		
+		return this; */
 	}
+	
+	public String getRotatorUrl() {
+		return rotatorUrl;
+	}
+	
+	public Plus1BannerRequest setRotatorUrl(String rotatorUrl) {
+		this.rotatorUrl = rotatorUrl;
+		
+		return this;
+	}
+	
 	public String getRequestUri() {
 
-		String url = ROTATOR_URI
-				+ "&version=" + VERSION
-				+ "&site=" + getApplicationId()
-				+ "&pageId=" + getPageId();
+		String url = 
+			getRotatorUrl()
+			+ "?area=application"
+			+ "&version=" + VERSION
+			+ "&site=" + getApplicationId()
+			+ "&pageId=" + getPageId();
 				
 		if (!this.getGender().equals(Gender.Unknown))
 			url += "&sex=" + this.getGender().ordinal();
