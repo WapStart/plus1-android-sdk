@@ -30,6 +30,8 @@
 package ru.wapstart.plus1.sdk;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.HashSet;
+import java.util.Set;
 
 import android.location.Location;
 
@@ -39,7 +41,8 @@ import android.location.Location;
  */
 public final class Plus1BannerRequest {
 	public static enum Gender {Unknown, Male, Female;}
-	public static enum Type {XML, JSON};
+	public static enum RequestType {XML, JSON};
+	public static enum BannerType {Undefined, Mixed, Text, Graphic};
 	
 	private static final Integer VERSION			= 2;
 
@@ -47,9 +50,11 @@ public final class Plus1BannerRequest {
 	private int age					= 0;
 	private int applicationId		= 0;
 	private Gender gender			= Gender.Unknown;
+	private String login			= null;
+	private Set<BannerType> types	= null;
 
 	private String pageId			= null;
-	private Type type				= Type.XML;
+	private RequestType requestType	= RequestType.XML;
 	private Location location		= null;
 	
 	public static Plus1BannerRequest create() {
@@ -88,11 +93,38 @@ public final class Plus1BannerRequest {
 		return this;
 	}
 	
-	public Type getType() {
-		return type;
+	public String getLogin() {
+		return login;
+	}
+	
+	public Plus1BannerRequest setLogin(String login) {
+		this.login = login;
+		
+		return this;
+	}
+	
+	public Plus1BannerRequest addType(BannerType type) {
+		if (types == null)
+			this.types = new HashSet<BannerType>();
+	
+		if (!type.equals(BannerType.Undefined))
+			types.add(type);
+		
+		return this; 
+	}
+	
+	public Plus1BannerRequest clearTypes() {
+		if (types != null)
+			types.clear();
+		
+		return this;
+	}
+	
+	public RequestType getRequestType() {
+		return requestType;
 	}
 
-	public Plus1BannerRequest setType(Type type) throws Exception {
+	public Plus1BannerRequest setRequestType(RequestType type) throws Exception {
 		throw new Exception("types not supported while");
 		/* this.type = type;
 		
@@ -125,7 +157,7 @@ public final class Plus1BannerRequest {
 			getRotatorUrl()
 			+ "?area=application"
 			+ "&version=" + VERSION
-			+ "&site=" + getApplicationId()
+			+ "&id=" + getApplicationId()
 			+ "&pageId=" + getPageId();
 				
 		if (!getGender().equals(Gender.Unknown))
@@ -134,7 +166,14 @@ public final class Plus1BannerRequest {
 		if (getAge() != 0)
 			url += "&age=" + getAge();
 		
-		if (getType() == Type.JSON)
+		if (getLogin() != null)
+			url += "&login=" + getLogin();
+		
+		if ((types != null) && !types.isEmpty())
+			for (BannerType bt : types)
+				url += "&type[]=" + bt.ordinal();
+		
+		if (getRequestType() == RequestType.JSON)
 			url += "&json=1";
 		
 		if (getLocation() != null)

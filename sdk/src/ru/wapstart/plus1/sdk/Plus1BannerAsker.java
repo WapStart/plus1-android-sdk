@@ -105,7 +105,7 @@ public class Plus1BannerAsker {
 		
 		BaseBannerDownloader downloader = null;
 		
-		if (request.getType() == Plus1BannerRequest.Type.JSON)
+		if (request.getRequestType() == Plus1BannerRequest.RequestType.JSON)
 			downloader = new JSONBannerDownloader(view);
 		else
 			downloader = new XMLBannerDownloader(view);
