@@ -59,7 +59,7 @@ public class Plus1BannerView extends LinearLayout {
 
 	private TextView title;
 	private TextView content;
-	private ImageView image;
+	private Plus1ImageView image;
 	
 	private ViewFlipper flipper		= null;
 	
@@ -159,8 +159,17 @@ public class Plus1BannerView extends LinearLayout {
 	}
 
 	public void setImage(Drawable drawable) {
-		image.setImageDrawable(drawable);
-
+		image.setImage(drawable);
+		imageDownloaded();
+	}
+	
+	public void setMovie(Movie movie) {
+		image.setMovie(movie);
+		imageDownloaded();
+	}
+	
+	private void imageDownloaded()
+	{
 		if (banner.isImageBanner()) {
 			if (!flipper.getCurrentView().equals(image))
 				flipper.showNext();
@@ -221,7 +230,7 @@ public class Plus1BannerView extends LinearLayout {
 		ll.addView(content);
 		flipper.addView(ll);
 		
-		this.image = new ImageView(getContext());
+		this.image = new Plus1ImageView(getContext());
 		flipper.addView(image);
 		
 		addView(
