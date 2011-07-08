@@ -54,21 +54,24 @@ final class Plus1ImageView extends View {
 			image.draw(canvas);
 		}
 		
-		long now = android.os.SystemClock.uptimeMillis();
-		if (movieStart == 0)
-			movieStart = now;
-		
 		if (movie != null) {
+			long now = android.os.SystemClock.uptimeMillis();
+			if (movieStart == 0)
+				movieStart = now;
+			
 			int duration = movie.duration();
 			if (duration == 0)
 				duration = 1000;
 			
-			movie.setTime((int)((now - movieStart) % duration));
+			int relTime = (int)((now - movieStart) % duration);
+			
+			movie.setTime(relTime);
 			movie.draw(
 				canvas, 
 				getWidth() - movie.width(),
 				getHeight() - movie.height()
 			);
+			
 			invalidate();
 		}
 	}
