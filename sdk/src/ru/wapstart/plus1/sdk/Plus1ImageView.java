@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Movie;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 final class Plus1ImageView extends View {
@@ -26,8 +25,6 @@ final class Plus1ImageView extends View {
 	}
 
 	public void setImage(Drawable drawable) {
-		Log.d(getClass().getName(), "set image");
-		
 		this.image	= drawable;
 		this.movie	= null;
 
@@ -35,8 +32,6 @@ final class Plus1ImageView extends View {
 	}
 	
 	public void setMovie(Movie movie) {
-		Log.d(getClass().getName(), "set movie");
-		
 		this.movie	= movie;
 		this.image	= null;
 		
@@ -47,8 +42,17 @@ final class Plus1ImageView extends View {
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		
-		if (image != null)
+		if (image != null) {
+			int x = (getWidth() - image.getIntrinsicWidth()) / 2;
+			int y = (getHeight() - image.getIntrinsicHeight()) / 2;
+			
+			image.setBounds(
+				x, y, 
+				x + image.getIntrinsicWidth(), y + image.getIntrinsicHeight()
+			);
+			
 			image.draw(canvas);
+		}
 		
 		long now = android.os.SystemClock.uptimeMillis();
 		if (movieStart == 0)
@@ -65,9 +69,8 @@ final class Plus1ImageView extends View {
 				getWidth() - movie.width(),
 				getHeight() - movie.height()
 			);
+			invalidate();
 		}
-			
-		invalidate();
 	}
 	
 }
