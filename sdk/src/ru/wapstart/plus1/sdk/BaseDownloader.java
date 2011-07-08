@@ -30,36 +30,42 @@
 package ru.wapstart.plus1.sdk;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import android.os.AsyncTask;
+import java.util.TimerTask;
 import android.util.Log;
 
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
-abstract class BaseDownloader extends AsyncTask<String, Void, Object> {
-
+abstract class BaseDownloader extends TimerTask {
+	protected InputStream stream	= null;
+	protected String url			= null;
+	
+	public BaseDownloader setUrl(String url) {
+		this.url = url;
+		
+		return this;
+	}
+	
 	@Override
-	protected Object doInBackground(String... url) {
+	public void run() {
 		try {
 			HttpURLConnection connection = 
-				(HttpURLConnection) new URL(url[0]).openConnection();
+				(HttpURLConnection) new URL(url).openConnection();
 			connection.setDoOutput(true);
 			modifyConnection(connection);
 			connection.connect();
 			
-			return connection.getInputStream();
+			stream = connection.getInputStream();
 		} catch (MalformedURLException e) {
 			Log.e(getClass().getName(), "Url parsing failed: " + url);
 		} catch (IOException e) {
 			Log.d(getClass().getName(), "Url " + url + " doesn't exists");
 		}		
-		
-		return null;
 	}
 	
 	abstract protected void modifyConnection(HttpURLConnection connection);

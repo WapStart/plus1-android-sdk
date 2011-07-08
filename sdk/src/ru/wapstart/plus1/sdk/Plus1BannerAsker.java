@@ -31,6 +31,7 @@ package ru.wapstart.plus1.sdk;
 
 import android.content.Context;
 import android.location.LocationManager;
+import android.os.Handler;
 import android.telephony.TelephonyManager;
 
 /**
@@ -40,10 +41,13 @@ import android.telephony.TelephonyManager;
 public class Plus1BannerAsker {
 	private Plus1BannerRequest request			= null;
 	private Plus1BannerView view				= null;
+	private Handler handler						= null;
+	private	BaseBannerDownloader downloader		= null;
 	
 	private String deviceId						= null;
 	private boolean disableDispatchIMEI			= false;
-	private boolean disableAutoDetectLocation	= false;	
+	private boolean disableAutoDetectLocation	= false;
+	private int timeout							= 10;
 	
 	public static Plus1BannerAsker create(
 		Plus1BannerRequest request, Plus1BannerView view
@@ -76,9 +80,15 @@ public class Plus1BannerAsker {
 		return this;
 	}
 
-	public void start() {
+	public Plus1BannerAsker setTimeout(int timeout) {
+		this.timeout = timeout;
+		
+		return this;
+	}
+	
+	public Plus1BannerAsker start() {
 		if ((request == null) || (view == null))
-			return;
+			return this;
 
 		if (!isDisabledAutoDetectLocation()) {
 			LocationManager locationManager = 
@@ -103,15 +113,28 @@ public class Plus1BannerAsker {
 			this.deviceId = telephonyManager.getDeviceId();
 		}
 		
-		BaseBannerDownloader downloader = null;
-		
 		if (request.getRequestType() == Plus1BannerRequest.RequestType.JSON)
-			downloader = new JSONBannerDownloader(view);
+			this.downloader = new JSONBannerDownloader(view);
 		else
-			downloader = new XMLBannerDownloader(view);
+			this.downloader = new XMLBannerDownloader(view);
 		
-		downloader.setDeviceId(deviceId);		
-		downloader.execute(request.getRequestUri());
+		this.handler = new Handler();
+		downloader
+			.setDeviceId(deviceId)
+			.setRequest(request)
+			.setHandler(handler)
+			.setTimeout(timeout);
+		
+		handler.removeCallbacks(downloader);
+		handler.postDelayed(downloader, 100);
+		
+		return this;
+	}
+	
+	public Plus1BannerAsker stop() {
+		handler.removeCallbacks(downloader);
+		
+		return this;
 	}
 }
 	

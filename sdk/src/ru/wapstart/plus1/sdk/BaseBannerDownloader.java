@@ -31,11 +31,11 @@ package ru.wapstart.plus1.sdk;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -47,22 +47,50 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 	private static final Integer BUFFER_SIZE = 8192;
 	private static final String NO_BANNER = "<!-- i4jgij4pfd4ssd -->";
 	
-	protected Plus1BannerView view	= null;
-	protected String deviceId		= null;		
+	protected Plus1BannerView view			= null;
+	protected Plus1BannerRequest request	= null;
+	protected Handler handler				= null;
+	protected String deviceId				= null;
+	protected int timeout					= 0;
 	
 	public BaseBannerDownloader(Plus1BannerView view) {
 		this.view = view;
 	}
 	
-	public void setDeviceId(String deviceId) {
+	public BaseBannerDownloader setDeviceId(String deviceId) {
 		this.deviceId = deviceId;
+		
+		return this;
 	}
 	
+	public BaseBannerDownloader setRequest(Plus1BannerRequest request) {
+		this.request = request;
+		
+		return this;
+	}
+	
+	public BaseBannerDownloader setHandler(Handler handler) {
+		this.handler = handler;
+		
+		return this;
+	}
+	
+	public BaseBannerDownloader setTimeout(int timeout) {
+		this.timeout = timeout;
+		
+		return this;
+	}	
+	
 	@Override
-	protected Plus1Banner doInBackground(String... url) {
-		BufferedInputStream stream = 
+	public void run() {
+		if (request != null)
+			this.url = request.getRequestUri();
+		
+		super.run();
+		
+		BufferedInputStream bufStream = 
 			new BufferedInputStream (
-				(InputStream) super.doInBackground(url),
+				stream,
 				BUFFER_SIZE
 			);
 		
@@ -72,8 +100,8 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 			byte[] buffer = new byte[BUFFER_SIZE];
 			int count = 0;
 			
-			if (stream != null)
-				while ((count = stream.read(buffer)) != -1)
+			if (bufStream != null)
+				while ((count = bufStream.read(buffer)) != -1)
 					result += new String(buffer, 0, count);
 			
 		} catch (IOException e) {
@@ -82,19 +110,12 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		
 		Log.d(getClass().getName(), "answer: " + result.toString());
 		
-		return 
-			(result.equals("") || result.equals(NO_BANNER)) 
-				? null 
-				: parse(result);
+		if (!result.equals("") && !result.equals(NO_BANNER)) 
+			view.setBanner(parse(result));
+		
+		handler.postDelayed(this, timeout * 1000);
 	}
 	
-	@Override
-	protected void onPostExecute(Object result) {
-		if (result != null)
-			view.setBanner((Plus1Banner) result);
-	}
-	
-	@Override
 	protected void modifyConnection(HttpURLConnection connection) {
 		connection.setRequestProperty(
 			"User-Agent", 

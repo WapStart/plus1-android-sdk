@@ -141,8 +141,8 @@ public class Plus1BannerView extends LinearLayout {
 				imageUrl = banner.getPictureUrlPng();
 			
 			if (imageUrl != null)
-				new ImageDowloader(this).execute(imageUrl);
-
+				new ImageDowloader(this).setUrl(imageUrl).run();
+				
 			if (!banner.isImageBanner()) {
 				if (flipper.getCurrentView().equals(image))
 					flipper.showNext();

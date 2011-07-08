@@ -28,7 +28,6 @@
  */
 package ru.wapstart.plus1.sdk;
 
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 
 import android.graphics.Movie;
@@ -47,30 +46,18 @@ final class ImageDowloader extends BaseDownloader {
 	}
 	
 	@Override
-	protected Object doInBackground(String... url) {
-		InputStream stream = (InputStream) super.doInBackground(url);
+	public void run() {
+		super.run();
 		
 		if (stream == null) 
-			return null;
-		
-		if (url[0].substring(url[0].length() - 4).toLowerCase().equals(".gif"))
-			return Movie.decodeStream(stream);
-		else
-			return Drawable.createFromStream(stream, "src");
-	}
-	
-	@Override
-	protected void onPostExecute(Object result) {
-		if (result == null)
 			return;
 		
-		if (result instanceof Drawable)
-			bannerView.setImage((Drawable) result);
-		else 
-			bannerView.setMovie((Movie) result);
+		if (url.substring(url.length() - 4).toLowerCase().equals(".gif"))
+			bannerView.setMovie(Movie.decodeStream(stream));
+		else
+			bannerView.setImage(Drawable.createFromStream(stream, "src"));
 	}
 	
-	@Override
 	protected void modifyConnection(HttpURLConnection connection) { /*_*/ }
 
 }
