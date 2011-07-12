@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Movie;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -36,6 +37,26 @@ final class Plus1ImageView extends View {
 		this.image	= null;
 		
 		this.movieStart = 0;
+		
+		final Handler handler = new Handler();
+		final View view = this;
+		
+		new Thread() {
+		    @Override public void run() {
+		        while(!Thread.currentThread().isInterrupted()) {
+		            handler.post(new Runnable() {
+		                public void run(){
+		                    view.invalidate();
+		                }
+		            });
+		            try {
+		                Thread.sleep(40); // yields 25 fps
+		            } catch (InterruptedException e) {
+		                Thread.currentThread().interrupt();
+		            }
+		        }
+		    }
+		}.start();		
 	}
 	
 	@Override
@@ -61,7 +82,7 @@ final class Plus1ImageView extends View {
 			
 			int duration = movie.duration();
 			if (duration == 0)
-				duration = 1000;
+				duration = 1;
 			
 			int relTime = (int)((now - movieStart) % duration);
 			
@@ -71,8 +92,6 @@ final class Plus1ImageView extends View {
 				getWidth() - movie.width(),
 				getHeight() - movie.height()
 			);
-			
-			invalidate();
 		}
 	}
 	
