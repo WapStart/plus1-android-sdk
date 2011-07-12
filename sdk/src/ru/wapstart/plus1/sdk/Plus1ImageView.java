@@ -15,14 +15,17 @@ final class Plus1ImageView extends View {
 	
 	public Plus1ImageView(Context context) {
 		super(context);
+		startInvalidateThread();
 	}
 
 	public Plus1ImageView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		startInvalidateThread();
 	}
 
 	public Plus1ImageView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		startInvalidateThread();
 	}
 
 	public void setImage(Drawable drawable) {
@@ -37,26 +40,6 @@ final class Plus1ImageView extends View {
 		this.image	= null;
 		
 		this.movieStart = 0;
-		
-		final Handler handler = new Handler();
-		final View view = this;
-		
-		new Thread() {
-		    @Override public void run() {
-		        while(!Thread.currentThread().isInterrupted()) {
-		            handler.post(new Runnable() {
-		                public void run(){
-		                    view.invalidate();
-		                }
-		            });
-		            try {
-		                Thread.sleep(40); // yields 25 fps
-		            } catch (InterruptedException e) {
-		                Thread.currentThread().interrupt();
-		            }
-		        }
-		    }
-		}.start();		
 	}
 	
 	@Override
@@ -94,5 +77,27 @@ final class Plus1ImageView extends View {
 			);
 		}
 	}
-	
+
+	private void startInvalidateThread()
+	{
+		final Handler handler = new Handler();
+		final View view = this;
+		
+		new Thread() {
+		    @Override public void run() {
+		        while(!Thread.currentThread().isInterrupted()) {
+		            handler.post(new Runnable() {
+		                public void run(){
+		                    view.invalidate();
+		                }
+		            });
+		            try {
+		                Thread.sleep(40); // yields 25 fps
+		            } catch (InterruptedException e) {
+		                Thread.currentThread().interrupt();
+		            }
+		        }
+		    }
+		}.start();
+	}
 }
