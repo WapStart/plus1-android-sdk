@@ -88,22 +88,23 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		
 		super.run();
 		
-		BufferedInputStream bufStream = 
-			new BufferedInputStream (
-				stream,
-				BUFFER_SIZE
-			);
-		
 		String result = new String();
 		
 		try {
 			byte[] buffer = new byte[BUFFER_SIZE];
 			int count = 0;
 			
+			BufferedInputStream bufStream = 
+				new BufferedInputStream (
+					stream,
+					BUFFER_SIZE
+				);
+			
 			if (bufStream != null)
 				while ((count = bufStream.read(buffer)) != -1)
 					result += new String(buffer, 0, count);
 			
+			bufStream.close();
 		} catch (IOException e) {
 			Log.e(getClass().getName(), "IOException in InputStream");
 		}

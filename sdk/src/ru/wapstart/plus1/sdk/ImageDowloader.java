@@ -28,13 +28,12 @@
  */
 package ru.wapstart.plus1.sdk;
 
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.net.HttpURLConnection;
 
-//import android.graphics.Movie;
 import android.graphics.Movie;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
@@ -56,25 +55,12 @@ final class ImageDowloader extends BaseDownloader {
 			return;
 		
 		if (url.substring(url.length() - 4).toLowerCase().equals(".gif")) {
-			ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
-			
-			byte[] buffer = new byte[1024];
-            int len;
-            try {
-                while ((len = stream.read(buffer)) >= 0) {
-                    os.write(buffer, 0, len);
-                }
-            } catch (java.io.IOException e) { 
-            	Log.d(getClass().getName(), e.getMessage());
-            }
-			
-			bannerView.setMovie(
-				Movie.decodeByteArray(
-					os.toByteArray(), 
-					0, 
-					os.toByteArray().length
-				)
-			);
+			try {
+				BufferedInputStream bis = new BufferedInputStream(stream);
+				bis.mark(connection.getContentLength());
+				bannerView.setMovie(Movie.decodeStream(bis));
+				bis.close();
+			} catch (IOException e) { /*_*/ }
 		} else
 			bannerView.setImage(Drawable.createFromStream(stream, "src"));
 	}

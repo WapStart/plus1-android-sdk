@@ -42,8 +42,9 @@ import android.util.Log;
  * @copyright Copyright (c) 2011, Wapstart
  */
 abstract class BaseDownloader extends TimerTask {
-	protected InputStream stream	= null;
-	protected String url			= null;
+	protected HttpURLConnection connection	= null;
+	protected InputStream stream			= null;
+	protected String url					= null;
 	
 	public BaseDownloader setUrl(String url) {
 		this.url = url;
@@ -54,8 +55,7 @@ abstract class BaseDownloader extends TimerTask {
 	@Override
 	public void run() {
 		try {
-			HttpURLConnection connection = 
-				(HttpURLConnection) new URL(url).openConnection();
+			connection = (HttpURLConnection) new URL(url).openConnection();
 			connection.setDoOutput(true);
 			modifyConnection(connection);
 			connection.connect();
