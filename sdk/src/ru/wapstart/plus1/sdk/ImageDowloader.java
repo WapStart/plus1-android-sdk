@@ -54,15 +54,7 @@ final class ImageDowloader extends BaseDownloader {
 		if (stream == null) 
 			return;
 		
-		if (url.substring(url.length() - 4).toLowerCase().equals(".gif")) {
-			try {
-				BufferedInputStream bis = new BufferedInputStream(stream);
-				bis.mark(connection.getContentLength());
-				bannerView.setMovie(Movie.decodeStream(bis));
-				bis.close();
-			} catch (IOException e) { /*_*/ }
-		} else
-			bannerView.setImage(Drawable.createFromStream(stream, "src"));
+		bannerView.setImage(Drawable.createFromStream(stream, "src"));
 	}
 	
 	protected void modifyConnection(HttpURLConnection connection) { /*_*/ }

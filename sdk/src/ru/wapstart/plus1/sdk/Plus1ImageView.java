@@ -15,17 +15,14 @@ final class Plus1ImageView extends View {
 	
 	public Plus1ImageView(Context context) {
 		super(context);
-		startInvalidateThread();
 	}
 
 	public Plus1ImageView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		startInvalidateThread();
 	}
 
 	public Plus1ImageView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
-		startInvalidateThread();
 	}
 
 	public void setImage(Drawable drawable) {
