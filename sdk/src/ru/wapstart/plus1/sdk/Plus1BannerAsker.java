@@ -140,7 +140,7 @@ public class Plus1BannerAsker {
 		if (!isDisabledAutoDetectLocation()) {
 			locationManager.requestLocationUpdates(
 				LocationManager.GPS_PROVIDER,
-				1000,
+				timeout * 10000,
 				500f,
 				locationListener
 			);
