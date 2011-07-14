@@ -39,17 +39,21 @@ import android.telephony.TelephonyManager;
  * @copyright Copyright (c) 2011, Wapstart
  */
 public class Plus1BannerAsker {
-	private Plus1BannerRequest request			= null;
-	private Plus1BannerView view				= null;
-	private Handler handler						= null;
-	private	BaseBannerDownloader downloader		= null;
+	private Plus1BannerRequest request				= null;
+	private Plus1BannerView view					= null;
+	private Handler handler							= null;
+	private	BaseBannerDownloader downloader			= null;
 	
-	private String deviceId						= null;
-	private boolean disableDispatchIMEI			= false;
-	private boolean disableAutoDetectLocation	= false;
-	private int timeout							= 10;
+	private String deviceId							= null;
+	private boolean disableDispatchIMEI				= false;
+	private boolean disableAutoDetectLocation		= false;
+	private int timeout								= 10;
 	
-	private boolean initialized					= false;
+	private boolean initialized						= false;
+
+	private LocationManager locationManager			= null;
+	private Plus1LocationListener locationListener	= null;
+	
 	
 	public static Plus1BannerAsker create(
 		Plus1BannerRequest request, Plus1BannerView view
@@ -93,17 +97,12 @@ public class Plus1BannerAsker {
 			return this;
 		
 		if (!isDisabledAutoDetectLocation()) {
-			LocationManager locationManager = 
+			this.locationManager = 
 				(LocationManager) view.getContext().getSystemService(
 					Context.LOCATION_SERVICE
 				);
 			
-			locationManager.requestLocationUpdates(
-				LocationManager.GPS_PROVIDER,
-				1000,
-				500f,
-				new Plus1LocationListener(request)
-			);
+			this.locationListener = new Plus1LocationListener(request);
 		}
 		
 		if (!isDisabledIMEIDispatch()) {
@@ -137,6 +136,16 @@ public class Plus1BannerAsker {
 			return this;
 
 		init();
+		
+		if (!isDisabledAutoDetectLocation()) {
+			locationManager.requestLocationUpdates(
+				LocationManager.GPS_PROVIDER,
+				1000,
+				500f,
+				locationListener
+			);
+		}
+		
 		downloader.setHandler(handler);
 		handler.removeCallbacks(downloader);
 		handler.postDelayed(downloader, 100);
@@ -145,6 +154,9 @@ public class Plus1BannerAsker {
 	}
 	
 	public Plus1BannerAsker stop() {
+		if (!isDisabledAutoDetectLocation())
+			locationManager.removeUpdates(locationListener);
+		
 		handler.removeCallbacks(downloader);
 		
 		return this;
