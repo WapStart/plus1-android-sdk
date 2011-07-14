@@ -49,6 +49,8 @@ public class Plus1BannerAsker {
 	private boolean disableAutoDetectLocation	= false;
 	private int timeout							= 10;
 	
+	private boolean initialized					= false;
+	
 	public static Plus1BannerAsker create(
 		Plus1BannerRequest request, Plus1BannerView view
 	) {
@@ -86,10 +88,10 @@ public class Plus1BannerAsker {
 		return this;
 	}
 	
-	public Plus1BannerAsker start() {
-		if ((request == null) || (view == null))
+	public Plus1BannerAsker init() {
+		if (initialized)
 			return this;
-
+		
 		if (!isDisabledAutoDetectLocation()) {
 			LocationManager locationManager = 
 				(LocationManager) view.getContext().getSystemService(
@@ -111,20 +113,31 @@ public class Plus1BannerAsker {
 				);
 			
 			this.deviceId = telephonyManager.getDeviceId();
-		}
-		
+		}		
+	
 		if (request.getRequestType() == Plus1BannerRequest.RequestType.JSON)
 			this.downloader = new JSONBannerDownloader(view);
 		else
 			this.downloader = new XMLBannerDownloader(view);
 		
-		this.handler = new Handler();
 		downloader
 			.setDeviceId(deviceId)
 			.setRequest(request)
-			.setHandler(handler)
 			.setTimeout(timeout);
 		
+		this.handler = new Handler();
+		
+		initialized = true;
+		
+		return this;
+	}
+	
+	public Plus1BannerAsker start() {
+		if ((request == null) || (view == null))
+			return this;
+
+		init();
+		downloader.setHandler(handler);
 		handler.removeCallbacks(downloader);
 		handler.postDelayed(downloader, 100);
 		
@@ -133,6 +146,16 @@ public class Plus1BannerAsker {
 	
 	public Plus1BannerAsker stop() {
 		handler.removeCallbacks(downloader);
+		
+		return this;
+	}
+	
+	public Plus1BannerAsker startOnce() {
+		if ((request == null) || (view == null))
+			return this;
+
+		init();
+		downloader.run();
 		
 		return this;
 	}

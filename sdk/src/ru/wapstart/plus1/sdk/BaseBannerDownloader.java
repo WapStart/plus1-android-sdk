@@ -83,6 +83,9 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 	
 	@Override
 	public void run() {
+		if (view.isClosed())
+			return;
+		
 		if (request != null)
 			this.url = request.getRequestUri();
 		
@@ -114,7 +117,8 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		if (!result.equals("") && !result.equals(NO_BANNER)) 
 			view.setBanner(parse(result));
 		
-		handler.postDelayed(this, timeout * 1000);
+		if (handler != null)
+			handler.postDelayed(this, timeout * 1000);
 	}
 	
 	protected void modifyConnection(HttpURLConnection connection) {
