@@ -75,6 +75,13 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		return this;
 	}
 	
+	public BaseBannerDownloader removeHandler() {
+		this.handler = null;
+		
+		return this;
+	}
+
+	
 	public BaseBannerDownloader setTimeout(int timeout) {
 		this.timeout = timeout;
 		

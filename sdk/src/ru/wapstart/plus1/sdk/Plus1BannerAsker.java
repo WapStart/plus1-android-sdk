@@ -155,7 +155,9 @@ public class Plus1BannerAsker {
 			return this;
 
 		init();
-		downloader.run();
+		downloader
+			.removeHandler()
+			.run();
 		
 		return this;
 	}
