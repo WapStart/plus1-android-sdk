@@ -45,7 +45,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 			new Plus1BannerAsker(
 				Plus1BannerRequest
 					.create()
-					.setApplicationId(1273),
+					.setApplicationId(/* PLACE YOUR APPLICATION ID HERE */),
 				bannerView
 					.enableAnimationFromTop()
 					.enableCloseButton()
