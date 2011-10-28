@@ -32,7 +32,7 @@ package ru.wapstart.plus1.sdk;
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
-public interface BannerViewStateListener {
+public interface Plus1BannerViewStateListener {
 	/**
 	 * Raised on show banner view
 	 */

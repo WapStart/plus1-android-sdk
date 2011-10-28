@@ -70,7 +70,7 @@ public class Plus1BannerView extends LinearLayout {
 	private boolean closed			= false;
 	private boolean initialized		= false;
 
-	private BannerViewStateListener listener = null;
+	private Plus1BannerViewStateListener viewStateListener = null;
 
 	public Plus1BannerView(Context context) {
 		super(context);
@@ -120,9 +120,10 @@ public class Plus1BannerView extends LinearLayout {
 		return this;
 	}
 
-	public Plus1BannerView setStateListener(BannerViewStateListener listener)
-	{
-		this.listener = listener;
+	public Plus1BannerView setViewStateListener(
+		Plus1BannerViewStateListener viewStateListener
+	) {
+		this.viewStateListener = viewStateListener;
 
 		return this;
 	}
@@ -165,8 +166,8 @@ public class Plus1BannerView extends LinearLayout {
 			
 			setVisibility(INVISIBLE);
 
-			if (listener != null)
-				listener.onHideBannerView();
+			if (viewStateListener != null)
+				viewStateListener.onHideBannerView();
 		}
 	}
 
@@ -270,8 +271,8 @@ public class Plus1BannerView extends LinearLayout {
 							
 							setVisibility(INVISIBLE);
 
-							if (listener != null)
-								listener.onCloseBannerView();
+							if (viewStateListener != null)
+								viewStateListener.onCloseBannerView();
 						}
 					}
 				}
@@ -309,8 +310,8 @@ public class Plus1BannerView extends LinearLayout {
 
 		setVisibility(INVISIBLE);
 
-		if (listener != null)
-			listener.onHideBannerView();
+		if (viewStateListener != null)
+			viewStateListener.onHideBannerView();
 
 		initialized = true;
 	}
@@ -338,8 +339,8 @@ public class Plus1BannerView extends LinearLayout {
 
 			setVisibility(VISIBLE);
 
-			if (listener != null)
-				listener.onShowBannerView();
+			if (viewStateListener != null)
+				viewStateListener.onShowBannerView();
 		}
 	}
 }

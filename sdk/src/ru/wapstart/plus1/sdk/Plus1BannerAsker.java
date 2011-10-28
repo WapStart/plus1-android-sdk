@@ -38,24 +38,26 @@ import android.telephony.TelephonyManager;
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
-public class Plus1BannerAsker implements BannerViewStateListener {
-	private Plus1BannerRequest request							= null;
-	private Plus1BannerView view								= null;
-	private Handler handler										= null;
-	private Runnable askerStoper								= null;
-	private	BaseBannerDownloader downloader						= null;
+public class Plus1BannerAsker implements Plus1BannerViewStateListener {
+	private Plus1BannerRequest request						= null;
+	private Plus1BannerView view							= null;
+	private Handler handler									= null;
+	private Runnable askerStoper							= null;
+	private	BaseBannerDownloader downloader					= null;
 
-	private String deviceId										= null;
-	private boolean disableDispatchIMEI							= false;
-	private boolean disableAutoDetectLocation					= false;
-	private int timeout											= 10;
-	private int visibilityTimeout								= 0;
+	private String deviceId									= null;
+	private boolean disableDispatchIMEI						= false;
+	private boolean disableAutoDetectLocation				= false;
+	private int timeout										= 10;
+	private int visibilityTimeout							= 0;
 	
-	private boolean initialized									= false;
+	private boolean initialized								= false;
 
-	private LocationManager locationManager						= null;
-	private Plus1LocationListener locationListener				= null;
-	private Plus1BannerDownloadListener bannerDownloadListener	= null;
+	private LocationManager locationManager					= null;
+	private Plus1LocationListener locationListener			= null;
+
+	private Plus1BannerViewStateListener viewStateListener	= null;
+	private Plus1BannerDownloadListener downloadListener	= null;
 	
 	public static Plus1BannerAsker create(
 		Plus1BannerRequest request, Plus1BannerView view
@@ -100,10 +102,18 @@ public class Plus1BannerAsker implements BannerViewStateListener {
 		return this;
 	}
 
-	public Plus1BannerAsker setDownloadListener(
-		Plus1BannerDownloadListener bannerDownloadListener
+	public Plus1BannerAsker setViewStateListener(
+		Plus1BannerViewStateListener viewStateListener
 	) {
-		this.bannerDownloadListener = bannerDownloadListener;
+		this.viewStateListener = viewStateListener;
+
+		return this;
+	}
+
+	public Plus1BannerAsker setDownloadListener(
+		Plus1BannerDownloadListener downloadListener
+	) {
+		this.downloadListener = downloadListener;
 
 		return this;
 	}
@@ -140,15 +150,18 @@ public class Plus1BannerAsker implements BannerViewStateListener {
 			.setRequest(request)
 			.setTimeout(timeout);
 
-		if (bannerDownloadListener != null)
-			downloader.setDownloadListener(bannerDownloadListener);
+		if (viewStateListener != null)
+			view.setViewStateListener(viewStateListener);
+		else
+			view.setViewStateListener(this);
+
+		if (downloadListener != null)
+			downloader.setDownloadListener(downloadListener);
 		
 		this.handler = new Handler();
 
 		if (visibilityTimeout == 0)
 			visibilityTimeout = timeout * 3;
-
-		view.setStateListener(this);
 
 		initialized = true;
 		
