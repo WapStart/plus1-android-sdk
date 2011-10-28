@@ -52,6 +52,7 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 	protected Handler handler				= null;
 	protected String deviceId				= null;
 	protected int timeout					= 0;
+	protected boolean isRunOnce				= false;
 	
 	public BaseBannerDownloader(Plus1BannerView view) {
 		this.view = view;
@@ -86,7 +87,19 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		this.timeout = timeout;
 		
 		return this;
-	}	
+	}
+
+	public BaseBannerDownloader setRunOnce() {
+		this.isRunOnce = true;
+
+		return this;
+	}
+
+	public BaseBannerDownloader setRunOnce(boolean isRunOnce) {
+		this.isRunOnce = isRunOnce;
+
+		return this;
+	}
 	
 	@Override
 	public void run() {
@@ -124,7 +137,7 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		if (!result.equals("") && !result.equals(NO_BANNER)) 
 			view.setBanner(parse(result));
 		
-		if (handler != null)
+		if ((handler != null) && !isRunOnce)
 			handler.postDelayed(this, timeout * 1000);
 	}
 	

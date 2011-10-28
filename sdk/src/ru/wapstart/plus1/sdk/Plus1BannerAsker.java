@@ -167,9 +167,10 @@ public class Plus1BannerAsker {
 			return this;
 
 		init();
-		downloader
-			.removeHandler()
-			.run();
+		downloader.setRunOnce();
+		downloader.setHandler(handler);
+		handler.removeCallbacks(downloader);
+		handler.postDelayed(downloader, 100);
 		
 		return this;
 	}
