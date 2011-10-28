@@ -151,6 +151,8 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		
 		Log.d(getClass().getName(), "answer: " + result.toString());
 		
+		Plus1Banner banner = null;
+
 		if (result.equals("")) {
 			if (bannerDownloadListener != null)
 				bannerDownloadListener.onBannerLoadFailed(
@@ -162,8 +164,7 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 					LoadError.NoHaveBanner
 				);
 		} else {
-			Plus1Banner banner = parse(result);
-			view.setBanner(banner);
+			banner = parse(result);
 
 			if ((banner != null) && (banner.getId() > 0)) {
 				if (bannerDownloadListener != null)
@@ -175,6 +176,7 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 					);
 			}
 		}
+		view.setBanner(banner);
 		
 		if ((handler != null) && !isRunOnce)
 			handler.postDelayed(this, timeout * 1000);

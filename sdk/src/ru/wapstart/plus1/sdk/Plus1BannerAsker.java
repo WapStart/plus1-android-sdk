@@ -221,6 +221,9 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	}
 
 	public void onHideBannerView() {
+		if (askerStoper != null)
+			return;
+
 		askerStoper =
 			new Runnable() {
 				public void run() {
