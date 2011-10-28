@@ -39,23 +39,23 @@ import android.telephony.TelephonyManager;
  * @copyright Copyright (c) 2011, Wapstart
  */
 public class Plus1BannerAsker implements BannerViewStateListener {
-	private Plus1BannerRequest request				= null;
-	private Plus1BannerView view					= null;
-	private Handler handler							= null;
-	private Runnable askerStoper					= null;
-	private	BaseBannerDownloader downloader			= null;
-	
-	private String deviceId							= null;
-	private boolean disableDispatchIMEI				= false;
-	private boolean disableAutoDetectLocation		= false;
-	private int timeout								= 10;
-	private int visibilityTimeout					= 0;
-	
-	private boolean initialized						= false;
+	private Plus1BannerRequest request							= null;
+	private Plus1BannerView view								= null;
+	private Handler handler										= null;
+	private Runnable askerStoper								= null;
+	private	BaseBannerDownloader downloader						= null;
 
-	private LocationManager locationManager			= null;
-	private Plus1LocationListener locationListener	= null;
+	private String deviceId										= null;
+	private boolean disableDispatchIMEI							= false;
+	private boolean disableAutoDetectLocation					= false;
+	private int timeout											= 10;
+	private int visibilityTimeout								= 0;
 	
+	private boolean initialized									= false;
+
+	private LocationManager locationManager						= null;
+	private Plus1LocationListener locationListener				= null;
+	private Plus1BannerDownloadListener bannerDownloadListener	= null;
 	
 	public static Plus1BannerAsker create(
 		Plus1BannerRequest request, Plus1BannerView view
@@ -100,6 +100,14 @@ public class Plus1BannerAsker implements BannerViewStateListener {
 		return this;
 	}
 
+	public Plus1BannerAsker setDownloadListener(
+		Plus1BannerDownloadListener bannerDownloadListener
+	) {
+		this.bannerDownloadListener = bannerDownloadListener;
+
+		return this;
+	}
+
 	public Plus1BannerAsker init() {
 		if (initialized)
 			return this;
@@ -131,6 +139,9 @@ public class Plus1BannerAsker implements BannerViewStateListener {
 			.setDeviceId(deviceId)
 			.setRequest(request)
 			.setTimeout(timeout);
+
+		if (bannerDownloadListener != null)
+			downloader.setDownloadListener(bannerDownloadListener);
 		
 		this.handler = new Handler();
 

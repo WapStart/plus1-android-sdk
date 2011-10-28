@@ -34,6 +34,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.Locale;
 
+import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
+
 import android.app.Activity;
 import android.os.Handler;
 import android.util.DisplayMetrics;
@@ -53,6 +55,8 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 	protected String deviceId				= null;
 	protected int timeout					= 0;
 	protected boolean isRunOnce				= false;
+
+	protected Plus1BannerDownloadListener bannerDownloadListener = null;
 	
 	public BaseBannerDownloader(Plus1BannerView view) {
 		this.view = view;
@@ -100,6 +104,14 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 
 		return this;
 	}
+
+	public BaseBannerDownloader setDownloadListener(
+		Plus1BannerDownloadListener bannerDownloadListener
+	) {
+		this.bannerDownloadListener = bannerDownloadListener;
+
+		return this;
+	}
 	
 	@Override
 	public void run() {
@@ -130,12 +142,39 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 			bufStream.close();
 		} catch (IOException e) {
 			Log.e(getClass().getName(), "IOException in InputStream");
+
+			if (bannerDownloadListener != null)
+				bannerDownloadListener.onBannerLoadFailed(
+					LoadError.DownloadFailed
+				);
 		}
 		
 		Log.d(getClass().getName(), "answer: " + result.toString());
 		
-		if (!result.equals("") && !result.equals(NO_BANNER)) 
-			view.setBanner(parse(result));
+		if (result.equals("")) {
+			if (bannerDownloadListener != null)
+				bannerDownloadListener.onBannerLoadFailed(
+					LoadError.UnknownAnswer
+				);
+		} else if (result.equals(NO_BANNER)) { 
+			if (bannerDownloadListener != null)
+				bannerDownloadListener.onBannerLoadFailed(
+					LoadError.NoHaveBanner
+				);
+		} else {
+			Plus1Banner banner = parse(result);
+			view.setBanner(banner);
+
+			if ((banner != null) && (banner.getId() > 0)) {
+				if (bannerDownloadListener != null)
+					bannerDownloadListener.onBannerLoaded();
+			} else {
+				if (bannerDownloadListener != null)
+					bannerDownloadListener.onBannerLoadFailed(
+						LoadError.UnknownAnswer
+					);
+			}
+		}
 		
 		if ((handler != null) && !isRunOnce)
 			handler.postDelayed(this, timeout * 1000);
