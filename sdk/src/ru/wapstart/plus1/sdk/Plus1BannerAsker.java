@@ -38,16 +38,18 @@ import android.telephony.TelephonyManager;
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
-public class Plus1BannerAsker {
+public class Plus1BannerAsker implements BannerViewStateListener {
 	private Plus1BannerRequest request				= null;
 	private Plus1BannerView view					= null;
 	private Handler handler							= null;
+	private Runnable askerStoper					= null;
 	private	BaseBannerDownloader downloader			= null;
 	
 	private String deviceId							= null;
 	private boolean disableDispatchIMEI				= false;
 	private boolean disableAutoDetectLocation		= false;
 	private int timeout								= 10;
+	private int visibilityTimeout					= 0;
 	
 	private boolean initialized						= false;
 
@@ -91,7 +93,13 @@ public class Plus1BannerAsker {
 		
 		return this;
 	}
-	
+
+	public Plus1BannerAsker setVisibilityTimeout(int visibilityTimeout) {
+		this.visibilityTimeout = visibilityTimeout;
+
+		return this;
+	}
+
 	public Plus1BannerAsker init() {
 		if (initialized)
 			return this;
@@ -125,7 +133,12 @@ public class Plus1BannerAsker {
 			.setTimeout(timeout);
 		
 		this.handler = new Handler();
-		
+
+		if (visibilityTimeout == 0)
+			visibilityTimeout = timeout * 3;
+
+		view.setStateListener(this);
+
 		initialized = true;
 		
 		return this;
@@ -173,6 +186,29 @@ public class Plus1BannerAsker {
 		handler.postDelayed(downloader, 100);
 		
 		return this;
+	}
+
+	public void onShowBannerView() {
+		if (askerStoper != null) {
+			handler.removeCallbacks(askerStoper);
+
+			askerStoper = null;
+		}
+	}
+
+	public void onHideBannerView() {
+		askerStoper =
+			new Runnable() {
+				public void run() {
+					stop();
+				}
+			};
+
+		handler.postDelayed(askerStoper, visibilityTimeout * 1000);
+	}
+
+	public void onCloseBannerView() {
+		stop();
 	}
 }
 	
