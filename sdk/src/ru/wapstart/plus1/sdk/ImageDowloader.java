@@ -28,11 +28,8 @@
  */
 package ru.wapstart.plus1.sdk;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
 import java.net.HttpURLConnection;
 
-import android.graphics.Movie;
 import android.graphics.drawable.Drawable;
 
 /**
