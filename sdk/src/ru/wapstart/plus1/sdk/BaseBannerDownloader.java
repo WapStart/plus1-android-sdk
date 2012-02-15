@@ -108,21 +108,21 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 	@Override	
 	protected Void doInBackground(Void... voids)
 	{
-        while( running ) {
-    		if (view.isClosed())
-    			return null;
+		while( running ) {
+			if (view.isClosed())
+				return null;
     		
-    		updateBanner();
+			updateBanner();
         	
-    		if (runOnce)
-    			return null;
+			if (runOnce)
+				return null;
     		
-            try {
+			try {
 				Thread.sleep(1000 * timeout);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-        }
+		}
 		
 		return null;
 	}
