@@ -46,16 +46,19 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.LinearLayout;
+import android.widget.FrameLayout;
 import android.widget.ViewFlipper;
 
+import android.util.Log;
 
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
-public class Plus1BannerView extends LinearLayout {
+public class Plus1BannerView extends FrameLayout {
 
 	private Plus1Banner banner;
+	private MraidView mAdView;
 
 	private TextView title;
 	private TextView content;
@@ -71,11 +74,16 @@ public class Plus1BannerView extends LinearLayout {
 	private boolean initialized		= false;
 
 	public Plus1BannerView(Context context) {
-		super(context);
+		this(context, null);
 	}
 
 	public Plus1BannerView(Context context, AttributeSet attr) {
 		super(context, attr);
+
+		setHorizontalScrollBarEnabled(false);
+		setVerticalScrollBarEnabled(false);
+
+		mAdView = new MraidView(context);
 	}
 
 	public boolean isHaveCloseButton()
@@ -158,6 +166,30 @@ public class Plus1BannerView extends LinearLayout {
 		}
 	}
 
+	public void loadHtmlAd(String url) {
+		if (!initialized)
+			init();
+
+		if (getVisibility() == INVISIBLE) {
+			flipper.stopFlipping();
+
+			//mAdView.loadData("<b>THIS IS WebView, yeaaah</b>", "text/html", null);
+			//mAdView.loadData(html, "text/html", null);
+			//mAdView.loadUrl("http://ro.trunk.plus1.oemtest.ru/testmraid.html");
+			mAdView.loadUrl(url);
+
+			mAdView.setVisibility(VISIBLE);
+
+			show();
+
+		} else if (getVisibility() == VISIBLE) {
+			if (hideAnimation != null)
+				startAnimation(hideAnimation);
+			
+			setVisibility(INVISIBLE);
+		}
+	}
+
 	public void setImage(Drawable drawable) {
 		image.setImage(drawable);
 		imageDownloaded();
@@ -193,7 +225,7 @@ public class Plus1BannerView extends LinearLayout {
 			new LinearLayout.LayoutParams(
 				LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT,
-				0.03125f
+				Gravity.LEFT
 			)
 		);
 		
@@ -211,24 +243,27 @@ public class Plus1BannerView extends LinearLayout {
 				android.R.anim.fade_out
 			)
 		);
-		
-		LinearLayout ll = new LinearLayout(getContext());
-		ll.setOrientation(VERTICAL);
+
+		//WebView mWebView = new WebView();
+		//this.addView(webview);
+
+		//LinearLayout ll = new LinearLayout(getContext());
+		//ll.setOrientation(LinearLayout.VERTICAL);
 		
 		this.title = new TextView(getContext());
 		title.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
 		title.setTextSize(14f);
 		title.setTextColor(Color.rgb(115, 154, 208));
 		title.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-		ll.addView(title);
+		this.addView(title);
 		
 		this.content = new TextView(getContext());
 		content.setTypeface(Typeface.SANS_SERIF);
 		content.setTextSize(13f);
 		content.setTextColor(Color.WHITE);
 		content.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-		ll.addView(content);
-		flipper.addView(ll);
+		this.addView(content);
+		//flipper.addView(this);
 		
 		this.image = new Plus1ImageView(getContext());
 		flipper.addView(image);
@@ -240,6 +275,20 @@ public class Plus1BannerView extends LinearLayout {
 				LayoutParams.FILL_PARENT,
 				0.90625f + (isHaveCloseButton() ? 0f : 0.0625f)
 			)
+		);
+
+		//mAdView.loadData("<b>THIS IS WebView, yeaaah</b>", "text/html", null);
+		//mAdView.loadUrl("http://cdn.celtra.com/v1/creatives/6295/compiled/v2-a7f007af60/ExpandableBanner/banner.html?logged=1#channel=testchannel&c=&rnd=142");
+
+		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+			FrameLayout.LayoutParams.FILL_PARENT,
+			FrameLayout.LayoutParams.FILL_PARENT,
+			Gravity.CENTER
+		);
+
+		addView(
+			mAdView,
+			layoutParams
 		);
 
 		if (isHaveCloseButton()) {
@@ -261,14 +310,14 @@ public class Plus1BannerView extends LinearLayout {
 					}
 				}
 			);
-			
+
 			addView(
 				closeButton, 
-				new LinearLayout.LayoutParams(
-						18,
-						17,
-						0.0625f
-					)
+				new FrameLayout.LayoutParams(
+					18,
+					17,
+					Gravity.RIGHT
+				)
 			);
 		}
 		

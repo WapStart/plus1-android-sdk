@@ -42,7 +42,6 @@ public class Plus1BannerAsker {
 	private Plus1BannerRequest request				= null;
 	private Plus1BannerView view					= null;
 	private Handler handler							= null;
-	private	BaseBannerDownloader downloader			= null;
 	
 	private String deviceId							= null;
 	private boolean disableDispatchIMEI				= false;
@@ -112,9 +111,9 @@ public class Plus1BannerAsker {
 				);
 			
 			this.deviceId = telephonyManager.getDeviceId();
-		}		
-	
-		if (request.getRequestType() == Plus1BannerRequest.RequestType.JSON)
+		}
+
+		/*if (request.getRequestType() == Plus1BannerRequest.RequestType.JSON)
 			this.downloader = new JSONBannerDownloader(view);
 		else
 			this.downloader = new XMLBannerDownloader(view);
@@ -124,7 +123,7 @@ public class Plus1BannerAsker {
 			.setRequest(request)
 			.setTimeout(timeout);
 		
-		this.handler = new Handler();
+		this.handler = new Handler();*/
 		
 		initialized = true;
 		
@@ -146,9 +145,10 @@ public class Plus1BannerAsker {
 			);
 		}
 		
-		downloader.setHandler(handler);
+		view.loadHtmlAd(request.getRequestUri());
+		/*downloader.setHandler(handler);
 		handler.removeCallbacks(downloader);
-		handler.postDelayed(downloader, 100);
+		handler.postDelayed(downloader, 100);*/
 		
 		return this;
 	}
@@ -157,7 +157,7 @@ public class Plus1BannerAsker {
 		if (!isDisabledAutoDetectLocation())
 			locationManager.removeUpdates(locationListener);
 		
-		handler.removeCallbacks(downloader);
+		//handler.removeCallbacks(downloader);
 		
 		return this;
 	}
@@ -166,10 +166,10 @@ public class Plus1BannerAsker {
 		if ((request == null) || (view == null))
 			return this;
 
-		init();
+		/*init();
 		downloader
 			.removeHandler()
-			.run();
+			.run();*/
 		
 		return this;
 	}

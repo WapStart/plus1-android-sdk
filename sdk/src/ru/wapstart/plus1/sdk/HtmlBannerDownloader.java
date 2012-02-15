@@ -43,7 +43,7 @@ import android.util.Log;
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
-abstract class BaseBannerDownloader extends BaseDownloader {
+final class HtmlBannerDownloader extends BaseDownloader {
 	private static final Integer BUFFER_SIZE = 8192;
 	private static final String NO_BANNER = "<!-- i4jgij4pfd4ssd -->";
 	
@@ -53,36 +53,36 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 	protected String deviceId				= null;
 	protected int timeout					= 0;
 	
-	public BaseBannerDownloader(Plus1BannerView view) {
+	public HtmlBannerDownloader(Plus1BannerView view) {
 		this.view = view;
 	}
 	
-	public BaseBannerDownloader setDeviceId(String deviceId) {
+	public HtmlBannerDownloader setDeviceId(String deviceId) {
 		this.deviceId = deviceId;
 		
 		return this;
 	}
 	
-	public BaseBannerDownloader setRequest(Plus1BannerRequest request) {
+	public HtmlBannerDownloader setRequest(Plus1BannerRequest request) {
 		this.request = request;
 		
 		return this;
 	}
 	
-	public BaseBannerDownloader setHandler(Handler handler) {
+	public HtmlBannerDownloader setHandler(Handler handler) {
 		this.handler = handler;
 		
 		return this;
 	}
 	
-	public BaseBannerDownloader removeHandler() {
+	public HtmlBannerDownloader removeHandler() {
 		this.handler = null;
 		
 		return this;
 	}
 
 	
-	public BaseBannerDownloader setTimeout(int timeout) {
+	public HtmlBannerDownloader setTimeout(int timeout) {
 		this.timeout = timeout;
 		
 		return this;
@@ -122,7 +122,7 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		Log.d(getClass().getName(), "answer: " + result.toString());
 		
 		if (!result.equals("") && !result.equals(NO_BANNER)) 
-			view.setBanner(parse(result));
+			view.loadHtmlAd(result.toString());
 		
 		if (handler != null)
 			handler.postDelayed(this, timeout * 1000);
@@ -171,6 +171,4 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 			String.valueOf(metrics.widthPixels) + "x" 
 			+ String.valueOf(metrics.heightPixels);
 	}
-	
-	abstract protected Plus1Banner parse(String answer);
 }
