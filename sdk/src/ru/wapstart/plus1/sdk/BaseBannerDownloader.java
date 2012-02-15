@@ -53,6 +53,9 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 	protected Plus1BannerRequest request	= null;
 	protected String deviceId				= null;
 	protected int timeout					= 0;
+	protected boolean runOnce               = false;
+	
+	private boolean running = true;
 
 	protected Plus1BannerDownloadListener bannerDownloadListener = null;
 	
@@ -78,6 +81,18 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		return this;
 	}
 
+	public BaseBannerDownloader setRunOnce() {
+		this.runOnce = true;
+
+		return this;
+	}
+
+	public BaseBannerDownloader setRunOnce(boolean runOnce) {
+		this.runOnce = runOnce;
+
+		return this;
+	}	
+	
 	public BaseBannerDownloader setDownloadListener(
 		Plus1BannerDownloadListener bannerDownloadListener
 	) {
@@ -86,12 +101,35 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		return this;
 	}
 	
+    public void stop()
+    {
+        running = false;
+    }	
+	
 	@Override	
-	protected Void doInBackground(Void... params)
+	protected Void doInBackground(Void... voids)
 	{
-		if (view.isClosed())
-			return null;
+        while( running ) {
+    		if (view.isClosed())
+    			return null;
+    		
+    		updateBanner();
+        	
+    		if (runOnce)
+    			return null;
+    		
+            try {
+				Thread.sleep(1000 * timeout);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+        }
 		
+		return null;
+	}
+
+	protected void updateBanner()
+	{
 		if (request != null)
 			this.url = request.getRequestUri();
 		
@@ -129,9 +167,7 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 				
 				view.setBanner(banner);
 			}
-		});
-		
-		return null;
+		});		
 	}
 	
 	protected String getData()

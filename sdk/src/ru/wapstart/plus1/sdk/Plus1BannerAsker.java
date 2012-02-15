@@ -45,7 +45,7 @@ import android.telephony.TelephonyManager;
 public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	private Plus1BannerRequest request						= null;
 	private Plus1BannerView view							= null;
-	private Timer timer									    = null;
+	private BaseBannerDownloader downloaderTask				= null;
 	private Runnable askerStoper							= null;
 
 	private String deviceId									= null;
@@ -142,8 +142,6 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 			
 			this.deviceId = telephonyManager.getDeviceId();
 		}
-		
-		timer = new Timer();
 
 		if (viewStateListener != null)
 			view.setViewStateListener(viewStateListener);
@@ -172,15 +170,9 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 				locationListener
 			);
 		}
-		
-		timer.schedule(
-                new TimerTask() {
-                    @Override
-                    public void run() {
-                    	getDownloaderTask().execute();
-                    }
-                }, 2000, 1000
-        );		
+
+		downloaderTask = getDownloaderTask();		
+		downloaderTask.execute();	
 		
 		return this;
 	}
@@ -189,7 +181,7 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 		if (!isDisabledAutoDetectLocation())
 			locationManager.removeUpdates(locationListener);
 		
-		timer.cancel();
+		downloaderTask.stop();
 		
 		return this;
 	}
@@ -200,22 +192,13 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 
 		init();
 
-		timer.schedule(
-                new TimerTask() {
-                    @Override
-                    public void run() {
-                    	getDownloaderTask().execute();
-                    }
-                }, 100
-        );		
+		downloaderTask.setRunOnce().execute();		
 		
 		return this;
 	}
 
 	public void onShowBannerView() {
 		if (askerStoper != null) {
-			//handler.removeCallbacks(askerStoper);
-
 			askerStoper = null;
 		}
 	}
@@ -231,7 +214,7 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 				}
 			};
 
-		//handler.postDelayed(askerStoper, visibilityTimeout * 1000);
+		new Handler().postDelayed(askerStoper, visibilityTimeout * 1000);
 	}
 
 	public void onCloseBannerView() {
