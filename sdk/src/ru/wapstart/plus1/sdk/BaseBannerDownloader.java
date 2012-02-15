@@ -37,7 +37,6 @@ import java.util.Locale;
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 
 import android.app.Activity;
-import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 

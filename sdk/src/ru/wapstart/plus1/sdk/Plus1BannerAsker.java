@@ -29,10 +29,6 @@
 
 package ru.wapstart.plus1.sdk;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
-import android.R.bool;
 import android.content.Context;
 import android.location.LocationManager;
 import android.os.Handler;
