@@ -37,7 +37,7 @@ import java.util.Locale;
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 
 import android.app.Activity;
-import android.os.Handler;
+import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -51,10 +51,8 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 	
 	protected Plus1BannerView view			= null;
 	protected Plus1BannerRequest request	= null;
-	protected Handler handler				= null;
 	protected String deviceId				= null;
 	protected int timeout					= 0;
-	protected boolean isRunOnce				= false;
 
 	protected Plus1BannerDownloadListener bannerDownloadListener = null;
 	
@@ -74,34 +72,9 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		return this;
 	}
 	
-	public BaseBannerDownloader setHandler(Handler handler) {
-		this.handler = handler;
-		
-		return this;
-	}
-	
-	public BaseBannerDownloader removeHandler() {
-		this.handler = null;
-		
-		return this;
-	}
-
-	
 	public BaseBannerDownloader setTimeout(int timeout) {
 		this.timeout = timeout;
 		
-		return this;
-	}
-
-	public BaseBannerDownloader setRunOnce() {
-		this.isRunOnce = true;
-
-		return this;
-	}
-
-	public BaseBannerDownloader setRunOnce(boolean isRunOnce) {
-		this.isRunOnce = isRunOnce;
-
 		return this;
 	}
 
@@ -113,15 +86,57 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		return this;
 	}
 	
-	@Override
-	public void run() {
+	@Override	
+	protected Void doInBackground(Void... params)
+	{
 		if (view.isClosed())
-			return;
+			return null;
 		
 		if (request != null)
 			this.url = request.getRequestUri();
 		
-		super.run();
+		final String result = getData();
+		
+		Log.d(getClass().getName(), "answer: " + result.toString());
+		
+		view.post(new Runnable() {
+			public void run() {
+				Plus1Banner banner = null;
+
+				if (result.equals("")) {
+					if (bannerDownloadListener != null)
+						bannerDownloadListener.onBannerLoadFailed(
+							LoadError.UnknownAnswer
+						);
+				} else if (result.equals(NO_BANNER)) { 
+					if (bannerDownloadListener != null)
+						bannerDownloadListener.onBannerLoadFailed(
+							LoadError.NoHaveBanner
+						);
+				} else {
+					banner = parse(result);
+
+					if ((banner != null) && (banner.getId() > 0)) {
+						if (bannerDownloadListener != null)
+							bannerDownloadListener.onBannerLoaded();
+					} else {
+						if (bannerDownloadListener != null)
+							bannerDownloadListener.onBannerLoadFailed(
+								LoadError.UnknownAnswer
+							);
+					}
+				}			
+				
+				view.setBanner(banner);
+			}
+		});
+		
+		return null;
+	}
+	
+	protected String getData()
+	{
+		openConnection();
 		
 		String result = new String();
 		
@@ -149,37 +164,7 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 				);
 		}
 		
-		Log.d(getClass().getName(), "answer: " + result.toString());
-		
-		Plus1Banner banner = null;
-
-		if (result.equals("")) {
-			if (bannerDownloadListener != null)
-				bannerDownloadListener.onBannerLoadFailed(
-					LoadError.UnknownAnswer
-				);
-		} else if (result.equals(NO_BANNER)) { 
-			if (bannerDownloadListener != null)
-				bannerDownloadListener.onBannerLoadFailed(
-					LoadError.NoHaveBanner
-				);
-		} else {
-			banner = parse(result);
-
-			if ((banner != null) && (banner.getId() > 0)) {
-				if (bannerDownloadListener != null)
-					bannerDownloadListener.onBannerLoaded();
-			} else {
-				if (bannerDownloadListener != null)
-					bannerDownloadListener.onBannerLoadFailed(
-						LoadError.UnknownAnswer
-					);
-			}
-		}
-		view.setBanner(banner);
-		
-		if ((handler != null) && !isRunOnce)
-			handler.postDelayed(this, timeout * 1000);
+		return result;
 	}
 	
 	protected void modifyConnection(HttpURLConnection connection) {

@@ -29,6 +29,10 @@
 
 package ru.wapstart.plus1.sdk;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import android.R.bool;
 import android.content.Context;
 import android.location.LocationManager;
 import android.os.Handler;
@@ -41,9 +45,8 @@ import android.telephony.TelephonyManager;
 public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	private Plus1BannerRequest request						= null;
 	private Plus1BannerView view							= null;
-	private Handler handler									= null;
+	private Timer timer									    = null;
 	private Runnable askerStoper							= null;
-	private	BaseBannerDownloader downloader					= null;
 
 	private String deviceId									= null;
 	private boolean disableDispatchIMEI						= false;
@@ -138,27 +141,14 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 				);
 			
 			this.deviceId = telephonyManager.getDeviceId();
-		}		
-	
-		if (request.getRequestType() == Plus1BannerRequest.RequestType.JSON)
-			this.downloader = new JSONBannerDownloader(view);
-		else
-			this.downloader = new XMLBannerDownloader(view);
+		}
 		
-		downloader
-			.setDeviceId(deviceId)
-			.setRequest(request)
-			.setTimeout(timeout);
+		timer = new Timer();
 
 		if (viewStateListener != null)
 			view.setViewStateListener(viewStateListener);
 		else
 			view.setViewStateListener(this);
-
-		if (downloadListener != null)
-			downloader.setDownloadListener(downloadListener);
-		
-		this.handler = new Handler();
 
 		if (visibilityTimeout == 0)
 			visibilityTimeout = timeout * 3;
@@ -183,9 +173,14 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 			);
 		}
 		
-		downloader.setHandler(handler);
-		handler.removeCallbacks(downloader);
-		handler.postDelayed(downloader, 100);
+		timer.schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                    	getDownloaderTask().execute();
+                    }
+                }, 2000, 1000
+        );		
 		
 		return this;
 	}
@@ -194,7 +189,7 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 		if (!isDisabledAutoDetectLocation())
 			locationManager.removeUpdates(locationListener);
 		
-		handler.removeCallbacks(downloader);
+		timer.cancel();
 		
 		return this;
 	}
@@ -204,17 +199,22 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 			return this;
 
 		init();
-		downloader.setRunOnce();
-		downloader.setHandler(handler);
-		handler.removeCallbacks(downloader);
-		handler.postDelayed(downloader, 100);
+
+		timer.schedule(
+                new TimerTask() {
+                    @Override
+                    public void run() {
+                    	getDownloaderTask().execute();
+                    }
+                }, 100
+        );		
 		
 		return this;
 	}
 
 	public void onShowBannerView() {
 		if (askerStoper != null) {
-			handler.removeCallbacks(askerStoper);
+			//handler.removeCallbacks(askerStoper);
 
 			askerStoper = null;
 		}
@@ -231,11 +231,31 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 				}
 			};
 
-		handler.postDelayed(askerStoper, visibilityTimeout * 1000);
+		//handler.postDelayed(askerStoper, visibilityTimeout * 1000);
 	}
 
 	public void onCloseBannerView() {
 		stop();
+	}
+	
+	protected BaseBannerDownloader getDownloaderTask()
+	{
+		BaseBannerDownloader task;
+		
+		if (request.getRequestType() == Plus1BannerRequest.RequestType.JSON)
+			task = new JSONBannerDownloader(view);
+		else
+			task = new XMLBannerDownloader(view);
+		
+		task
+			.setDeviceId(deviceId)
+			.setRequest(request)
+			.setTimeout(timeout);
+
+		if (downloadListener != null)
+			task.setDownloadListener(downloadListener);
+		
+		return task;
 	}
 }
 	

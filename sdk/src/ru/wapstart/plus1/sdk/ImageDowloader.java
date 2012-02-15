@@ -44,16 +44,18 @@ final class ImageDowloader extends BaseDownloader {
 		this.bannerView = bannerView;
 	}
 	
-	@Override
-	public void run() {
-		super.run();
-		
+	@Override	
+	protected Void doInBackground(Void... params)
+	{
+		openConnection();
+	
 		if (stream == null) 
-			return;
+			return null;
 		
-		bannerView.setImage(Drawable.createFromStream(stream, "src"));
+		bannerView.setImage(Drawable.createFromStream(stream, "src"));		
+		
+		return null;
 	}
 	
 	protected void modifyConnection(HttpURLConnection connection) { /*_*/ }
-
 }

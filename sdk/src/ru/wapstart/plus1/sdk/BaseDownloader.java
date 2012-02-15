@@ -34,14 +34,14 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.TimerTask;
 import android.util.Log;
+import android.os.AsyncTask;
 
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
-abstract class BaseDownloader extends TimerTask {
+abstract class BaseDownloader extends AsyncTask<Void, Void, Void> {
 	protected HttpURLConnection connection	= null;
 	protected InputStream stream			= null;
 	protected String url					= null;
@@ -52,8 +52,8 @@ abstract class BaseDownloader extends TimerTask {
 		return this;
 	}
 	
-	@Override
-	public void run() {
+	protected void openConnection()
+	{
 		try {
 			connection = (HttpURLConnection) new URL(url).openConnection();
 			connection.setDoOutput(true);
@@ -65,7 +65,7 @@ abstract class BaseDownloader extends TimerTask {
 			Log.e(getClass().getName(), "Url parsing failed: " + url);
 		} catch (IOException e) {
 			Log.d(getClass().getName(), "Url " + url + " doesn't exists");
-		}		
+		}
 	}
 	
 	abstract protected void modifyConnection(HttpURLConnection connection);

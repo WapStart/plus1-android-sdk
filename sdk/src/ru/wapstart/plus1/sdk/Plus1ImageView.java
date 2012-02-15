@@ -75,6 +75,9 @@ final class Plus1ImageView extends View {
 		}
 	}
 
+	/**
+	 * FIXME: this method is never used (he was in constructors in r77144)
+	 */
 	private void startInvalidateThread()
 	{
 		final Handler handler = new Handler();
