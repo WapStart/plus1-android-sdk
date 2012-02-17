@@ -29,7 +29,6 @@
 
 package ru.wapstart.plus1.sdk;
 
-import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
@@ -46,6 +45,7 @@ final class Plus1Helper {
 
 	private static final String PREFERENCES_STORAGE = "WapstartPlus1";
 	private static final String PREFERENCES_KEY		= "session";
+	private static final String HEX_DIGITS = "0123456789abcdef";
 	
 	private static String clientSessionId = null;
 	
@@ -59,8 +59,8 @@ final class Plus1Helper {
 
 		for (int i = 0; i < 10; i++)
 			sha1.update((byte)rnd.nextInt(255));
-
-		return new BigInteger(sha1.digest()).abs().toString(16);
+		
+		return getHex(sha1.digest());
 	}
 	
 	// TODO: find out needs of our network
@@ -94,5 +94,16 @@ final class Plus1Helper {
 		return clientSessionId;		
 	}
 	
-	
+	private static String getHex(byte[] raw)
+	{
+		final StringBuilder hex = new StringBuilder(raw.length * 2);
+
+		for (final byte b : raw) {
+			hex
+			.append(HEX_DIGITS.charAt((b & 0xF0) >> 4))
+			.append(HEX_DIGITS.charAt((b & 0x0F)));
+		}
+		
+		return hex.toString();
+	}
 }

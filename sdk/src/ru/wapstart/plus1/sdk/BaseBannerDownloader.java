@@ -191,7 +191,7 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 			
 			bufStream.close();
 		} catch (IOException e) {
-			Log.e(getClass().getName(), "IOException in InputStream");
+			Log.e(getClass().getName(), "IOException in InputStream: " + e.toString());
 
 			if (bannerDownloadListener != null)
 				bannerDownloadListener.onBannerLoadFailed(
@@ -203,8 +203,6 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 	}
 	
 	protected void modifyConnection(HttpURLConnection connection) {
-		connection.setDoOutput(true);
-		
 		connection.setRequestProperty(
 			"User-Agent", 
 			Plus1Helper.getUserAgent()
