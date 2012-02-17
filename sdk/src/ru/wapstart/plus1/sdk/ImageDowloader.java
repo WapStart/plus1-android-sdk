@@ -52,7 +52,11 @@ final class ImageDowloader extends BaseDownloader {
 		if (stream == null) 
 			return null;
 		
-		bannerView.setImage(Drawable.createFromStream(stream, "src"));		
+		bannerView.post(new Runnable() {
+			public void run() {
+				bannerView.setImage(Drawable.createFromStream(stream, "src"));
+			}
+		});
 		
 		return null;
 	}

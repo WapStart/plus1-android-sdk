@@ -74,30 +74,4 @@ final class Plus1ImageView extends View {
 			);
 		}
 	}
-
-	/**
-	 * FIXME: this method is never used (he was in constructors in r77144)
-	 */
-	private void startInvalidateThread()
-	{
-		final Handler handler = new Handler();
-		final View view = this;
-		
-		new Thread() {
-		    @Override public void run() {
-		        while(!Thread.currentThread().isInterrupted()) {
-		            handler.post(new Runnable() {
-		                public void run(){
-		                    view.invalidate();
-		                }
-		            });
-		            try {
-		                Thread.sleep(40); // yields 25 fps
-		            } catch (InterruptedException e) {
-		                Thread.currentThread().interrupt();
-		            }
-		        }
-		    }
-		}.start();
-	}
 }

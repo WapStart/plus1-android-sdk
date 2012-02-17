@@ -203,6 +203,8 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 	}
 	
 	protected void modifyConnection(HttpURLConnection connection) {
+		connection.setDoOutput(true);
+		
 		connection.setRequestProperty(
 			"User-Agent", 
 			Plus1Helper.getUserAgent()

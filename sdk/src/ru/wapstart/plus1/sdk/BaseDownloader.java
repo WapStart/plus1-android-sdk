@@ -56,15 +56,14 @@ abstract class BaseDownloader extends AsyncTask<Void, Void, Void> {
 	{
 		try {
 			connection = (HttpURLConnection) new URL(url).openConnection();
-			connection.setDoOutput(true);
 			modifyConnection(connection);
 			connection.connect();
 			
 			stream = connection.getInputStream();
 		} catch (MalformedURLException e) {
-			Log.e(getClass().getName(), "Url parsing failed: " + url);
+			Log.e(getClass().getName(), "URL parsing failed: " + url);
 		} catch (IOException e) {
-			Log.d(getClass().getName(), "Url " + url + " doesn't exist");
+			Log.d(getClass().getName(), "URL " + url + " doesn't exist");
 		}
 	}
 	
