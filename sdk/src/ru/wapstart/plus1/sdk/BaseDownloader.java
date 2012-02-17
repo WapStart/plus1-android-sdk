@@ -64,7 +64,7 @@ abstract class BaseDownloader extends AsyncTask<Void, Void, Void> {
 		} catch (MalformedURLException e) {
 			Log.e(getClass().getName(), "Url parsing failed: " + url);
 		} catch (IOException e) {
-			Log.d(getClass().getName(), "Url " + url + " doesn't exists");
+			Log.d(getClass().getName(), "Url " + url + " doesn't exist");
 		}
 	}
 	
