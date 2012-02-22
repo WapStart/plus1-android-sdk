@@ -52,6 +52,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import android.util.Log;
+import ru.wapstart.plus1.sdk.MraidView.ViewState;
 
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
@@ -182,16 +183,16 @@ public class Plus1BannerView extends FrameLayout {
 			// FIXME: more flexible
 			if ("mraid".equals(adType)) {
 				((MraidView)mAdView).loadHtmlData(html);
-				show(); // FIXME XXX: show when ready, add another listiners
+				//show(); // FIXME XXX: show when ready, add another listiners
 			} else {
 				((AdView)mAdView).loadHtmlData(html);
 
-				mAdView.setWebViewClient(new WebViewClient() {
+				/*mAdView.setWebViewClient(new WebViewClient() {
 					@Override
 					public void onPageFinished(WebView view, String url) {
 						show();
 					}
-				});
+				});*/
 			}
 
 			mAdView.setVisibility(VISIBLE);
@@ -199,6 +200,43 @@ public class Plus1BannerView extends FrameLayout {
 		} else {
 			hide();
 		}
+	}
+
+	public MraidView makeMraidView()
+	{
+		MraidView adView = new MraidView(getContext());
+		adView.setOnReadyListener(new MraidView.OnReadyListener() {
+			public void onReady(MraidView view) {
+				show();
+			}
+		});
+		adView.setOnExpandListener(new MraidView.OnExpandListener() {
+			public void onExpand(MraidView view) {
+				setAutorefreshEnabled(false);
+			}
+		});
+		adView.setOnCloseListener(new MraidView.OnCloseListener() {
+			public void onClose(MraidView view, ViewState newViewState) {
+				setAutorefreshEnabled(true);
+			}
+		});
+		// FIXME: add another listeners
+
+		return adView;
+	}
+
+	public AdView makeAdView()
+	{
+		AdView adView = new AdView(getContext());
+		adView.setWebViewClient(new WebViewClient() {
+			@Override
+			public void onPageFinished(WebView view, String url) {
+				show();
+			}
+		});
+		// FIXME: add another listeners
+
+		return adView;
 	}
 
 	public void setAutorefreshEnabled(boolean enabled) {
@@ -280,8 +318,8 @@ public class Plus1BannerView extends FrameLayout {
 		// FIXME XXX: re-render all views for ad of another type
 		mAdView =
 			"mraid".equals(adType)
-				? new MraidView(getContext())
-				: new AdView(getContext());
+				? makeMraidView()
+				: makeAdView();
 
 		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
 			FrameLayout.LayoutParams.WRAP_CONTENT,
