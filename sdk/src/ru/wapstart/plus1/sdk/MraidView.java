@@ -26,8 +26,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
+//import android.view.MotionEvent;
+//import android.view.View;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -100,11 +100,11 @@ public class MraidView extends WebView {
         
         setVerticalScrollBarEnabled(false);
         setHorizontalScrollBarEnabled(false);
-        setOnTouchListener(new View.OnTouchListener() {
+        /*setOnTouchListener(new View.OnTouchListener() {
             public boolean onTouch(View v, MotionEvent event) {
-                return (event.getAction() == MotionEvent.ACTION_MOVE);
+				return (event.getAction() == MotionEvent.ACTION_MOVE);
             }
-        });
+        });*/
         
         getSettings().setJavaScriptEnabled(true);
         
@@ -141,7 +141,6 @@ public class MraidView extends WebView {
 
 	@Override
     public void loadUrl(String url) {
-		// FIXME XXX: use custom client
         HttpClient httpClient = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet(url);
         StringBuffer out = new StringBuffer();
@@ -286,7 +285,7 @@ public class MraidView extends WebView {
         }
     }
     
-    /* 
+    /**
      * Copies a file from res/raw to <destinationFilename> in the application file directory.
      */
     private String copyRawResourceToFilesDir(int resourceId, String destinationFilename) {
@@ -330,6 +329,7 @@ public class MraidView extends WebView {
             String scheme = uri.getScheme();
             
             if (scheme.equals("mraid")) {
+				Log.d("MRAIDCommand", url);
                 tryCommand(URI.create(url)); // java.net.URI, not android.net.Uri
                 return true;
             }

@@ -45,12 +45,13 @@ public class BartActivity extends Activity implements View.OnClickListener
 			new Plus1BannerAsker(
 				Plus1BannerRequest
 					.create()
-					.setApplicationId(/* PLACE YOUR APPLICATION ID HERE */),
+					.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/")
+					.setApplicationId(352),
 				bannerView
 					.enableAnimationFromTop()
-					.enableCloseButton()
+					//.enableCloseButton()
 			)
-			.setTimeout(5);
+			.setTimeout(20);
     }
 
 	public void onClick(View view) {

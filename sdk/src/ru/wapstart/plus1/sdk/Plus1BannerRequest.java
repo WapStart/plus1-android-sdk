@@ -188,7 +188,7 @@ public final class Plus1BannerRequest {
 				+ ";" + getLocation().getLongitude();
 		
 		//return url;
-		return "http://ro.trunk.plus1.oemtest.ru/testmraid.html"; // debug
+		return "http://ro.trunk.plus1.oemtest.ru/testmraid.php"; // debug
 	}
 
 	private String getPageId() {

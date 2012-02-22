@@ -50,12 +50,13 @@ import android.widget.FrameLayout;
 import android.widget.ViewFlipper;
 
 import android.util.Log;
+import ru.wapstart.plus1.sdk.MraidView.OnReadyListener;
 
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
-public class Plus1BannerView extends FrameLayout {
+public class Plus1BannerView extends FrameLayout implements OnReadyListener {
 
 	private Plus1Banner banner;
 	private MraidView mAdView;
@@ -126,7 +127,7 @@ public class Plus1BannerView extends FrameLayout {
 		return this;
 	}
 
-	public void setBanner(Plus1Banner banner) {
+	/*public void setBanner(Plus1Banner banner) {
 		if (!initialized)
 			init();
 		
@@ -164,7 +165,7 @@ public class Plus1BannerView extends FrameLayout {
 			
 			setVisibility(INVISIBLE);
 		}
-	}
+	}*/
 
 	public void setHtmlAd(String html) {
 		if (!initialized)
@@ -173,12 +174,9 @@ public class Plus1BannerView extends FrameLayout {
 		if (getVisibility() == INVISIBLE) {
 			flipper.stopFlipping();
 
+			mAdView.setOnReadyListener(this);
 			mAdView.loadHtmlData(html);
 			//mAdView.loadUrl("http://ro.trunk.plus1.oemtest.ru/testmraid.html");
-
-			mAdView.setVisibility(VISIBLE);
-
-			show();
 
 		} else if (getVisibility() == VISIBLE) {
 			if (hideAnimation != null)
@@ -186,6 +184,11 @@ public class Plus1BannerView extends FrameLayout {
 			
 			setVisibility(INVISIBLE);
 		}
+	}
+
+	public void onReady(MraidView view) {
+		mAdView.setVisibility(VISIBLE);
+		show();
 	}
 
 	public void setImage(Drawable drawable) {
@@ -213,19 +216,7 @@ public class Plus1BannerView extends FrameLayout {
 		if (initialized)
 			return;
 		
-		setBackgroundResource(R.drawable.wp_banner_background);
-
-		ImageView shild = new ImageView(getContext());
-		shild.setImageResource(R.drawable.wp_banner_shild);
-		shild.setMaxWidth(9);
-		addView(
-			shild,
-			new LinearLayout.LayoutParams(
-				LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT,
-				Gravity.LEFT
-			)
-		);
+		//setBackgroundResource(R.drawable.wp_banner_background);
 		
 		this.flipper = new ViewFlipper(getContext());
 		flipper.setFlipInterval(3000);
@@ -242,49 +233,42 @@ public class Plus1BannerView extends FrameLayout {
 			)
 		);
 
-		//WebView mWebView = new WebView();
-		//this.addView(webview);
-
 		//LinearLayout ll = new LinearLayout(getContext());
 		//ll.setOrientation(LinearLayout.VERTICAL);
 		
-		this.title = new TextView(getContext());
-		title.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
-		title.setTextSize(14f);
-		title.setTextColor(Color.rgb(115, 154, 208));
-		title.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-		this.addView(title);
-		
-		this.content = new TextView(getContext());
-		content.setTypeface(Typeface.SANS_SERIF);
-		content.setTextSize(13f);
-		content.setTextColor(Color.WHITE);
-		content.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-		this.addView(content);
 		//flipper.addView(this);
-		
-		this.image = new Plus1ImageView(getContext());
-		flipper.addView(image);
-		
-		addView(
-			flipper, 			
-			new LinearLayout.LayoutParams(
-				LayoutParams.FILL_PARENT,
-				LayoutParams.FILL_PARENT,
-				0.90625f + (isHaveCloseButton() ? 0f : 0.0625f)
-			)
-		);
 
 		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-			FrameLayout.LayoutParams.FILL_PARENT,
-			FrameLayout.LayoutParams.FILL_PARENT,
-			Gravity.CENTER
+			FrameLayout.LayoutParams.WRAP_CONTENT,
+			FrameLayout.LayoutParams.WRAP_CONTENT,
+			Gravity.CENTER_HORIZONTAL | Gravity.TOP
 		);
 
 		addView(
 			mAdView,
 			layoutParams
 		);
+
+		/*ImageView shild = new ImageView(getContext());
+		shild.setImageResource(R.drawable.wp_banner_shild);
+		shild.setMaxWidth(9);
+		addView(
+			shild,
+			new LinearLayout.LayoutParams(
+				LayoutParams.WRAP_CONTENT,
+				50,
+				Gravity.LEFT
+			)
+		);*/
+
+		/*addView(
+			flipper, 			
+			new LinearLayout.LayoutParams(
+				LayoutParams.FILL_PARENT,
+				LayoutParams.FILL_PARENT,
+				0.90625f + (isHaveCloseButton() ? 0f : 0.0625f)
+			)
+		);*/
 
 		if (isHaveCloseButton()) {
 			Button closeButton = new Button(getContext());
