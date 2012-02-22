@@ -35,15 +35,15 @@ import android.webkit.WebView;
 
 public class AdView extends WebView {
 
-	protected Plus1BannerView mBannerView;
+	//protected Plus1BannerView mBannerView;
 
-	public AdView(Context context, Plus1BannerView view) {
+	public AdView(Context context) {
 		// Important: don't allow any WebView subclass to be instantiated using
 		// an Activity context, as it will leak on Froyo devices and earlier.
 		//super(context.getApplicationContext());
 		super(context);
 
-		mBannerView = view;
+		//mBannerView = view;
 
 		disableScrollingAndZoom();
 		getSettings().setJavaScriptEnabled(true);

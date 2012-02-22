@@ -142,7 +142,7 @@ public class Plus1BannerAsker {
 			);
 		}
 		
-		//downloader.setHandler(handler);
+		downloader.setHandler(handler);
 		handler.removeCallbacks(downloader);
 		handler.postDelayed(downloader, 100);
 		

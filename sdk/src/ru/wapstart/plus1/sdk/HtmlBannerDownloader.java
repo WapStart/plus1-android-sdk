@@ -80,7 +80,6 @@ final class HtmlBannerDownloader extends BaseDownloader {
 		
 		return this;
 	}
-
 	
 	public HtmlBannerDownloader setTimeout(int timeout) {
 		this.timeout = timeout;
@@ -92,7 +91,16 @@ final class HtmlBannerDownloader extends BaseDownloader {
 	public void run() {
 		if (view.isClosed())
 			return;
-		
+
+		// NOTE: possible lock by rich media banner
+		// FIXME: find another way to start/stop asker from banner
+		if (!view.getAutorefreshEnabled()) {
+			if (handler != null)
+				handler.postDelayed(this, timeout * 1000);
+
+			return;
+		}
+
 		if (request != null)
 			this.url = request.getRequestUri();
 		

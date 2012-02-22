@@ -49,7 +49,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 					.setApplicationId(352),
 				bannerView
 					.enableAnimationFromTop()
-					//.enableCloseButton()
+					.enableCloseButton()
 			)
 			.setTimeout(20);
     }

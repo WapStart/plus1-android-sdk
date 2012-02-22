@@ -49,6 +49,7 @@ import android.widget.LinearLayout;
 import android.widget.FrameLayout;
 import android.widget.ViewFlipper;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import android.util.Log;
 
@@ -73,6 +74,7 @@ public class Plus1BannerView extends FrameLayout {
 	private boolean haveCloseButton	= false;
 	private boolean closed			= false;
 	private boolean initialized		= false;
+	private boolean mAutorefreshEnabled = true;
 
 	public Plus1BannerView(Context context) {
 		this(context, null);
@@ -106,8 +108,11 @@ public class Plus1BannerView extends FrameLayout {
 		return closed;
 	}
 	
+	/**
+	 * @deprecated
+	 */
 	public Plus1Banner getBanner() {
-		return banner;
+		return null;
 	}
 	
 	public Plus1BannerView enableAnimationFromTop() {
@@ -167,38 +172,41 @@ public class Plus1BannerView extends FrameLayout {
 
 	public void loadAd(String html, String adType) {
 		if (!initialized)
-			init();
+			init(adType);
+
+		//setBackgroundResource(R.drawable.wp_banner_background);
 
 		if (getVisibility() == INVISIBLE) {
 			flipper.stopFlipping();
 
+			// FIXME: more flexible
 			if ("mraid".equals(adType)) {
-				mAdView = new MraidView(getContext());
-				//mAdView.setOnReadyListener(this);
 				((MraidView)mAdView).loadHtmlData(html);
-				//mAdView.loadUrl("http://ro.trunk.plus1.oemtest.ru/testmraid.html");
+				show(); // FIXME XXX: show when ready, add another listiners
 			} else {
-				mAdView = new AdView(getContext(), this);
 				((AdView)mAdView).loadHtmlData(html);
+
+				mAdView.setWebViewClient(new WebViewClient() {
+					@Override
+					public void onPageFinished(WebView view, String url) {
+						show();
+					}
+				});
 			}
 
-			FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-				FrameLayout.LayoutParams.WRAP_CONTENT,
-				FrameLayout.LayoutParams.WRAP_CONTENT,
-				Gravity.CENTER_HORIZONTAL | Gravity.TOP
-			);
-
-			addView(mAdView, layoutParams);
-
 			mAdView.setVisibility(VISIBLE);
-			show();
 
-		} else if (getVisibility() == VISIBLE) {
-			if (hideAnimation != null)
-				startAnimation(hideAnimation);
-			
-			setVisibility(INVISIBLE);
+		} else {
+			hide();
 		}
+	}
+
+	public void setAutorefreshEnabled(boolean enabled) {
+		mAutorefreshEnabled = enabled;
+	}
+
+	public boolean getAutorefreshEnabled() {
+		return mAutorefreshEnabled;
 	}
 
 	public void setImage(Drawable drawable) {
@@ -222,12 +230,12 @@ public class Plus1BannerView extends FrameLayout {
 		show();
 	}
 	
-	private void init() {
+	private void init(String adType) {
 		if (initialized)
 			return;
-		
-		//setBackgroundResource(R.drawable.wp_banner_background);
-		
+
+		setVisibility(INVISIBLE);
+
 		this.flipper = new ViewFlipper(getContext());
 		flipper.setFlipInterval(3000);
 		flipper.setInAnimation(
@@ -245,7 +253,7 @@ public class Plus1BannerView extends FrameLayout {
 
 		//LinearLayout ll = new LinearLayout(getContext());
 		//ll.setOrientation(LinearLayout.VERTICAL);
-		
+
 		//flipper.addView(this);
 
 		/*ImageView shild = new ImageView(getContext());
@@ -269,6 +277,20 @@ public class Plus1BannerView extends FrameLayout {
 			)
 		);*/
 
+		// FIXME XXX: re-render all views for ad of another type
+		mAdView =
+			"mraid".equals(adType)
+				? new MraidView(getContext())
+				: new AdView(getContext());
+
+		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+			FrameLayout.LayoutParams.WRAP_CONTENT,
+			FrameLayout.LayoutParams.WRAP_CONTENT,
+			Gravity.CENTER_HORIZONTAL | Gravity.TOP
+		);
+
+		addView(mAdView, layoutParams);
+
 		if (isHaveCloseButton()) {
 			Button closeButton = new Button(getContext());
 			closeButton.setBackgroundResource(R.drawable.wp_banner_close);
@@ -278,13 +300,7 @@ public class Plus1BannerView extends FrameLayout {
 					public void onClick(View v) {
 						closed = true;
 						flipper.stopFlipping();
-						
-						if (getVisibility() == VISIBLE) {
-							if (hideAnimation != null)
-								startAnimation(hideAnimation);
-							
-							setVisibility(INVISIBLE);	
-						}
+						hide();
 					}
 				}
 			);
@@ -298,8 +314,9 @@ public class Plus1BannerView extends FrameLayout {
 				)
 			);
 		}
-		
-		setOnClickListener(
+
+		// FIXME: intent in AdView
+		/*setOnClickListener(
 			new OnClickListener() {
 				public void onClick(View view) {
 					if (
@@ -317,9 +334,7 @@ public class Plus1BannerView extends FrameLayout {
 					);
 				}
 			}
-		);
-	
-		setVisibility(INVISIBLE);
+		);*/
 		
 		initialized = true;
 	}
@@ -346,6 +361,15 @@ public class Plus1BannerView extends FrameLayout {
 				startAnimation(showAnimation);
 		
 			setVisibility(VISIBLE);
+		}
+	}
+
+	private void hide() {
+		if (getVisibility() == VISIBLE) {
+			if (hideAnimation != null)
+				startAnimation(hideAnimation);
+
+			setVisibility(INVISIBLE);
 		}
 	}
 }
