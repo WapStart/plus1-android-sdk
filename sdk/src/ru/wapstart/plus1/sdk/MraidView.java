@@ -26,8 +26,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
-//import android.view.MotionEvent;
-//import android.view.View;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -100,11 +98,6 @@ public class MraidView extends WebView {
         
         setVerticalScrollBarEnabled(false);
         setHorizontalScrollBarEnabled(false);
-        /*setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-				return (event.getAction() == MotionEvent.ACTION_MOVE);
-            }
-        });*/
         
         getSettings().setJavaScriptEnabled(true);
         
@@ -128,8 +121,8 @@ public class MraidView extends WebView {
     public void loadHtmlData(String data) {
         // If the string data lacks the HTML boilerplate, add it.
         if (data.indexOf("<html>") == -1) {
-            data = "<html><head></head><body style='margin:0;padding:0;'>" + data + 
-                    "</body></html>";
+			data = "<html><head></head><body style='margin:0;padding:0;'>"
+					+ data + "</body></html>";
         }
         
         // Inject the MRAID JavaScript bridge.

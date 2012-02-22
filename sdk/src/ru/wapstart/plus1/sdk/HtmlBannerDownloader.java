@@ -122,7 +122,7 @@ final class HtmlBannerDownloader extends BaseDownloader {
 		Log.d(getClass().getName(), "answer: " + result.toString());
 		
 		if (!result.equals("") && !result.equals(NO_BANNER)) 
-			view.setHtmlAd(result.toString());
+			view.loadAd(result.toString(), connection.getHeaderField("X-Adtype"));
 		
 		if (handler != null)
 			handler.postDelayed(this, timeout * 1000);

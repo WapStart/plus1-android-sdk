@@ -48,18 +48,18 @@ import android.widget.TextView;
 import android.widget.LinearLayout;
 import android.widget.FrameLayout;
 import android.widget.ViewFlipper;
+import android.webkit.WebView;
 
 import android.util.Log;
-import ru.wapstart.plus1.sdk.MraidView.OnReadyListener;
 
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
-public class Plus1BannerView extends FrameLayout implements OnReadyListener {
+public class Plus1BannerView extends FrameLayout {
 
 	private Plus1Banner banner;
-	private MraidView mAdView;
+	private WebView mAdView;
 
 	private TextView title;
 	private TextView content;
@@ -83,8 +83,6 @@ public class Plus1BannerView extends FrameLayout implements OnReadyListener {
 
 		setHorizontalScrollBarEnabled(false);
 		setVerticalScrollBarEnabled(false);
-
-		mAdView = new MraidView(context);
 	}
 
 	public boolean isHaveCloseButton()
@@ -167,16 +165,33 @@ public class Plus1BannerView extends FrameLayout implements OnReadyListener {
 		}
 	}*/
 
-	public void setHtmlAd(String html) {
+	public void loadAd(String html, String adType) {
 		if (!initialized)
 			init();
 
 		if (getVisibility() == INVISIBLE) {
 			flipper.stopFlipping();
 
-			mAdView.setOnReadyListener(this);
-			mAdView.loadHtmlData(html);
-			//mAdView.loadUrl("http://ro.trunk.plus1.oemtest.ru/testmraid.html");
+			if ("mraid".equals(adType)) {
+				mAdView = new MraidView(getContext());
+				//mAdView.setOnReadyListener(this);
+				((MraidView)mAdView).loadHtmlData(html);
+				//mAdView.loadUrl("http://ro.trunk.plus1.oemtest.ru/testmraid.html");
+			} else {
+				mAdView = new AdView(getContext(), this);
+				((AdView)mAdView).loadHtmlData(html);
+			}
+
+			FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+				FrameLayout.LayoutParams.WRAP_CONTENT,
+				FrameLayout.LayoutParams.WRAP_CONTENT,
+				Gravity.CENTER_HORIZONTAL | Gravity.TOP
+			);
+
+			addView(mAdView, layoutParams);
+
+			mAdView.setVisibility(VISIBLE);
+			show();
 
 		} else if (getVisibility() == VISIBLE) {
 			if (hideAnimation != null)
@@ -184,11 +199,6 @@ public class Plus1BannerView extends FrameLayout implements OnReadyListener {
 			
 			setVisibility(INVISIBLE);
 		}
-	}
-
-	public void onReady(MraidView view) {
-		mAdView.setVisibility(VISIBLE);
-		show();
 	}
 
 	public void setImage(Drawable drawable) {
@@ -237,17 +247,6 @@ public class Plus1BannerView extends FrameLayout implements OnReadyListener {
 		//ll.setOrientation(LinearLayout.VERTICAL);
 		
 		//flipper.addView(this);
-
-		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-			FrameLayout.LayoutParams.WRAP_CONTENT,
-			FrameLayout.LayoutParams.WRAP_CONTENT,
-			Gravity.CENTER_HORIZONTAL | Gravity.TOP
-		);
-
-		addView(
-			mAdView,
-			layoutParams
-		);
 
 		/*ImageView shild = new ImageView(getContext());
 		shild.setImageResource(R.drawable.wp_banner_shild);
