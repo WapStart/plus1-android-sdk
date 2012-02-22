@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-     package="ru.wapstart.plus1.sdk">
+		package="ru.wapstart.plus1.sdk"
+		android:versionCode="1"
+		android:versionName="1.1">
+	<uses-sdk android:minSdkVersion="4"/>
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 </manifest>

@@ -166,17 +166,15 @@ public class Plus1BannerView extends FrameLayout {
 		}
 	}
 
-	public void loadHtmlAd(String url) {
+	public void setHtmlAd(String html) {
 		if (!initialized)
 			init();
 
 		if (getVisibility() == INVISIBLE) {
 			flipper.stopFlipping();
 
-			//mAdView.loadData("<b>THIS IS WebView, yeaaah</b>", "text/html", null);
-			//mAdView.loadData(html, "text/html", null);
+			mAdView.loadHtmlData(html);
 			//mAdView.loadUrl("http://ro.trunk.plus1.oemtest.ru/testmraid.html");
-			mAdView.loadUrl(url);
 
 			mAdView.setVisibility(VISIBLE);
 
@@ -276,9 +274,6 @@ public class Plus1BannerView extends FrameLayout {
 				0.90625f + (isHaveCloseButton() ? 0f : 0.0625f)
 			)
 		);
-
-		//mAdView.loadData("<b>THIS IS WebView, yeaaah</b>", "text/html", null);
-		//mAdView.loadUrl("http://cdn.celtra.com/v1/creatives/6295/compiled/v2-a7f007af60/ExpandableBanner/banner.html?logged=1#channel=testchannel&c=&rnd=142");
 
 		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
 			FrameLayout.LayoutParams.FILL_PARENT,

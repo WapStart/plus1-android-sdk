@@ -120,6 +120,7 @@ public class MraidView extends WebView {
         mListenerInfo = new MraidListenerInfo();
     }
     
+	@Override
     public void destroy() {
         mDisplayController.destroy();
     }
@@ -138,6 +139,7 @@ public class MraidView extends WebView {
         loadDataWithBaseURL(null, data, "text/html", "UTF-8", null);
     }
 
+	@Override
     public void loadUrl(String url) {
 		// FIXME XXX: use custom client
         HttpClient httpClient = new DefaultHttpClient();
