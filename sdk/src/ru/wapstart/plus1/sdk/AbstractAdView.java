@@ -29,44 +29,14 @@
 
 package ru.wapstart.plus1.sdk;
 
-import android.graphics.Color;
 import android.content.Context;
 import android.webkit.WebView;
 
-public class AdView extends AbstractAdView {
+public abstract class AbstractAdView extends WebView {
 
-	//protected Plus1BannerView mBannerView;
-
-	public AdView(Context context) {
-		// Important: don't allow any WebView subclass to be instantiated using
-		// an Activity context, as it will leak on Froyo devices and earlier.
-		//super(context.getApplicationContext());
+	public AbstractAdView(Context context) {
 		super(context);
-
-		//mBannerView = view;
-
-		disableScrollingAndZoom();
-		getSettings().setJavaScriptEnabled(true);
-		getSettings().setPluginsEnabled(true);
-		setBackgroundColor(Color.TRANSPARENT);
-		//setWebViewClient(new AdWebViewClient());
 	}
 
-	public void loadHtmlData(String data) {
-		// If the string data lacks the HTML boilerplate, add it.
-		if (data.indexOf("<html>") == -1) {
-			data = "<html><head></head><body style='margin:0;padding:0;'>"
-					+ data + "</body></html>";
-		}
-
-		loadDataWithBaseURL(null, data, "text/html", "UTF-8", null);
-	}
-
-	private void disableScrollingAndZoom() {
-		setHorizontalScrollBarEnabled(false);
-		setHorizontalScrollbarOverlay(false);
-		setVerticalScrollBarEnabled(false);
-		setVerticalScrollbarOverlay(false);
-		getSettings().setSupportZoom(false);
-	}
+	abstract public void loadHtmlData(String data);
 }

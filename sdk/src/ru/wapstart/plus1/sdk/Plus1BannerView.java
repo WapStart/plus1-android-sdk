@@ -61,7 +61,7 @@ import ru.wapstart.plus1.sdk.MraidView.ViewState;
 public class Plus1BannerView extends FrameLayout {
 
 	private Plus1Banner banner;
-	private WebView mAdView;
+	private AbstractAdView mAdView;
 
 	private TextView title;
 	private TextView content;
@@ -173,32 +173,26 @@ public class Plus1BannerView extends FrameLayout {
 
 	public void loadAd(String html, String adType) {
 		if (!initialized)
-			init(adType);
-
-		//setBackgroundResource(R.drawable.wp_banner_background);
+			init();
 
 		if (getVisibility() == INVISIBLE) {
-			flipper.stopFlipping();
+			//flipper.stopFlipping(); // FIXME XXX: debug flipper
 
-			// FIXME: more flexible
-			if ("mraid".equals(adType)) {
-				((MraidView)mAdView).loadHtmlData(html);
-				//show(); // FIXME XXX: show when ready, add another listiners
-			} else {
-				((AdView)mAdView).loadHtmlData(html);
+			removeAllViews();
 
-				/*mAdView.setWebViewClient(new WebViewClient() {
-					@Override
-					public void onPageFinished(WebView view, String url) {
-						show();
-					}
-				});*/
-			}
+			mAdView =
+				"mraid".equals(adType)
+					? makeMraidView()
+					: makeAdView();
+
+			mAdView.loadHtmlData(html);
+
+			addAdView(mAdView);
 
 			mAdView.setVisibility(VISIBLE);
 
 		} else {
-			hide();
+			hide(); // FIXME XXX: load ad always when called
 		}
 	}
 
@@ -268,7 +262,7 @@ public class Plus1BannerView extends FrameLayout {
 		show();
 	}
 	
-	private void init(String adType) {
+	private void init() {
 		if (initialized)
 			return;
 
@@ -294,18 +288,6 @@ public class Plus1BannerView extends FrameLayout {
 
 		//flipper.addView(this);
 
-		/*ImageView shild = new ImageView(getContext());
-		shild.setImageResource(R.drawable.wp_banner_shild);
-		shild.setMaxWidth(9);
-		addView(
-			shild,
-			new LinearLayout.LayoutParams(
-				LayoutParams.WRAP_CONTENT,
-				50,
-				Gravity.LEFT
-			)
-		);*/
-
 		/*addView(
 			flipper, 			
 			new LinearLayout.LayoutParams(
@@ -314,44 +296,6 @@ public class Plus1BannerView extends FrameLayout {
 				0.90625f + (isHaveCloseButton() ? 0f : 0.0625f)
 			)
 		);*/
-
-		// FIXME XXX: re-render all views for ad of another type
-		mAdView =
-			"mraid".equals(adType)
-				? makeMraidView()
-				: makeAdView();
-
-		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-			FrameLayout.LayoutParams.WRAP_CONTENT,
-			FrameLayout.LayoutParams.WRAP_CONTENT,
-			Gravity.CENTER_HORIZONTAL | Gravity.TOP
-		);
-
-		addView(mAdView, layoutParams);
-
-		if (isHaveCloseButton()) {
-			Button closeButton = new Button(getContext());
-			closeButton.setBackgroundResource(R.drawable.wp_banner_close);
-			
-			closeButton.setOnClickListener(
-				new OnClickListener() {
-					public void onClick(View v) {
-						closed = true;
-						flipper.stopFlipping();
-						hide();
-					}
-				}
-			);
-
-			addView(
-				closeButton, 
-				new FrameLayout.LayoutParams(
-					18,
-					17,
-					Gravity.RIGHT
-				)
-			);
-		}
 
 		// FIXME: intent in AdView
 		/*setOnClickListener(
@@ -376,7 +320,61 @@ public class Plus1BannerView extends FrameLayout {
 		
 		initialized = true;
 	}
-	
+
+	private void addAdView(WebView view)
+	{
+		// background
+		setBackgroundResource(R.drawable.wp_banner_background);
+
+		// web view
+		addView(
+			view,
+			new FrameLayout.LayoutParams(
+				FrameLayout.LayoutParams.WRAP_CONTENT,
+				FrameLayout.LayoutParams.WRAP_CONTENT,
+				Gravity.CENTER_HORIZONTAL | Gravity.TOP
+			)
+		);
+
+		// shild
+		ImageView shild = new ImageView(getContext());
+		shild.setImageResource(R.drawable.wp_banner_shild);
+		shild.setMaxWidth(9);
+		addView(
+			shild,
+			new FrameLayout.LayoutParams(
+				FrameLayout.LayoutParams.WRAP_CONTENT,
+				FrameLayout.LayoutParams.WRAP_CONTENT,
+				Gravity.LEFT | Gravity.CENTER_VERTICAL
+			)
+		);
+
+		// close button
+		if (isHaveCloseButton()) {
+			Button closeButton = new Button(getContext());
+			closeButton.setBackgroundResource(R.drawable.wp_banner_close);
+
+			closeButton.setOnClickListener(
+				new OnClickListener() {
+					public void onClick(View v) {
+						closed = true;
+						flipper.stopFlipping();
+						hide();
+					}
+				}
+			);
+
+			addView(
+				closeButton, 
+				new FrameLayout.LayoutParams(
+					18,
+					17,
+					Gravity.RIGHT
+				)
+			);
+		}
+	}
+
 	private Plus1BannerView enableAnimation(float toYDelta) {
 		this.showAnimation = new TranslateAnimation(
 				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
