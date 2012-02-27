@@ -12,8 +12,8 @@
 		
 	<ru.wapstart.plus1.sdk.Plus1BannerView
 			android:id="@+id/plus1BannerView"
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
+			android:layout_width="320dp"
+			android:layout_height="50dp"
 			android:layout_gravity="top|center"
 		/>
 		

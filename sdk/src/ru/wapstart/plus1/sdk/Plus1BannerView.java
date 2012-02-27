@@ -47,7 +47,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.LinearLayout;
 import android.widget.FrameLayout;
-import android.widget.ViewFlipper;
+import android.widget.ViewAnimator;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -61,13 +61,12 @@ import ru.wapstart.plus1.sdk.MraidView.ViewState;
 public class Plus1BannerView extends FrameLayout {
 
 	private Plus1Banner banner;
-	private AbstractAdView mAdView;
 
 	private TextView title;
 	private TextView content;
 	private Plus1ImageView image;
 	
-	private ViewFlipper flipper		= null;
+	private ViewAnimator animator	= null;
 	
 	private Animation hideAnimation = null;
 	private Animation showAnimation = null;
@@ -138,7 +137,7 @@ public class Plus1BannerView extends FrameLayout {
 		this.banner = banner;
 		
 		if ((banner != null) && (banner.getId() > 0)) {
-			flipper.stopFlipping();
+			animator.stopFlipping();
 			
 			SpannableStringBuilder text = 
 				new SpannableStringBuilder(banner.getTitle());
@@ -157,8 +156,8 @@ public class Plus1BannerView extends FrameLayout {
 				new ImageDowloader(this).setUrl(imageUrl).run();
 				
 			if (!banner.isImageBanner()) {
-				if (flipper.getCurrentView().equals(image))
-					flipper.showNext();
+				if (animator.getCurrentView().equals(image))
+					animator.showNext();
 				
 				show();
 			}
@@ -175,24 +174,21 @@ public class Plus1BannerView extends FrameLayout {
 		if (!initialized)
 			init();
 
-		if (getVisibility() == INVISIBLE) {
-			//flipper.stopFlipping(); // FIXME XXX: debug flipper
+		AbstractAdView adView =
+			"mraid".equals(adType)
+				? makeMraidView()
+				: makeAdView();
 
+		adView.loadHtmlData(html);
+		adView.setVisibility(VISIBLE);
+
+		if (getVisibility() == INVISIBLE) {
 			removeAllViews();
 
-			mAdView =
-				"mraid".equals(adType)
-					? makeMraidView()
-					: makeAdView();
-
-			mAdView.loadHtmlData(html);
-
-			addAdView(mAdView);
-
-			mAdView.setVisibility(VISIBLE);
-
+			addAdView(adView);
 		} else {
-			hide(); // FIXME XXX: load ad always when called
+			// FIXME XXX: delete from animator and destroy
+			animator.addView(adView);
 		}
 	}
 
@@ -253,13 +249,13 @@ public class Plus1BannerView extends FrameLayout {
 	
 	private void imageDownloaded()
 	{
-		if (banner.isImageBanner()) {
-			if (!flipper.getCurrentView().equals(image))
-				flipper.showNext();
+		/*if (banner.isImageBanner()) {
+			if (!animator.getCurrentView().equals(image))
+				animator.showNext();
 		} else
-			flipper.startFlipping();
+			animator.startFlipping();
 		
-		show();
+		show();*/
 	}
 	
 	private void init() {
@@ -268,28 +264,27 @@ public class Plus1BannerView extends FrameLayout {
 
 		setVisibility(INVISIBLE);
 
-		this.flipper = new ViewFlipper(getContext());
-		flipper.setFlipInterval(3000);
-		flipper.setInAnimation(
+		animator = new ViewAnimator(getContext());
+		animator.setInAnimation(
 			AnimationUtils.loadAnimation(
 				getContext(), 
 				android.R.anim.fade_in
 			)
 		);
-		flipper.setOutAnimation(
+		animator.setOutAnimation(
 			AnimationUtils.loadAnimation(
 				getContext(), 
 				android.R.anim.fade_out
 			)
 		);
 
-		//LinearLayout ll = new LinearLayout(getContext());
-		//ll.setOrientation(LinearLayout.VERTICAL);
+		/*LinearLayout ll = new LinearLayout(getContext());
+		ll.setOrientation(LinearLayout.VERTICAL);
 
-		//flipper.addView(this);
+		animator.addView(ll);
 
-		/*addView(
-			flipper, 			
+		addView(
+			animator,
 			new LinearLayout.LayoutParams(
 				LayoutParams.FILL_PARENT,
 				LayoutParams.FILL_PARENT,
@@ -326,13 +321,14 @@ public class Plus1BannerView extends FrameLayout {
 		// background
 		setBackgroundResource(R.drawable.wp_banner_background);
 
-		// web view
+		animator.addView(view);
+
 		addView(
-			view,
+			animator,
 			new FrameLayout.LayoutParams(
 				FrameLayout.LayoutParams.WRAP_CONTENT,
 				FrameLayout.LayoutParams.WRAP_CONTENT,
-				Gravity.CENTER_HORIZONTAL | Gravity.TOP
+				Gravity.CENTER_VERTICAL | Gravity.RIGHT
 			)
 		);
 
@@ -358,7 +354,6 @@ public class Plus1BannerView extends FrameLayout {
 				new OnClickListener() {
 					public void onClick(View v) {
 						closed = true;
-						flipper.stopFlipping();
 						hide();
 					}
 				}
@@ -395,9 +390,10 @@ public class Plus1BannerView extends FrameLayout {
 		if (getVisibility() == INVISIBLE) {
 			if (showAnimation != null)
 				startAnimation(showAnimation);
-		
+
 			setVisibility(VISIBLE);
-		}
+		} else if (animator.getChildCount() > 1)
+			animator.showNext();
 	}
 
 	private void hide() {

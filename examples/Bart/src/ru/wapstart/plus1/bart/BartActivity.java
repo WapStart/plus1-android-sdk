@@ -51,7 +51,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 					.enableAnimationFromTop()
 					.enableCloseButton()
 			)
-			.setTimeout(20);
+			.setTimeout(10);
     }
 
 	public void onClick(View view) {
