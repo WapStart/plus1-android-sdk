@@ -16,6 +16,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 {
 	private MediaPlayer mp;
 	private Plus1BannerAsker asker;
+	private Plus1BannerView mBannerView;
 
     /** Called when the activity is first created. */
     @Override
@@ -38,7 +39,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 
 		imageView.setOnClickListener(this);
 		
-		Plus1BannerView bannerView = 
+		mBannerView =
 			(Plus1BannerView) findViewById(R.id.plus1BannerView);
 		
 		asker = 
@@ -47,7 +48,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 					.create()
 					.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/")
 					.setApplicationId(352),
-				bannerView
+				mBannerView
 					.enableAnimationFromTop()
 					.enableCloseButton()
 			)
@@ -74,4 +75,10 @@ public class BartActivity extends Activity implements View.OnClickListener
 		
 		asker.stop();
 	}
+
+    @Override
+    protected void onDestroy() {
+        mBannerView.destroy();
+        super.onDestroy();
+    }
 }

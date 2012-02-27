@@ -40,7 +40,6 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -60,13 +59,16 @@ import ru.wapstart.plus1.sdk.MraidView.ViewState;
  */
 public class Plus1BannerView extends FrameLayout {
 
-	private Plus1Banner banner;
+	/**
+	 * @deprecated WebView-based banners used
+	 */
+	private Plus1Banner mBanner;
 
 	private TextView title;
 	private TextView content;
 	private Plus1ImageView image;
 	
-	private ViewAnimator animator	= null;
+	private Plus1ViewAnimator mAnimator	= null;
 	
 	private Animation hideAnimation = null;
 	private Animation showAnimation = null;
@@ -87,8 +89,12 @@ public class Plus1BannerView extends FrameLayout {
 		setVerticalScrollBarEnabled(false);
 	}
 
-	public boolean isHaveCloseButton()
-	{
+	public void destroy() {
+		if (mAnimator != null)
+			mAnimator.destroy();
+	}
+
+	public boolean isHaveCloseButton() {
 		return haveCloseButton;
 	}
 	
@@ -108,13 +114,6 @@ public class Plus1BannerView extends FrameLayout {
 		return closed;
 	}
 	
-	/**
-	 * @deprecated
-	 */
-	public Plus1Banner getBanner() {
-		return null;
-	}
-	
 	public Plus1BannerView enableAnimationFromTop() {
 		return enableAnimation(-1f);
 	}
@@ -130,45 +129,19 @@ public class Plus1BannerView extends FrameLayout {
 		return this;
 	}
 
-	/*public void setBanner(Plus1Banner banner) {
-		if (!initialized)
-			init();
-		
-		this.banner = banner;
-		
-		if ((banner != null) && (banner.getId() > 0)) {
-			animator.stopFlipping();
-			
-			SpannableStringBuilder text = 
-				new SpannableStringBuilder(banner.getTitle());
-			text.setSpan(new UnderlineSpan(), 0, banner.getTitle().length(), 0);				
-			title.setText(text);
-			content.setText(banner.getContent());
-			
-			String imageUrl = null;
-			
-			if (!banner.getPictureUrl().equals(""))
-				imageUrl = banner.getPictureUrl();
-			else if (!banner.getPictureUrlPng().equals(""))
-				imageUrl = banner.getPictureUrlPng();
-			
-			if (imageUrl != null)
-				new ImageDowloader(this).setUrl(imageUrl).run();
-				
-			if (!banner.isImageBanner()) {
-				if (animator.getCurrentView().equals(image))
-					animator.showNext();
-				
-				show();
-			}
-			
-		} else if (getVisibility() == VISIBLE) {
-			if (hideAnimation != null)
-				startAnimation(hideAnimation);
-			
-			setVisibility(INVISIBLE);
-		}
-	}*/
+	/**
+	 * @deprecated WebView-based banners used
+	 */
+	public Plus1Banner getBanner() {
+		return mBanner;
+	}
+
+	/**
+	 * @deprecated WebView-based banners used
+	 */
+	public void setBanner(Plus1Banner banner) {
+		mBanner = banner;
+	}
 
 	public void loadAd(String html, String adType) {
 		if (!initialized)
@@ -186,14 +159,11 @@ public class Plus1BannerView extends FrameLayout {
 			removeAllViews();
 
 			addAdView(adView);
-		} else {
-			// FIXME XXX: delete from animator and destroy
-			animator.addView(adView);
-		}
+		} else
+			mAnimator.addView(adView);
 	}
 
-	public MraidView makeMraidView()
-	{
+	public MraidView makeMraidView() {
 		MraidView adView = new MraidView(getContext());
 		adView.setOnReadyListener(new MraidView.OnReadyListener() {
 			public void onReady(MraidView view) {
@@ -215,8 +185,7 @@ public class Plus1BannerView extends FrameLayout {
 		return adView;
 	}
 
-	public AdView makeAdView()
-	{
+	public AdView makeAdView() {
 		AdView adView = new AdView(getContext());
 		adView.setWebViewClient(new WebViewClient() {
 			@Override
@@ -247,8 +216,7 @@ public class Plus1BannerView extends FrameLayout {
 		imageDownloaded();
 	}
 	
-	private void imageDownloaded()
-	{
+	private void imageDownloaded() {
 		/*if (banner.isImageBanner()) {
 			if (!animator.getCurrentView().equals(image))
 				animator.showNext();
@@ -262,21 +230,11 @@ public class Plus1BannerView extends FrameLayout {
 		if (initialized)
 			return;
 
+		setBackgroundResource(R.drawable.wp_banner_background);
+
 		setVisibility(INVISIBLE);
 
-		animator = new ViewAnimator(getContext());
-		animator.setInAnimation(
-			AnimationUtils.loadAnimation(
-				getContext(), 
-				android.R.anim.fade_in
-			)
-		);
-		animator.setOutAnimation(
-			AnimationUtils.loadAnimation(
-				getContext(), 
-				android.R.anim.fade_out
-			)
-		);
+		mAnimator = new Plus1ViewAnimator(getContext());
 
 		/*LinearLayout ll = new LinearLayout(getContext());
 		ll.setOrientation(LinearLayout.VERTICAL);
@@ -318,13 +276,10 @@ public class Plus1BannerView extends FrameLayout {
 
 	private void addAdView(WebView view)
 	{
-		// background
-		setBackgroundResource(R.drawable.wp_banner_background);
-
-		animator.addView(view);
+		mAnimator.addView(view);
 
 		addView(
-			animator,
+			mAnimator.getViewAnimator(),
 			new FrameLayout.LayoutParams(
 				FrameLayout.LayoutParams.WRAP_CONTENT,
 				FrameLayout.LayoutParams.WRAP_CONTENT,
@@ -392,8 +347,8 @@ public class Plus1BannerView extends FrameLayout {
 				startAnimation(showAnimation);
 
 			setVisibility(VISIBLE);
-		} else if (animator.getChildCount() > 1)
-			animator.showNext();
+		} else
+			mAnimator.showNext();
 	}
 
 	private void hide() {
