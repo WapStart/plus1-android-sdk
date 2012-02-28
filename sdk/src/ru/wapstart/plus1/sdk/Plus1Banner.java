@@ -36,6 +36,8 @@ import android.util.Log;
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2010, Wapstart
+ *
+ * @deprecated WebView-based banners used
  */
 final class Plus1Banner {
 	private static enum ResponseType { UNKNOWN, LINK, CALL};

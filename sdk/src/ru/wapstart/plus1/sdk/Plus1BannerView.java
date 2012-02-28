@@ -118,20 +118,6 @@ public class Plus1BannerView extends FrameLayout {
 		return this;
 	}
 
-	/**
-	 * @deprecated WebView-based banners used
-	 */
-	public Plus1Banner getBanner() {
-		return mBanner;
-	}
-
-	/**
-	 * @deprecated WebView-based banners used
-	 */
-	public void setBanner(Plus1Banner banner) {
-		mBanner = banner;
-	}
-
 	public void loadAd(String html, String adType) {
 		if (!mInitialized)
 			init();
@@ -188,6 +174,20 @@ public class Plus1BannerView extends FrameLayout {
 
 	public boolean getAutorefreshEnabled() {
 		return mAutorefreshEnabled;
+	}
+
+	/**
+	 * @deprecated WebView-based banners used
+	 */
+	public Plus1Banner getBanner() {
+		return mBanner;
+	}
+
+	/**
+	 * @deprecated WebView-based banners used
+	 */
+	public void setBanner(Plus1Banner banner) {
+		mBanner = banner;
 	}
 
 	/**
