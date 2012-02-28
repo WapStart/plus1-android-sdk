@@ -57,7 +57,7 @@ public class Plus1BannerView extends FrameLayout {
 	 */
 	private Plus1Banner mBanner;
 
-	private Plus1AdAnimator mAnimator	= null;
+	private Plus1AdAnimator mAdAnimator	= null;
 
 	private Animation mHideAnimation	= null;
 	private Animation mShowAnimation	= null;
@@ -79,8 +79,8 @@ public class Plus1BannerView extends FrameLayout {
 	}
 
 	public void destroy() {
-		if (mAnimator != null)
-			mAnimator.destroy();
+		if (mAdAnimator != null)
+			mAdAnimator.destroy();
 	}
 
 	public boolean isHaveCloseButton() {
@@ -130,7 +130,7 @@ public class Plus1BannerView extends FrameLayout {
 		adView.loadHtmlData(html);
 		adView.setVisibility(VISIBLE);
 
-		mAnimator.addView(adView);
+		mAdAnimator.addView(adView);
 	}
 
 	public MraidView makeMraidView() {
@@ -215,10 +215,10 @@ public class Plus1BannerView extends FrameLayout {
 		// background
 		setBackgroundResource(R.drawable.wp_banner_background);
 
-		mAnimator = new Plus1AdAnimator(getContext());
+		mAdAnimator = new Plus1AdAnimator(getContext());
 
 		addView(
-			mAnimator.getViewAnimator(),
+			mAdAnimator.getViewAnimator(),
 			new FrameLayout.LayoutParams(
 				FrameLayout.LayoutParams.WRAP_CONTENT,
 				FrameLayout.LayoutParams.WRAP_CONTENT,
@@ -289,7 +289,7 @@ public class Plus1BannerView extends FrameLayout {
 
 			setVisibility(VISIBLE);
 		} else
-			mAnimator.showNext();
+			mAdAnimator.showNext();
 	}
 
 	private void hide() {
