@@ -30,12 +30,8 @@
 package ru.wapstart.plus1.sdk;
 
 import android.content.Context;
-import android.content.Intent;
-
-import android.graphics.*;
 import android.graphics.drawable.Drawable;
-import android.text.SpannableStringBuilder;
-import android.text.style.UnderlineSpan;
+import android.graphics.Movie;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -43,10 +39,7 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.LinearLayout;
 import android.widget.FrameLayout;
-import android.widget.ViewAnimator;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -64,18 +57,14 @@ public class Plus1BannerView extends FrameLayout {
 	 */
 	private Plus1Banner mBanner;
 
-	private TextView title;
-	private TextView content;
-	private Plus1ImageView image;
-	
 	private Plus1ViewAnimator mAnimator	= null;
-	
-	private Animation hideAnimation = null;
-	private Animation showAnimation = null;
-	
-	private boolean haveCloseButton	= false;
-	private boolean closed			= false;
-	private boolean initialized		= false;
+
+	private Animation mHideAnimation	= null;
+	private Animation mShowAnimation	= null;
+
+	private boolean mHaveCloseButton	= false;
+	private boolean mClosed				= false;
+	private boolean mInitialized		= false;
 	private boolean mAutorefreshEnabled = true;
 
 	public Plus1BannerView(Context context) {
@@ -95,37 +84,37 @@ public class Plus1BannerView extends FrameLayout {
 	}
 
 	public boolean isHaveCloseButton() {
-		return haveCloseButton;
+		return mHaveCloseButton;
 	}
-	
+
 	public Plus1BannerView enableCloseButton() {
-		this.haveCloseButton = true;
-		
+		mHaveCloseButton = true;
+
 		return this;
 	}
-	
+
 	public Plus1BannerView setCloseButtonEnabled(boolean closeButtonEnabled) {
-		this.haveCloseButton = closeButtonEnabled;
-		
+		mHaveCloseButton = closeButtonEnabled;
+
 		return this;
 	}
-	
+
 	public boolean isClosed() {
-		return closed;
+		return mClosed;
 	}
-	
+
 	public Plus1BannerView enableAnimationFromTop() {
 		return enableAnimation(-1f);
 	}
-	
+
 	public Plus1BannerView enableAnimationFromBottom() {
 		return enableAnimation(1f);
 	}
-	
+
 	public Plus1BannerView disableAnimation() {
-		this.showAnimation = null;
-		this.hideAnimation = null;
-		
+		mShowAnimation = null;
+		mHideAnimation = null;
+
 		return this;
 	}
 
@@ -144,7 +133,7 @@ public class Plus1BannerView extends FrameLayout {
 	}
 
 	public void loadAd(String html, String adType) {
-		if (!initialized)
+		if (!mInitialized)
 			init();
 
 		AbstractAdView adView =
@@ -155,12 +144,7 @@ public class Plus1BannerView extends FrameLayout {
 		adView.loadHtmlData(html);
 		adView.setVisibility(VISIBLE);
 
-		if (getVisibility() == INVISIBLE) {
-			removeAllViews();
-
-			addAdView(adView);
-		} else
-			mAnimator.addView(adView);
+		mAnimator.addView(adView);
 	}
 
 	public MraidView makeMraidView() {
@@ -206,77 +190,30 @@ public class Plus1BannerView extends FrameLayout {
 		return mAutorefreshEnabled;
 	}
 
+	/**
+	 * @deprecated WebView-based banners used
+	 */
 	public void setImage(Drawable drawable) {
-		image.setImage(drawable);
-		imageDownloaded();
+		// do nothing
 	}
-	
-	public void setMovie(Movie movie) {
-		image.setMovie(movie);
-		imageDownloaded();
-	}
-	
-	private void imageDownloaded() {
-		/*if (banner.isImageBanner()) {
-			if (!animator.getCurrentView().equals(image))
-				animator.showNext();
-		} else
-			animator.startFlipping();
-		
-		show();*/
-	}
-	
-	private void init() {
-		if (initialized)
-			return;
 
-		setBackgroundResource(R.drawable.wp_banner_background);
+	/**
+	 * @deprecated WebView-based banners used
+	 */
+	public void setMovie(Movie movie) {
+		// do nothing
+	}
+
+	private void init() {
+		if (mInitialized)
+			return;
 
 		setVisibility(INVISIBLE);
 
+		// background
+		setBackgroundResource(R.drawable.wp_banner_background);
+
 		mAnimator = new Plus1ViewAnimator(getContext());
-
-		/*LinearLayout ll = new LinearLayout(getContext());
-		ll.setOrientation(LinearLayout.VERTICAL);
-
-		animator.addView(ll);
-
-		addView(
-			animator,
-			new LinearLayout.LayoutParams(
-				LayoutParams.FILL_PARENT,
-				LayoutParams.FILL_PARENT,
-				0.90625f + (isHaveCloseButton() ? 0f : 0.0625f)
-			)
-		);*/
-
-		// FIXME: intent in AdView
-		/*setOnClickListener(
-			new OnClickListener() {
-				public void onClick(View view) {
-					if (
-						(banner == null)
-						|| (banner.getLink() == null)
-					)
-						return;
-
-					// TODO: click2call
-					getContext().startActivity(
-						new Intent(
-							Intent.ACTION_VIEW,
-							android.net.Uri.parse(banner.getLink())
-						)
-					);
-				}
-			}
-		);*/
-		
-		initialized = true;
-	}
-
-	private void addAdView(WebView view)
-	{
-		mAnimator.addView(view);
 
 		addView(
 			mAnimator.getViewAnimator(),
@@ -308,14 +245,14 @@ public class Plus1BannerView extends FrameLayout {
 			closeButton.setOnClickListener(
 				new OnClickListener() {
 					public void onClick(View v) {
-						closed = true;
+						mClosed = true;
 						hide();
 					}
 				}
 			);
 
 			addView(
-				closeButton, 
+				closeButton,
 				new FrameLayout.LayoutParams(
 					18,
 					17,
@@ -323,28 +260,30 @@ public class Plus1BannerView extends FrameLayout {
 				)
 			);
 		}
+
+		mInitialized = true;
 	}
 
 	private Plus1BannerView enableAnimation(float toYDelta) {
-		this.showAnimation = new TranslateAnimation(
+		mShowAnimation = new TranslateAnimation(
 				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
 				Animation.RELATIVE_TO_SELF, toYDelta, Animation.RELATIVE_TO_SELF, 0f
 			);
-		showAnimation.setDuration(500);
-		
-		this.hideAnimation = new TranslateAnimation(
+		mShowAnimation.setDuration(500);
+
+		mHideAnimation = new TranslateAnimation(
 				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
 				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, toYDelta
 		);
-		hideAnimation.setDuration(500);
-		
+		mHideAnimation.setDuration(500);
+
 		return this;
 	}
-	
+
 	private void show() {
 		if (getVisibility() == INVISIBLE) {
-			if (showAnimation != null)
-				startAnimation(showAnimation);
+			if (mShowAnimation != null)
+				startAnimation(mShowAnimation);
 
 			setVisibility(VISIBLE);
 		} else
@@ -353,8 +292,8 @@ public class Plus1BannerView extends FrameLayout {
 
 	private void hide() {
 		if (getVisibility() == VISIBLE) {
-			if (hideAnimation != null)
-				startAnimation(hideAnimation);
+			if (mHideAnimation != null)
+				startAnimation(mHideAnimation);
 
 			setVisibility(INVISIBLE);
 		}
