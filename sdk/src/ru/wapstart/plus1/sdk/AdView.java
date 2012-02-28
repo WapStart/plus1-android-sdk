@@ -99,13 +99,18 @@ public class AdView extends AbstractAdView {
 					getContext().startActivity(intent);
 				} catch (ActivityNotFoundException e) {
 					Log.w("Plus1", "Could not handle intent with URI: " + url);
+					return false;
 				}
 			} else {
 				// TODO: open in inner browser, same as mraid
 				// Default browser
 				Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				getContext().startActivity(intent);
+				try {
+					getContext().startActivity(intent);
+				} catch (ActivityNotFoundException e) {
+					return false;
+				}
 			}
 
 			return true;

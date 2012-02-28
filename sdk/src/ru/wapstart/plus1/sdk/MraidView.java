@@ -318,7 +318,7 @@ public class MraidView extends AbstractAdView {
             String scheme = uri.getScheme();
             
             if (scheme.equals("mraid")) {
-				Log.d("MRAIDCommand", url);
+				Log.d(LOGTAG, "MRAID command: " + url);
                 tryCommand(URI.create(url)); // java.net.URI, not android.net.Uri
                 return true;
             }
