@@ -49,6 +49,7 @@ import ru.wapstart.plus1.sdk.MraidView.ViewState;
  * @copyright Copyright (c) 2011, Wapstart
  */
 public class Plus1BannerView extends FrameLayout {
+    private static final String LOGTAG = "Plus1BannerView";
 
 	/**
 	 * @deprecated WebView-based banners used
@@ -133,6 +134,7 @@ public class Plus1BannerView extends FrameLayout {
 
 	public MraidView makeMraidView() {
 		MraidView adView = new MraidView(getContext());
+		Log.d(LOGTAG, "MraidView instance created");
 		adView.setOnReadyListener(new MraidView.OnReadyListener() {
 			public void onReady(MraidView view) {
 				show();
@@ -150,7 +152,7 @@ public class Plus1BannerView extends FrameLayout {
 		});
 		adView.setOnFailureListener(new MraidView.OnFailureListener() {
 			public void onFailure(MraidView view) {
-				Log.d("Plus1BannerView", "Mraid ad failed to load");
+				Log.d(LOGTAG, "Mraid ad failed to load");
 			}
 		});
 
@@ -159,6 +161,7 @@ public class Plus1BannerView extends FrameLayout {
 
 	public AdView makeAdView() {
 		AdView adView = new AdView(getContext());
+		Log.d(LOGTAG, "AdView instance created");
 		adView.setOnReadyListener(new AdView.OnReadyListener() {
 			public void onReady() {
 				show();
@@ -264,14 +267,14 @@ public class Plus1BannerView extends FrameLayout {
 
 	private Plus1BannerView enableAnimation(float toYDelta) {
 		mShowAnimation = new TranslateAnimation(
-				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
-				Animation.RELATIVE_TO_SELF, toYDelta, Animation.RELATIVE_TO_SELF, 0f
-			);
+			Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
+			Animation.RELATIVE_TO_SELF, toYDelta, Animation.RELATIVE_TO_SELF, 0f
+		);
 		mShowAnimation.setDuration(500);
 
 		mHideAnimation = new TranslateAnimation(
-				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
-				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, toYDelta
+			Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
+			Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, toYDelta
 		);
 		mHideAnimation.setDuration(500);
 

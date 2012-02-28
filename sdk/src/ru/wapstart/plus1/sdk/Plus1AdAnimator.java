@@ -97,7 +97,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 		WebView child = (WebView)mAnimator.getChildAt(index);
 
 		if (child != null) {
-			Log.d(LOGTAG, "Destroy view at index=" + index);
+			Log.d(LOGTAG, "Destroy WebView at index=" + index);
 			child.destroy();
 			mAnimator.removeView(child);
 		}
