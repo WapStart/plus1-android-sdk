@@ -37,8 +37,8 @@ import android.widget.ViewAnimator;
 import android.webkit.WebView;
 
 final public class Plus1AdAnimator extends FrameLayout {
-    private static final String LOGTAG = "Plus1AdAnimator";
-	// NOTE: order and numbers are important
+	private static final String LOGTAG = "Plus1AdAnimator";
+	// NOTE: order and indexes are important
 	private static final int INDEX_FIRST = 0;
 	private static final int INDEX_SECOND = 1;
 
@@ -62,6 +62,8 @@ final public class Plus1AdAnimator extends FrameLayout {
 				android.R.anim.fade_out
 			)
 		);
+
+		mCurrentIndex = INDEX_SECOND; // NOTE: init state
 	}
 
 	public ViewAnimator getViewAnimator() {

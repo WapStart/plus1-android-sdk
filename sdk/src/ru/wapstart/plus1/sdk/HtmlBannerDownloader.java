@@ -44,6 +44,7 @@ import android.util.Log;
  * @copyright Copyright (c) 2011, Wapstart
  */
 final class HtmlBannerDownloader extends BaseDownloader {
+	private static final String LOGTAG = "HtmlBannerDownloader";
 	private static final Integer BUFFER_SIZE = 8192;
 	private static final String NO_BANNER = "<!-- i4jgij4pfd4ssd -->";
 	
@@ -124,10 +125,10 @@ final class HtmlBannerDownloader extends BaseDownloader {
 			
 			bufStream.close();
 		} catch (IOException e) {
-			Log.e(getClass().getName(), "IOException in InputStream");
+			Log.e(LOGTAG, "IOException in InputStream");
 		}
 		
-		Log.d(getClass().getName(), "answer: " + result.toString());
+		Log.d(LOGTAG, "answer: " + result.toString());
 		
 		if (!result.equals("") && !result.equals(NO_BANNER)) 
 			view.loadAd(result.toString(), connection.getHeaderField("X-Adtype"));
