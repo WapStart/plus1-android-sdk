@@ -115,7 +115,13 @@ public class MraidView extends BaseAdView {
 
 	@Override
 	public void destroy() {
-		mDisplayController.destroy();
+		if (mDisplayController != null) {
+			mDisplayController.destroy();
+			mBrowserController = null;
+			mDisplayController = null;
+		}
+
+		super.destroy();
 	}
 
 	public void loadHtmlData(String data) {
