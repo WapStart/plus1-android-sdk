@@ -121,7 +121,7 @@ public class Plus1BannerView extends FrameLayout {
 		if (!mInitialized)
 			init();
 
-		AbstractAdView adView =
+		BaseAdView adView =
 			"mraid".equals(adType)
 				? makeMraidView()
 				: makeAdView();

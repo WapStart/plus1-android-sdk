@@ -32,9 +32,9 @@ package ru.wapstart.plus1.sdk;
 import android.content.Context;
 import android.webkit.WebView;
 
-public abstract class AbstractAdView extends WebView {
+public abstract class BaseAdView extends WebView {
 
-	public AbstractAdView(Context context) {
+	public BaseAdView(Context context) {
 		super(context);
 	}
 

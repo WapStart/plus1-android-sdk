@@ -38,7 +38,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.util.Log;
 
-public class AdView extends AbstractAdView {
+public class AdView extends BaseAdView {
 
 	private OnReadyListener mOnReadyListener;
 

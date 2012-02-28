@@ -31,7 +31,7 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-public class MraidView extends AbstractAdView {
+public class MraidView extends BaseAdView {
 	private static final String LOGTAG = "MraidView";
 
 	private MraidBrowserController mBrowserController;

@@ -70,7 +70,6 @@ final public class Plus1AdAnimator extends FrameLayout {
 
 	public void addView(WebView child) {
 		int index = getNextIndex();
-		Log.d(LOGTAG, "Next inner index for WebView: " + index);
 
 		if (mAnimator.getChildAt(index) != null) {
 			cleanViewAt(index);
@@ -89,6 +88,8 @@ final public class Plus1AdAnimator extends FrameLayout {
 			mCurrentIndex == INDEX_FIRST
 				? INDEX_SECOND
 				: INDEX_FIRST;
+
+		Log.d(LOGTAG, "Next inner index for WebView: " + mCurrentIndex);
 
 		return mCurrentIndex;
 	}
