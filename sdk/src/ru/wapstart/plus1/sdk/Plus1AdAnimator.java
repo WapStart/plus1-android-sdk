@@ -36,7 +36,8 @@ import android.widget.FrameLayout;
 import android.widget.ViewAnimator;
 import android.webkit.WebView;
 
-final public class Plus1ViewAnimator extends FrameLayout {
+final public class Plus1AdAnimator extends FrameLayout {
+    private static final String LOGTAG = "Plus1AdAnimator";
 	private static final int INDEX_FIRST = 0;
 	private static final int INDEX_SECOND = 1;
 
@@ -44,7 +45,7 @@ final public class Plus1ViewAnimator extends FrameLayout {
 
 	private ViewAnimator mAnimator;
 
-	public Plus1ViewAnimator(Context context) {
+	public Plus1AdAnimator(Context context) {
 		super(context);
 
 		mAnimator = new ViewAnimator(context);
@@ -68,7 +69,7 @@ final public class Plus1ViewAnimator extends FrameLayout {
 
 	public void addView(WebView child) {
 		int index = getNextIndex();
-		Log.d("Plus1ViewAnimator", "Next index: " + index);
+		Log.d(LOGTAG, "Next inner index for WebView: " + index);
 
 		if (mAnimator.getChildAt(index) != null) {
 			clearViewAt(index);
@@ -100,6 +101,7 @@ final public class Plus1ViewAnimator extends FrameLayout {
 		WebView child = (WebView)mAnimator.getChildAt(index);
 
 		if (child != null) {
+			Log.d(LOGTAG, "Destroy view at index=" + index);
 			child.destroy();
 			mAnimator.removeView(child);
 		}

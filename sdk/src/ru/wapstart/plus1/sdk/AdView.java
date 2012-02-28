@@ -29,27 +29,29 @@
 
 package ru.wapstart.plus1.sdk;
 
-import android.graphics.Color;
+import android.content.Intent;
 import android.content.Context;
+import android.content.ActivityNotFoundException;
+import android.graphics.Color;
+import android.net.Uri;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.util.Log;
 
 public class AdView extends AbstractAdView {
 
-	//protected Plus1BannerView mBannerView;
+	private OnReadyListener mOnReadyListener;
 
 	public AdView(Context context) {
 		// Important: don't allow any WebView subclass to be instantiated using
 		// an Activity context, as it will leak on Froyo devices and earlier.
-		//super(context.getApplicationContext());
-		super(context);
-
-		//mBannerView = view;
+		super(context.getApplicationContext());
 
 		disableScrollingAndZoom();
 		getSettings().setJavaScriptEnabled(true);
 		getSettings().setPluginsEnabled(true);
 		setBackgroundColor(Color.TRANSPARENT);
-		//setWebViewClient(new AdWebViewClient());
+		setWebViewClient(new AdWebViewClient());
 	}
 
 	public void loadHtmlData(String data) {
@@ -62,11 +64,61 @@ public class AdView extends AbstractAdView {
 		loadDataWithBaseURL(null, data, "text/html", "UTF-8", null);
 	}
 
+	public void setOnReadyListener(OnReadyListener listener) {
+		mOnReadyListener = listener;
+	}
+
+	public OnReadyListener getOnReadyListener() {
+		return mOnReadyListener;
+	}
+
 	private void disableScrollingAndZoom() {
 		setHorizontalScrollBarEnabled(false);
 		setHorizontalScrollbarOverlay(false);
 		setVerticalScrollBarEnabled(false);
 		setVerticalScrollbarOverlay(false);
 		getSettings().setSupportZoom(false);
+	}
+
+	public interface OnReadyListener {
+		public void onReady();
+	}
+
+	private class AdWebViewClient extends WebViewClient {
+		@Override
+		public boolean shouldOverrideUrlLoading(WebView view, String url) {
+			// Handle phone intents
+			if (
+				   url.startsWith("tel:")
+				|| url.startsWith("voicemail:")
+				|| url.startsWith("sms:")
+				|| url.startsWith("mailto:")
+				|| url.startsWith("geo:")
+				|| url.startsWith("google.streetview:")
+			) {
+				Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+				try {
+					getContext().startActivity(intent);
+				} catch (ActivityNotFoundException e) {
+					Log.w("Plus1", "Could not handle intent with URI: " + url);
+				}
+			} else {
+				// TODO: open in inner browser, same as mraid
+				// Default browser
+				Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				getContext().startActivity(intent);
+			}
+
+			return true;
+		}
+
+		@Override
+		public void onPageFinished(WebView view, String url) {
+			if (getOnReadyListener() != null)
+				getOnReadyListener().onReady();
+		}
 	}
 }

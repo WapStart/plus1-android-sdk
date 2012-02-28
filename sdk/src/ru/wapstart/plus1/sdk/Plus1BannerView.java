@@ -57,7 +57,7 @@ public class Plus1BannerView extends FrameLayout {
 	 */
 	private Plus1Banner mBanner;
 
-	private Plus1ViewAnimator mAnimator	= null;
+	private Plus1AdAnimator mAnimator	= null;
 
 	private Animation mHideAnimation	= null;
 	private Animation mShowAnimation	= null;
@@ -150,20 +150,22 @@ public class Plus1BannerView extends FrameLayout {
 				setAutorefreshEnabled(true);
 			}
 		});
-		// FIXME: add another listeners
+		adView.setOnFailureListener(new MraidView.OnFailureListener() {
+			public void onFailure(MraidView view) {
+				Log.d("Plus1BannerView", "Mraid ad failed to load");
+			}
+		});
 
 		return adView;
 	}
 
 	public AdView makeAdView() {
 		AdView adView = new AdView(getContext());
-		adView.setWebViewClient(new WebViewClient() {
-			@Override
-			public void onPageFinished(WebView view, String url) {
+		adView.setOnReadyListener(new AdView.OnReadyListener() {
+			public void onReady() {
 				show();
 			}
 		});
-		// FIXME: add another listeners
 
 		return adView;
 	}
@@ -213,7 +215,7 @@ public class Plus1BannerView extends FrameLayout {
 		// background
 		setBackgroundResource(R.drawable.wp_banner_background);
 
-		mAnimator = new Plus1ViewAnimator(getContext());
+		mAnimator = new Plus1AdAnimator(getContext());
 
 		addView(
 			mAnimator.getViewAnimator(),
