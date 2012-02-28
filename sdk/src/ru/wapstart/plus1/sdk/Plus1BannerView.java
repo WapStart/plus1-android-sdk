@@ -40,8 +40,6 @@ import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.FrameLayout;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 import android.util.Log;
 import ru.wapstart.plus1.sdk.MraidView.ViewState;
@@ -244,14 +242,12 @@ public class Plus1BannerView extends FrameLayout {
 			Button closeButton = new Button(getContext());
 			closeButton.setBackgroundResource(R.drawable.wp_banner_close);
 
-			closeButton.setOnClickListener(
-				new OnClickListener() {
-					public void onClick(View v) {
-						mClosed = true;
-						hide();
-					}
+			closeButton.setOnClickListener(new OnClickListener() {
+				public void onClick(View v) {
+					mClosed = true;
+					hide();
 				}
-			);
+			});
 
 			addView(
 				closeButton,
@@ -288,8 +284,8 @@ public class Plus1BannerView extends FrameLayout {
 				startAnimation(mShowAnimation);
 
 			setVisibility(VISIBLE);
-		} else
-			mAdAnimator.showNext();
+		} else if (mAdAnimator.getViewAnimator().getChildCount() > 1)
+			mAdAnimator.getViewAnimator().showNext();
 	}
 
 	private void hide() {

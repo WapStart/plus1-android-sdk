@@ -38,6 +38,7 @@ import android.webkit.WebView;
 
 final public class Plus1AdAnimator extends FrameLayout {
     private static final String LOGTAG = "Plus1AdAnimator";
+	// NOTE: order and numbers are important
 	private static final int INDEX_FIRST = 0;
 	private static final int INDEX_SECOND = 1;
 
@@ -72,15 +73,15 @@ final public class Plus1AdAnimator extends FrameLayout {
 		Log.d(LOGTAG, "Next inner index for WebView: " + index);
 
 		if (mAnimator.getChildAt(index) != null) {
-			clearViewAt(index);
+			cleanViewAt(index);
 			mAnimator.addView(child, index);
 		} else
 			mAnimator.addView(child);
 	}
 
-	public void showNext() {
-		if (mAnimator.getChildCount() > 1)
-			mAnimator.showNext();
+	public void destroy() {
+		cleanViewAt(INDEX_FIRST);
+		cleanViewAt(INDEX_SECOND);
 	}
 
 	private int getNextIndex() {
@@ -92,12 +93,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 		return mCurrentIndex;
 	}
 
-	public void destroy() {
-		clearViewAt(INDEX_FIRST);
-		clearViewAt(INDEX_SECOND);
-	}
-
-	private void clearViewAt(int index) {
+	private void cleanViewAt(int index) {
 		WebView child = (WebView)mAnimator.getChildAt(index);
 
 		if (child != null) {
