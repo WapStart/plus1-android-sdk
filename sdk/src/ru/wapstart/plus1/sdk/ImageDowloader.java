@@ -38,6 +38,8 @@ import android.graphics.drawable.Drawable;
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
+ * 
+ * @deprecated WebView-based banners used
  */
 final class ImageDowloader extends BaseDownloader {
 
