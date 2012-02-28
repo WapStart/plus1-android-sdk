@@ -46,7 +46,8 @@ public class BartActivity extends Activity implements View.OnClickListener
 			new Plus1BannerAsker(
 				Plus1BannerRequest
 					.create()
-					.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/")
+					//.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/")
+					.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/testmraid.php")
 					.setApplicationId(352),
 				mBannerView
 					.enableAnimationFromTop()
