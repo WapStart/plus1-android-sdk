@@ -55,11 +55,7 @@ public class AdView extends AbstractAdView {
 	}
 
 	public void loadHtmlData(String data) {
-		// If the string data lacks the HTML boilerplate, add it.
-		if (data.indexOf("<html>") == -1) {
-			data = "<html><head></head><body style='margin:0;padding:0;'>"
-					+ data + "</body></html>";
-		}
+		data = completeHtml(data);
 
 		loadDataWithBaseURL(null, data, "text/html", "UTF-8", null);
 	}

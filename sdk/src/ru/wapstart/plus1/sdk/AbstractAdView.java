@@ -39,4 +39,14 @@ public abstract class AbstractAdView extends WebView {
 	}
 
 	abstract public void loadHtmlData(String data);
+
+	protected String completeHtml(String data) {
+        // If the string data lacks the HTML boilerplate, add it.
+        if (data.indexOf("<html>") == -1) {
+			data = "<html><head></head><body style='margin:0;padding:0;'>"
+					+ data + "</body></html>";
+        }
+
+		return data;
+	}
 }
