@@ -67,6 +67,7 @@ public class Plus1BannerView extends FrameLayout {
 	private boolean mClosed				= false;
 	private boolean mInitialized		= false;
 	private boolean mAutorefreshEnabled = true;
+	private boolean mAutorefreshPreviousState = true;
 
 	public Plus1BannerView(Context context) {
 		this(context, null);
@@ -143,13 +144,17 @@ public class Plus1BannerView extends FrameLayout {
 		});
 		adView.setOnExpandListener(new MraidView.OnExpandListener() {
 			public void onExpand(MraidView view) {
-				setAutorefreshEnabled(false);
+				if (getAutorefreshEnabled()) {
+					mAutorefreshPreviousState = true;
+					setAutorefreshEnabled(false);
+				}
 				setVisibility(INVISIBLE); // hide without animation
 			}
 		});
 		adView.setOnCloseListener(new MraidView.OnCloseListener() {
 			public void onClose(MraidView view, ViewState newViewState) {
-				setAutorefreshEnabled(true);
+				if (mAutorefreshPreviousState == true)
+					setAutorefreshEnabled(true);
 			}
 		});
 		adView.setOnFailureListener(new MraidView.OnFailureListener() {
@@ -267,7 +272,6 @@ public class Plus1BannerView extends FrameLayout {
 					mClosed = true;
 					setAutorefreshEnabled(false);
 					hide();
-					mAdAnimator.removeAllViews();
 				}
 			});
 

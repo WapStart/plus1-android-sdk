@@ -49,6 +49,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 					.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/testmraid.php")
 					.setApplicationId(352),
 				mBannerView
+					.setAutorefreshEnabled(true)
 					.enableAnimationFromTop()
 					.enableCloseButton()
 			)
