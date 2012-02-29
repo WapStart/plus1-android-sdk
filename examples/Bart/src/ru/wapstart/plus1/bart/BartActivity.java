@@ -15,7 +15,7 @@ import ru.wapstart.plus1.sdk.*;
 public class BartActivity extends Activity implements View.OnClickListener
 {
 	private MediaPlayer mp;
-	private Plus1BannerAsker asker;
+	private Plus1BannerAsker mAsker;
 	private Plus1BannerView mBannerView;
 
     /** Called when the activity is first created. */
@@ -42,10 +42,9 @@ public class BartActivity extends Activity implements View.OnClickListener
 		mBannerView =
 			(Plus1BannerView) findViewById(R.id.plus1BannerView);
 		
-		asker = 
+		mAsker =
 			new Plus1BannerAsker(
-				Plus1BannerRequest
-					.create()
+				new Plus1BannerRequest()
 					//.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/")
 					.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/testmraid.php")
 					.setApplicationId(352),
@@ -67,14 +66,14 @@ public class BartActivity extends Activity implements View.OnClickListener
 	protected void onResume() {
 		super.onResume();
 		
-		asker.start();
+		mAsker.start();
 	}
 	
 	@Override
 	protected void onPause() {
 		super.onPause();
 		
-		asker.stop();
+		mAsker.stop();
 	}
 
     @Override
