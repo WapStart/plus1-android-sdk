@@ -142,6 +142,7 @@ public class Plus1BannerView extends FrameLayout {
 		adView.setOnExpandListener(new MraidView.OnExpandListener() {
 			public void onExpand(MraidView view) {
 				setAutorefreshEnabled(false);
+				setVisibility(INVISIBLE);
 			}
 		});
 		adView.setOnCloseListener(new MraidView.OnCloseListener() {
