@@ -173,7 +173,8 @@ class MraidDisplayController extends MraidAbstractController {
 	private void onOrientationChanged(int currentRotation) {
 		initializeScreenMetrics();
 		getView().fireChangeEventForProperty(
-			MraidScreenSizeProperty.createWithSize(mScreenWidth, mScreenHeight));
+			MraidScreenSizeProperty.createWithSize(mScreenWidth, mScreenHeight)
+		);
 	}
 
 	public void destroy() {
