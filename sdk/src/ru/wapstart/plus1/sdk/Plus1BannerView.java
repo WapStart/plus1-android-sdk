@@ -142,7 +142,7 @@ public class Plus1BannerView extends FrameLayout {
 		adView.setOnExpandListener(new MraidView.OnExpandListener() {
 			public void onExpand(MraidView view) {
 				setAutorefreshEnabled(false);
-				setVisibility(INVISIBLE);
+				setVisibility(INVISIBLE); // hide without animation
 			}
 		});
 		adView.setOnCloseListener(new MraidView.OnCloseListener() {
@@ -152,7 +152,7 @@ public class Plus1BannerView extends FrameLayout {
 		});
 		adView.setOnFailureListener(new MraidView.OnFailureListener() {
 			public void onFailure(MraidView view) {
-				Log.d(LOGTAG, "Mraid ad failed to load");
+				Log.e(LOGTAG, "Mraid ad failed to load");
 			}
 		});
 
