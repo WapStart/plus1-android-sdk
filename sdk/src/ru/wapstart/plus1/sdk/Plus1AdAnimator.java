@@ -87,7 +87,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 		}
 	}
 
-	public void destroy() {
+	public void removeAllViews() {
 		if (mCurrentView != null) {
 			safeRemove(mCurrentView);
 			mCurrentView = null;
@@ -97,6 +97,8 @@ final public class Plus1AdAnimator extends FrameLayout {
 			safeRemove(mNewView);
 			mNewView = null;
 		}
+
+		mAnimator.removeAllViews();
 	}
 
 	private void safeRemove(BaseAdView view) {

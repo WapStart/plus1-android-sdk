@@ -51,6 +51,8 @@ import ru.wapstart.plus1.sdk.MraidView.ViewState;
 public class Plus1BannerView extends FrameLayout {
     private static final String LOGTAG = "Plus1BannerView";
 
+	private OnAutorefreshChangeListener mOnAutorefreshChangeListener;
+
 	/**
 	 * @deprecated WebView-based banners used
 	 */
@@ -79,7 +81,7 @@ public class Plus1BannerView extends FrameLayout {
 
 	public void destroy() {
 		if (mAdAnimator != null)
-			mAdAnimator.destroy();
+			mAdAnimator.removeAllViews();
 	}
 
 	public boolean isHaveCloseButton() {
@@ -171,8 +173,22 @@ public class Plus1BannerView extends FrameLayout {
 		return adView;
 	}
 
+	public void setOnAutorefreshChangeListener(OnAutorefreshChangeListener listener) {
+		mOnAutorefreshChangeListener = listener;
+	}
+
 	public void setAutorefreshEnabled(boolean enabled) {
+		if (mAutorefreshEnabled == enabled)
+			return; // NOTE: not changed
+
 		mAutorefreshEnabled = enabled;
+
+		if (mOnAutorefreshChangeListener != null) {
+			if (enabled)
+				mOnAutorefreshChangeListener.onAutorefreshEnabled();
+			else
+				mOnAutorefreshChangeListener.onAutorefreshDisabled();
+		}
 	}
 
 	public boolean getAutorefreshEnabled() {
@@ -248,7 +264,9 @@ public class Plus1BannerView extends FrameLayout {
 			closeButton.setOnClickListener(new OnClickListener() {
 				public void onClick(View v) {
 					mClosed = true;
+					setAutorefreshEnabled(false);
 					hide();
+					mAdAnimator.removeAllViews();
 				}
 			});
 
@@ -299,5 +317,10 @@ public class Plus1BannerView extends FrameLayout {
 
 			setVisibility(INVISIBLE);
 		}
+	}
+
+	public interface OnAutorefreshChangeListener {
+		public void onAutorefreshEnabled();
+		public void onAutorefreshDisabled();
 	}
 }

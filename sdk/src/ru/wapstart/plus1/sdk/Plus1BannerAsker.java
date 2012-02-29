@@ -63,6 +63,18 @@ public class Plus1BannerAsker {
 	public Plus1BannerAsker(Plus1BannerRequest request, Plus1BannerView view) {
 		this.request = request;
 		this.view = view;
+
+		this.view.setOnAutorefreshChangeListener(
+			new Plus1BannerView.OnAutorefreshChangeListener() {
+				public void onAutorefreshEnabled() {
+					start();
+				}
+
+				public void onAutorefreshDisabled() {
+					stop();
+				}
+			}
+		);
 	}
 
 	public boolean isDisabledIMEIDispatch() {
