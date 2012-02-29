@@ -177,18 +177,19 @@ public class Plus1BannerView extends FrameLayout {
 		mOnAutorefreshChangeListener = listener;
 	}
 
-	public void setAutorefreshEnabled(boolean enabled) {
-		if (mAutorefreshEnabled == enabled)
-			return; // NOTE: not changed
+	public Plus1BannerView setAutorefreshEnabled(boolean enabled) {
+		if (mAutorefreshEnabled != enabled) { // NOTE: really changed
+			mAutorefreshEnabled = enabled;
 
-		mAutorefreshEnabled = enabled;
-
-		if (mOnAutorefreshChangeListener != null) {
-			if (enabled)
-				mOnAutorefreshChangeListener.onAutorefreshEnabled();
-			else
-				mOnAutorefreshChangeListener.onAutorefreshDisabled();
+			if (mOnAutorefreshChangeListener != null) {
+				if (enabled)
+					mOnAutorefreshChangeListener.onAutorefreshEnabled();
+				else
+					mOnAutorefreshChangeListener.onAutorefreshDisabled();
+			}
 		}
+
+		return this;
 	}
 
 	public boolean getAutorefreshEnabled() {
