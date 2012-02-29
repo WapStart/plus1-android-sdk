@@ -43,12 +43,12 @@ import android.location.Location;
  */
 public final class Plus1BannerRequest {
 	private static final String LOGTAG = "Plus1BannerRequest";
+	private static final String SDK_VERSION = "1.1.0";
+	private static final Integer REQUEST_VERSION = 2;
 
 	public static enum Gender {Unknown, Male, Female;}
 	public static enum RequestType {XML, JSON};
 	public static enum BannerType {Undefined, Mixed, Text, Graphic};
-
-	private static final Integer VERSION			= 2;
 
 	private String rotatorUrl		= "http://ro.plus1.wapstart.ru/";
 	private int age					= 0;
@@ -166,8 +166,8 @@ public final class Plus1BannerRequest {
 		String url =
 			getRotatorUrl()
 			+ "?area=application"
-			+ "&version=" + VERSION
-			// FIXME: sdk or mraid version
+			+ "&version=" + REQUEST_VERSION
+			+ "&sdkver=" + SDK_VERSION
 			+ "&id=" + getApplicationId()
 			+ "&pageId=" + getPageId();
 
