@@ -347,7 +347,8 @@ public class MraidView extends BaseAdView {
 			if (!mHasFiredReadyEvent) {
 				mDisplayController.initializeJavaScriptState();
 				fireChangeEventForProperty(
-						MraidPlacementTypeProperty.createWithType(mPlacementType));
+					MraidPlacementTypeProperty.createWithType(mPlacementType)
+				);
 				fireReadyEvent();
 				if (getOnReadyListener() != null) getOnReadyListener().onReady(MraidView.this);
 				mHasFiredReadyEvent = true;

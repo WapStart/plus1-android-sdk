@@ -127,9 +127,8 @@ public class Plus1BannerView extends FrameLayout {
 				: makeAdView();
 
 		adView.loadHtmlData(html);
-		adView.setVisibility(VISIBLE);
 
-		mAdAnimator.addView(adView);
+		mAdAnimator.setAdView(adView);
 	}
 
 	public MraidView makeMraidView() {
@@ -287,8 +286,9 @@ public class Plus1BannerView extends FrameLayout {
 				startAnimation(mShowAnimation);
 
 			setVisibility(VISIBLE);
-		} else if (mAdAnimator.getViewAnimator().getChildCount() > 1)
-			mAdAnimator.getViewAnimator().showNext();
+		}
+
+		mAdAnimator.showAd();
 	}
 
 	private void hide() {

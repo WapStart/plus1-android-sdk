@@ -34,17 +34,13 @@ import android.util.Log;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ViewAnimator;
-import android.webkit.WebView;
 
 final public class Plus1AdAnimator extends FrameLayout {
 	private static final String LOGTAG = "Plus1AdAnimator";
-	// NOTE: order and indexes are important
-	private static final int INDEX_FIRST = 0;
-	private static final int INDEX_SECOND = 1;
-
-	private int mCurrentIndex;
 
 	private ViewAnimator mAnimator;
+	private BaseAdView mCurrentView;
+	private BaseAdView mNewView;
 
 	public Plus1AdAnimator(Context context) {
 		super(context);
@@ -62,47 +58,49 @@ final public class Plus1AdAnimator extends FrameLayout {
 				android.R.anim.fade_out
 			)
 		);
-
-		mCurrentIndex = INDEX_SECOND; // NOTE: init state
 	}
 
 	public ViewAnimator getViewAnimator() {
 		return mAnimator;
 	}
 
-	public void addView(WebView child) {
-		int index = getNextIndex();
+	public void setAdView(BaseAdView child) {
+		if (mNewView != null) {
+			safeRemove(mNewView);
+			Log.w(LOGTAG, "Not shown ad view was removed. Did you call setAdView() twice?");
+		}
 
-		if (mAnimator.getChildAt(index) != null) {
-			cleanViewAt(index);
-			mAnimator.addView(child, index);
-		} else
-			mAnimator.addView(child);
+		mAnimator.addView(child);
+		mNewView = child;
+	}
+
+	public void showAd() {
+		if (mNewView != null) {
+			mNewView.setVisibility(VISIBLE);
+			mAnimator.showNext();
+
+			if (mCurrentView != null)
+				safeRemove(mCurrentView);
+
+			mCurrentView = mNewView;
+			mNewView = null;
+		}
 	}
 
 	public void destroy() {
-		cleanViewAt(INDEX_FIRST);
-		cleanViewAt(INDEX_SECOND);
-	}
-
-	private int getNextIndex() {
-		mCurrentIndex =
-			mCurrentIndex == INDEX_FIRST
-				? INDEX_SECOND
-				: INDEX_FIRST;
-
-		Log.d(LOGTAG, "Next inner index for WebView: " + mCurrentIndex);
-
-		return mCurrentIndex;
-	}
-
-	private void cleanViewAt(int index) {
-		WebView child = (WebView)mAnimator.getChildAt(index);
-
-		if (child != null) {
-			Log.d(LOGTAG, "Destroy WebView at index=" + index);
-			child.destroy();
-			mAnimator.removeView(child);
+		if (mCurrentView != null) {
+			safeRemove(mCurrentView);
+			mCurrentView = null;
 		}
+
+		if (mNewView != null) {
+			safeRemove(mNewView);
+			mNewView = null;
+		}
+	}
+
+	private void safeRemove(BaseAdView view) {
+		view.destroy();
+		mAnimator.removeView(view);
 	}
 }
