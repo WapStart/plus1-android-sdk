@@ -161,10 +161,13 @@ public class Plus1BannerView extends FrameLayout {
 		});
 		adView.setOnCloseListener(new MraidView.OnCloseListener() {
 			public void onClose(MraidView view, ViewState newViewState) {
+				mExpanded = false;
+
 				if (mAutorefreshPreviousState == true)
 					setAutorefreshEnabled(true);
+				else if (mOnAutorefreshChangeListener != null && getAutorefreshEnabled())
+					mOnAutorefreshChangeListener.onAutorefreshEnabled(); // FIXME: replace hack
 
-				mExpanded = false;
 			}
 		});
 		adView.setOnFailureListener(new MraidView.OnFailureListener() {

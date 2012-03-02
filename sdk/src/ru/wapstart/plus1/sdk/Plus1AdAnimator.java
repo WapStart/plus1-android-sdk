@@ -126,7 +126,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 				android.R.anim.fade_in
 			);
 
-		animation.setDuration(2000);
+		animation.setDuration(1400);
 
 		return animation;
 	}
@@ -139,7 +139,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 				android.R.anim.fade_out
 			);
 
-		animation.setDuration(2000);
+		animation.setDuration(600);
 
 		return animation;
 	}
