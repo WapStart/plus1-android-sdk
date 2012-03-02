@@ -143,7 +143,7 @@ public class Plus1BannerAsker {
 	}
 	
 	public Plus1BannerAsker start() {
-		if ((request == null) || (view == null))
+		if ((request == null) || (view == null) || view.isExpanded())
 			return this;
 
 		init();

@@ -237,7 +237,11 @@ class MraidDisplayController extends MraidAbstractController {
 
 	protected void expand(String url, int width, int height, boolean shouldUseCustomClose,
 			boolean shouldLockOrientation) {
-		if (mExpansionStyle == MraidView.ExpansionStyle.DISABLED) return;
+		if (
+			mExpansionStyle == MraidView.ExpansionStyle.DISABLED
+			|| mViewState == ViewState.EXPANDED
+		)
+			return;
 
 		if (url != null && !URLUtil.isValidUrl(url)) {
 			getView().fireErrorEvent("expand", "URL passed to expand() was invalid.");

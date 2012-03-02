@@ -41,6 +41,7 @@ public class MraidView extends BaseAdView {
 	private WebChromeClient mWebChromeClient;
 
 	private boolean mHasFiredReadyEvent;
+	private String mMraidPath;
 	private final PlacementType mPlacementType;
 
 	static class MraidListenerInfo {
@@ -128,8 +129,10 @@ public class MraidView extends BaseAdView {
 		data = completeHtml(data);
 
 		// Inject the MRAID JavaScript bridge.
-		String mraid = "file:/" + copyRawResourceToFilesDir(R.raw.mraid, "mraid.js");
-		data = data.replace("<head>", "<head><script src='" + mraid + "'></script>");
+		if (mMraidPath == null)
+			mMraidPath = "file:/" + copyRawResourceToFilesDir(R.raw.mraid, "mraid.js");
+
+		data = data.replace("<head>", "<head><script src='" + mMraidPath + "'></script>");
 
 		loadDataWithBaseURL(null, data, "text/html", "UTF-8", null);
 	}

@@ -68,6 +68,7 @@ public class Plus1BannerView extends FrameLayout {
 	private boolean mInitialized		= false;
 	private boolean mAutorefreshEnabled = true;
 	private boolean mAutorefreshPreviousState = true;
+	private boolean mExpanded			= false;
 
 	public Plus1BannerView(Context context) {
 		this(context, null);
@@ -120,6 +121,10 @@ public class Plus1BannerView extends FrameLayout {
 		return this;
 	}
 
+	public boolean isExpanded() {
+		return mExpanded;
+	}
+
 	public void loadAd(String html, String adType) {
 		if (!mInitialized)
 			init();
@@ -148,13 +153,18 @@ public class Plus1BannerView extends FrameLayout {
 					mAutorefreshPreviousState = true;
 					setAutorefreshEnabled(false);
 				}
-				setVisibility(INVISIBLE); // hide without animation
+
+				//setVisibility(INVISIBLE); // hide without animation
+
+				mExpanded = true;
 			}
 		});
 		adView.setOnCloseListener(new MraidView.OnCloseListener() {
 			public void onClose(MraidView view, ViewState newViewState) {
 				if (mAutorefreshPreviousState == true)
 					setAutorefreshEnabled(true);
+
+				mExpanded = false;
 			}
 		});
 		adView.setOnFailureListener(new MraidView.OnFailureListener() {
@@ -241,11 +251,10 @@ public class Plus1BannerView extends FrameLayout {
 		mAdAnimator = new Plus1AdAnimator(getContext());
 
 		addView(
-			mAdAnimator.getViewAnimator(),
+			mAdAnimator.getBaseView(),
 			new FrameLayout.LayoutParams(
-				FrameLayout.LayoutParams.WRAP_CONTENT,
-				FrameLayout.LayoutParams.WRAP_CONTENT,
-				Gravity.CENTER_VERTICAL | Gravity.RIGHT
+				FrameLayout.LayoutParams.FILL_PARENT,
+				FrameLayout.LayoutParams.FILL_PARENT
 			)
 		);
 
