@@ -50,6 +50,7 @@ final class JSONBannerDownloader extends BaseBannerDownloader {
 		
 		try {
 			JSONObject jsonObject = new JSONObject(answer);
+			// TODO: legacy API needs generics
 			@SuppressWarnings("unchecked")
 			Iterator<String> iterator = jsonObject.keys();
 			String propertyName = null;

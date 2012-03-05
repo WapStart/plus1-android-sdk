@@ -142,16 +142,6 @@ public class Plus1BannerView extends LinearLayout {
 			text.setSpan(new UnderlineSpan(), 0, banner.getTitle().length(), 0);				
 			title.setText(text);
 			content.setText(banner.getContent());
-			
-			String imageUrl = null;
-			
-			if (!banner.getPictureUrl().equals(""))
-				imageUrl = banner.getPictureUrl();
-			else if (!banner.getPictureUrlPng().equals(""))
-				imageUrl = banner.getPictureUrlPng();
-			
-			if (imageUrl != null)
-				new ImageDowloader(this).setUrl(imageUrl).execute();
 				
 			if (!banner.isImageBanner()) {
 				if (flipper.getCurrentView().equals(image))

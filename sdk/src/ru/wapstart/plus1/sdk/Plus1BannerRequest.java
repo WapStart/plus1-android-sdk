@@ -47,7 +47,7 @@ public final class Plus1BannerRequest {
 	
 	private static final Integer VERSION			= 2;
 
-	private String rotatorUrl		= "http://ro.plus1.wapstart.ru/";
+	private String rotatorUrl		= "http://ro.trunk.plus1.oemtest.ru/";
 	private int age					= 0;
 	private int applicationId		= 0;
 	private Gender gender			= Gender.Unknown;

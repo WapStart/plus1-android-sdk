@@ -31,12 +31,17 @@ package ru.wapstart.plus1.sdk;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Locale;
 
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -44,7 +49,7 @@ import android.util.Log;
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
-abstract class BaseBannerDownloader extends BaseDownloader {
+abstract class BaseBannerDownloader extends AsyncTask<Void, Void, Void> {
 	private static final Integer BUFFER_SIZE = 8192;
 	private static final String NO_BANNER = "<!-- i4jgij4pfd4ssd -->";
 	
@@ -111,7 +116,7 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		while( running ) {
 			if (view.isClosed())
 				return null;
-    		
+   
 			updateBanner();
         	
 			if (runOnce)
@@ -128,50 +133,66 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 	}
 
 	protected void updateBanner()
-	{
-		if (request != null)
-			this.url = request.getRequestUri();
-		
-		final String result = getData();
-		
-		Log.d(getClass().getName(), "answer: " + result.toString());
+	{		
+		final Plus1Banner banner = getBanner();
 		
 		view.post(new Runnable() {
 			public void run() {
-				Plus1Banner banner = null;
-
-				if (result.equals("")) {
-					if (bannerDownloadListener != null)
-						bannerDownloadListener.onBannerLoadFailed(
-							LoadError.UnknownAnswer
-						);
-				} else if (result.equals(NO_BANNER)) { 
-					if (bannerDownloadListener != null)
-						bannerDownloadListener.onBannerLoadFailed(
-							LoadError.NoHaveBanner
-						);
-				} else {
-					banner = parse(result);
-
-					if ((banner != null) && (banner.getId() > 0)) {
-						if (bannerDownloadListener != null)
-							bannerDownloadListener.onBannerLoaded();
-					} else {
-						if (bannerDownloadListener != null)
-							bannerDownloadListener.onBannerLoadFailed(
-								LoadError.UnknownAnswer
-							);
-					}
-				}			
-				
 				view.setBanner(banner);
 			}
-		});		
+		});	
+		
+		if (banner != null) {
+			String imageUrl = null;
+			
+			if (!banner.getPictureUrl().equals(""))
+				imageUrl = banner.getPictureUrl();
+			else if (!banner.getPictureUrlPng().equals(""))
+				imageUrl = banner.getPictureUrlPng();	
+			
+			if (imageUrl != null)
+				downloadImage(imageUrl);
+		}
 	}
 	
-	protected String getData()
+	protected Plus1Banner getBanner()
 	{
-		openConnection();
+		final String result = getBannerData();
+		
+		Log.d(getClass().getName(), "answer: " + result.toString());
+		
+		Plus1Banner banner = null;
+
+		if (result.equals("")) {
+			if (bannerDownloadListener != null)
+				bannerDownloadListener.onBannerLoadFailed(
+					LoadError.UnknownAnswer
+				);
+		} else if (result.equals(NO_BANNER)) { 
+			if (bannerDownloadListener != null)
+				bannerDownloadListener.onBannerLoadFailed(
+					LoadError.NoHaveBanner
+				);
+		} else {
+			banner = parse(result);
+
+			if ((banner != null) && (banner.getId() > 0)) {
+				if (bannerDownloadListener != null)
+					bannerDownloadListener.onBannerLoaded();
+			} else {
+				if (bannerDownloadListener != null)
+					bannerDownloadListener.onBannerLoadFailed(
+						LoadError.UnknownAnswer
+					);
+			}
+		}
+		
+		return banner;
+	}
+	
+	protected String getBannerData()
+	{
+		InputStream stream = getStream(request.getRequestUri());
 		
 		String result = new String();
 		
@@ -200,6 +221,22 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		}
 		
 		return result;
+	}
+	
+	protected void downloadImage(String imageUrl)
+	{
+		InputStream stream = getStream(imageUrl);
+		
+		if (stream == null) 
+			return;
+		
+		final Drawable img = Drawable.createFromStream(stream, "src");
+		
+		view.post(new Runnable() {
+			public void run() {
+				view.setImage(img);
+			}
+		});		
 	}
 	
 	protected void modifyConnection(HttpURLConnection connection) {
@@ -245,6 +282,26 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 			String.valueOf(metrics.widthPixels) + "x" 
 			+ String.valueOf(metrics.heightPixels);
 	}
+	
+	protected InputStream getStream(String url)
+	{
+		InputStream stream = null;
+		HttpURLConnection connection;
+		
+		try {
+			connection = (HttpURLConnection) new URL(url).openConnection();
+			modifyConnection(connection);
+			connection.connect();
+			
+			stream = connection.getInputStream();
+		} catch (MalformedURLException e) {
+			Log.e(getClass().getName(), "URL parsing failed: " + url);
+		} catch (IOException e) {
+			Log.d(getClass().getName(), "URL " + url + " doesn't exist");
+		}
+		
+		return stream;
+	}	
 	
 	abstract protected Plus1Banner parse(String answer);
 }
