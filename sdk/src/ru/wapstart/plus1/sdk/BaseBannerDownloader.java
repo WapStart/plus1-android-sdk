@@ -31,13 +31,17 @@ package ru.wapstart.plus1.sdk;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Locale;
 
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 
 import android.app.Activity;
-import android.os.Handler;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -45,16 +49,17 @@ import android.util.Log;
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
-abstract class BaseBannerDownloader extends BaseDownloader {
+abstract class BaseBannerDownloader extends AsyncTask<Void, Void, Void> {
 	private static final Integer BUFFER_SIZE = 8192;
 	private static final String NO_BANNER = "<!-- i4jgij4pfd4ssd -->";
 	
 	protected Plus1BannerView view			= null;
 	protected Plus1BannerRequest request	= null;
-	protected Handler handler				= null;
 	protected String deviceId				= null;
 	protected int timeout					= 0;
-	protected boolean isRunOnce				= false;
+	protected boolean runOnce               = false;
+	
+	private boolean running = true;
 
 	protected Plus1BannerDownloadListener bannerDownloadListener = null;
 	
@@ -74,19 +79,6 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		return this;
 	}
 	
-	public BaseBannerDownloader setHandler(Handler handler) {
-		this.handler = handler;
-		
-		return this;
-	}
-	
-	public BaseBannerDownloader removeHandler() {
-		this.handler = null;
-		
-		return this;
-	}
-
-	
 	public BaseBannerDownloader setTimeout(int timeout) {
 		this.timeout = timeout;
 		
@@ -94,17 +86,17 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 	}
 
 	public BaseBannerDownloader setRunOnce() {
-		this.isRunOnce = true;
+		this.runOnce = true;
 
 		return this;
 	}
 
-	public BaseBannerDownloader setRunOnce(boolean isRunOnce) {
-		this.isRunOnce = isRunOnce;
+	public BaseBannerDownloader setRunOnce(boolean runOnce) {
+		this.runOnce = runOnce;
 
 		return this;
-	}
-
+	}	
+	
 	public BaseBannerDownloader setDownloadListener(
 		Plus1BannerDownloadListener bannerDownloadListener
 	) {
@@ -113,41 +105,59 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 		return this;
 	}
 	
-	@Override
-	public void run() {
-		if (view.isClosed())
-			return;
-		
-		if (request != null)
-			this.url = request.getRequestUri();
-		
-		super.run();
-		
-		String result = new String();
-		
-		try {
-			byte[] buffer = new byte[BUFFER_SIZE];
-			int count = 0;
-			
-			BufferedInputStream bufStream = 
-				new BufferedInputStream (
-					stream,
-					BUFFER_SIZE
-				);
-			
-			if (bufStream != null)
-				while ((count = bufStream.read(buffer)) != -1)
-					result += new String(buffer, 0, count);
-			
-			bufStream.close();
-		} catch (IOException e) {
-			Log.e(getClass().getName(), "IOException in InputStream");
-
-			if (bannerDownloadListener != null)
-				bannerDownloadListener.onBannerLoadFailed(
-					LoadError.DownloadFailed
-				);
+    public void stop()
+    {
+        running = false;
+    }	
+	
+	@Override	
+	protected Void doInBackground(Void... voids)
+	{
+		while( running ) {
+			if (view.isClosed())
+				return null;
+   
+			updateBanner();
+        	
+			if (runOnce)
+				return null;
+    		
+			try {
+				Thread.sleep(1000 * timeout);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
+		
+		return null;
+	}
+
+	protected void updateBanner()
+	{		
+		final Plus1Banner banner = getBanner();
+		
+		view.post(new Runnable() {
+			public void run() {
+				view.setBanner(banner);
+			}
+		});	
+		
+		if (banner != null) {
+			String imageUrl = null;
+			
+			if (!banner.getPictureUrl().equals(""))
+				imageUrl = banner.getPictureUrl();
+			else if (!banner.getPictureUrlPng().equals(""))
+				imageUrl = banner.getPictureUrlPng();	
+			
+			if (imageUrl != null)
+				downloadImage(imageUrl);
+		}
+	}
+	
+	protected Plus1Banner getBanner()
+	{
+		final String result = getBannerData();
 		
 		Log.d(getClass().getName(), "answer: " + result.toString());
 		
@@ -176,10 +186,57 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 					);
 			}
 		}
-		view.setBanner(banner);
 		
-		if ((handler != null) && !isRunOnce)
-			handler.postDelayed(this, timeout * 1000);
+		return banner;
+	}
+	
+	protected String getBannerData()
+	{
+		InputStream stream = getStream(request.getRequestUri());
+		
+		String result = new String();
+		
+		try {
+			byte[] buffer = new byte[BUFFER_SIZE];
+			int count = 0;
+			
+			BufferedInputStream bufStream = 
+				new BufferedInputStream (
+					stream,
+					BUFFER_SIZE
+				);
+			
+			if (bufStream != null)
+				while ((count = bufStream.read(buffer)) != -1)
+					result += new String(buffer, 0, count);
+			
+			bufStream.close();
+		} catch (IOException e) {
+			Log.e(getClass().getName(), "IOException in InputStream: " + e.toString());
+
+			if (bannerDownloadListener != null)
+				bannerDownloadListener.onBannerLoadFailed(
+					LoadError.DownloadFailed
+				);
+		}
+		
+		return result;
+	}
+	
+	protected void downloadImage(String imageUrl)
+	{
+		InputStream stream = getStream(imageUrl);
+		
+		if (stream == null) 
+			return;
+		
+		final Drawable img = Drawable.createFromStream(stream, "src");
+		
+		view.post(new Runnable() {
+			public void run() {
+				view.setImage(img);
+			}
+		});		
 	}
 	
 	protected void modifyConnection(HttpURLConnection connection) {
@@ -225,6 +282,26 @@ abstract class BaseBannerDownloader extends BaseDownloader {
 			String.valueOf(metrics.widthPixels) + "x" 
 			+ String.valueOf(metrics.heightPixels);
 	}
+	
+	protected InputStream getStream(String url)
+	{
+		InputStream stream = null;
+		HttpURLConnection connection;
+		
+		try {
+			connection = (HttpURLConnection) new URL(url).openConnection();
+			modifyConnection(connection);
+			connection.connect();
+			
+			stream = connection.getInputStream();
+		} catch (MalformedURLException e) {
+			Log.e(getClass().getName(), "URL parsing failed: " + url);
+		} catch (IOException e) {
+			Log.d(getClass().getName(), "URL " + url + " doesn't exist");
+		}
+		
+		return stream;
+	}	
 	
 	abstract protected Plus1Banner parse(String answer);
 }
