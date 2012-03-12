@@ -1,0 +1,4 @@
+Android WapStart SDK 1.1, 2012-03-12
+----------------------
+- Fixed bug: network activity on the UI thread breaks application
+- Fixed bug: invalid pageId generation
