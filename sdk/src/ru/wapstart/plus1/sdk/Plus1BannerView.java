@@ -67,7 +67,6 @@ public class Plus1BannerView extends FrameLayout {
 	private boolean mClosed				= false;
 	private boolean mInitialized		= false;
 	private boolean mAutorefreshEnabled = true;
-	private boolean mAutorefreshPreviousState = true;
 	private boolean mExpanded			= false;
 
 	public Plus1BannerView(Context context) {

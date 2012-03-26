@@ -49,7 +49,6 @@ public class Plus1BannerAsker {
 	private int timeout								= 10;
 	
 	private boolean initialized						= false;
-	private boolean mWasManuallyStarted				= false;
 	private boolean mCurrentlyStarted				= false;
 
 	private LocationManager locationManager			= null;
@@ -69,12 +68,10 @@ public class Plus1BannerAsker {
 		view.setOnAutorefreshChangeListener(
 			new Plus1BannerView.OnAutorefreshStateListener() {
 				public void onAutorefreshStateChanged(Plus1BannerView view) {
-					if (mWasManuallyStarted) {
-						if (view.getAutorefreshEnabled() && !view.isExpanded())
-							start();
-						else
-							stop();
-					}
+					if (view.getAutorefreshEnabled() && !view.isExpanded())
+						start();
+					else
+						stop();
 				}
 			}
 		);
@@ -160,8 +157,7 @@ public class Plus1BannerAsker {
 		downloader.setHandler(handler);
 		handler.removeCallbacks(downloader);
 		handler.postDelayed(downloader, 100);
-		
-		mWasManuallyStarted = true;
+
 		mCurrentlyStarted = true;
 
 		return this;
@@ -186,8 +182,6 @@ public class Plus1BannerAsker {
 		downloader
 			.removeHandler()
 			.run();
-		
-		mWasManuallyStarted = true;
 
 		return this;
 	}
