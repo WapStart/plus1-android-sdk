@@ -53,11 +53,6 @@ public class Plus1BannerView extends FrameLayout {
 
 	private OnAutorefreshStateListener mOnAutorefreshChangeListener;
 
-	/**
-	 * @deprecated WebView-based banners used
-	 */
-	private Plus1Banner mBanner;
-
 	private Plus1AdAnimator mAdAnimator	= null;
 
 	private Animation mHideAnimation	= null;
@@ -205,34 +200,6 @@ public class Plus1BannerView extends FrameLayout {
 
 	public boolean isExpanded() {
 		return mExpanded;
-	}
-
-	/**
-	 * @deprecated WebView-based banners used
-	 */
-	public Plus1Banner getBanner() {
-		return mBanner;
-	}
-
-	/**
-	 * @deprecated WebView-based banners used
-	 */
-	public void setBanner(Plus1Banner banner) {
-		mBanner = banner;
-	}
-
-	/**
-	 * @deprecated WebView-based banners used
-	 */
-	public void setImage(Drawable drawable) {
-		// do nothing
-	}
-
-	/**
-	 * @deprecated WebView-based banners used
-	 */
-	public void setMovie(Movie movie) {
-		// do nothing
 	}
 
 	private void init() {

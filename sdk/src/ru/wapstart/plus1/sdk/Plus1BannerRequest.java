@@ -124,23 +124,6 @@ public final class Plus1BannerRequest {
 		return this;
 	}
 
-	/**
-	 * @deprecated use html banners instead
-	 */
-	public RequestType getRequestType() {
-		return requestType;
-	}
-
-	/**
-	 * @deprecated use html banners instead
-	 */
-	public Plus1BannerRequest setRequestType(RequestType type) throws Exception {
-		throw new Exception("types not supported while");
-		/* this.type = type;
-
-		return this; */
-	}
-
 	public String getRotatorUrl() {
 		return rotatorUrl;
 	}
