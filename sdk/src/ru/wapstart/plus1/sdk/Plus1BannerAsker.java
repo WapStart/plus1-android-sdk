@@ -50,6 +50,7 @@ public class Plus1BannerAsker {
 	
 	private boolean initialized						= false;
 	private boolean mWasManuallyStarted				= false;
+	private boolean mCurrentlyStarted				= false;
 
 	private LocationManager locationManager			= null;
 	private Plus1LocationListener locationListener	= null;
@@ -66,15 +67,14 @@ public class Plus1BannerAsker {
 		this.view = view;
 
 		view.setOnAutorefreshChangeListener(
-			new Plus1BannerView.OnAutorefreshChangeListener() {
-				public void onAutorefreshEnabled() {
-					if (mWasManuallyStarted)
-						start();
-				}
-
-				public void onAutorefreshDisabled() {
-					if (mWasManuallyStarted)
-						stop();
+			new Plus1BannerView.OnAutorefreshStateListener() {
+				public void onAutorefreshStateChanged(Plus1BannerView view) {
+					if (mWasManuallyStarted) {
+						if (view.getAutorefreshEnabled() && !view.isExpanded())
+							start();
+						else
+							stop();
+					}
 				}
 			}
 		);
@@ -143,7 +143,7 @@ public class Plus1BannerAsker {
 	}
 	
 	public Plus1BannerAsker start() {
-		if ((request == null) || (view == null) || view.isExpanded())
+		if ((request == null) || (view == null) || mCurrentlyStarted || view.isExpanded())
 			return this;
 
 		init();
@@ -162,6 +162,7 @@ public class Plus1BannerAsker {
 		handler.postDelayed(downloader, 100);
 		
 		mWasManuallyStarted = true;
+		mCurrentlyStarted = true;
 
 		return this;
 	}
@@ -171,12 +172,14 @@ public class Plus1BannerAsker {
 			locationManager.removeUpdates(locationListener);
 		
 		handler.removeCallbacks(downloader);
-		
+
+		mCurrentlyStarted = false;
+
 		return this;
 	}
 	
 	public Plus1BannerAsker startOnce() {
-		if ((request == null) || (view == null))
+		if ((request == null) || (view == null) || mCurrentlyStarted || view.isExpanded())
 			return this;
 
 		init();
@@ -189,4 +192,3 @@ public class Plus1BannerAsker {
 		return this;
 	}
 }
-	

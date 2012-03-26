@@ -51,7 +51,7 @@ import ru.wapstart.plus1.sdk.MraidView.ViewState;
 public class Plus1BannerView extends FrameLayout {
     private static final String LOGTAG = "Plus1BannerView";
 
-	private OnAutorefreshChangeListener mOnAutorefreshChangeListener;
+	private OnAutorefreshStateListener mOnAutorefreshChangeListener;
 
 	/**
 	 * @deprecated WebView-based banners used
@@ -121,10 +121,6 @@ public class Plus1BannerView extends FrameLayout {
 		return this;
 	}
 
-	public boolean isExpanded() {
-		return mExpanded;
-	}
-
 	public void loadAd(String html, String adType) {
 		if (!mInitialized)
 			init();
@@ -149,25 +145,14 @@ public class Plus1BannerView extends FrameLayout {
 		});
 		adView.setOnExpandListener(new MraidView.OnExpandListener() {
 			public void onExpand(MraidView view) {
-				if (getAutorefreshEnabled()) {
-					mAutorefreshPreviousState = true;
-					setAutorefreshEnabled(false);
-				}
+				setExpanded(true);
 
 				//setVisibility(INVISIBLE); // hide without animation
-
-				mExpanded = true;
 			}
 		});
 		adView.setOnCloseListener(new MraidView.OnCloseListener() {
 			public void onClose(MraidView view, ViewState newViewState) {
-				mExpanded = false;
-
-				if (mAutorefreshPreviousState == true)
-					setAutorefreshEnabled(true);
-				else if (mOnAutorefreshChangeListener != null && getAutorefreshEnabled())
-					mOnAutorefreshChangeListener.onAutorefreshEnabled(); // FIXME: replace hack
-
+				setExpanded(false);
 			}
 		});
 		adView.setOnFailureListener(new MraidView.OnFailureListener() {
@@ -191,7 +176,7 @@ public class Plus1BannerView extends FrameLayout {
 		return adView;
 	}
 
-	public void setOnAutorefreshChangeListener(OnAutorefreshChangeListener listener) {
+	public void setOnAutorefreshChangeListener(OnAutorefreshStateListener listener) {
 		mOnAutorefreshChangeListener = listener;
 	}
 
@@ -199,12 +184,8 @@ public class Plus1BannerView extends FrameLayout {
 		if (mAutorefreshEnabled != enabled) { // NOTE: really changed
 			mAutorefreshEnabled = enabled;
 
-			if (mOnAutorefreshChangeListener != null) {
-				if (enabled)
-					mOnAutorefreshChangeListener.onAutorefreshEnabled();
-				else
-					mOnAutorefreshChangeListener.onAutorefreshDisabled();
-			}
+			if (mOnAutorefreshChangeListener != null)
+				mOnAutorefreshChangeListener.onAutorefreshStateChanged(this);
 		}
 
 		return this;
@@ -212,6 +193,19 @@ public class Plus1BannerView extends FrameLayout {
 
 	public boolean getAutorefreshEnabled() {
 		return mAutorefreshEnabled;
+	}
+
+	private void setExpanded(boolean orly) {
+		if (mExpanded != orly) { // NOTE: really changed
+			mExpanded = orly;
+
+			if (mOnAutorefreshChangeListener != null)
+				mOnAutorefreshChangeListener.onAutorefreshStateChanged(this);
+		}
+	}
+
+	public boolean isExpanded() {
+		return mExpanded;
 	}
 
 	/**
@@ -336,8 +330,7 @@ public class Plus1BannerView extends FrameLayout {
 		}
 	}
 
-	public interface OnAutorefreshChangeListener {
-		public void onAutorefreshEnabled();
-		public void onAutorefreshDisabled();
+	public interface OnAutorefreshStateListener {
+		public void onAutorefreshStateChanged(Plus1BannerView view);
 	}
 }

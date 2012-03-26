@@ -76,7 +76,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 
 					public void onAnimationEnd(Animation anmtn) {
 						setNewRemovedAdView(null); // safe destroy removed ad
-						Log.d(LOGTAG, "WebView was removed");
+						Log.d(LOGTAG, "Ad view was destroyed in animation end context");
 					}
 
 					public void onAnimationRepeat(Animation anmtn) {
@@ -149,7 +149,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 		setNewRemovedAdView(view);
 	}
 
-	// FIXME: more flexible way to unregister events, think about moving to onAnimationEnd
+	// FIXME: more flexible way to unregister events
 	private void setNewRemovedAdView(BaseAdView view) {
 		if (mRemovedAdView != null)
 			mRemovedAdView.destroy();
