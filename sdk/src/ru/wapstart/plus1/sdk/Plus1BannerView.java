@@ -80,7 +80,7 @@ public class Plus1BannerView extends FrameLayout {
 		setVerticalScrollBarEnabled(false);
 	}
 
-	public void destroy() {
+	public void removeAllViews() {
 		if (mAdAnimator != null)
 			mAdAnimator.removeAllViews();
 	}

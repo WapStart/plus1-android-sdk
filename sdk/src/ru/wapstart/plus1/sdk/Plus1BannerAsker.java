@@ -77,6 +77,21 @@ public class Plus1BannerAsker {
 		);
 	}
 
+	public void onPause() {
+		stop();
+
+		view.removeAllViews();
+	}
+
+	public void onResume() {
+		if (!view.isExpanded()) {
+			if (view.getAutorefreshEnabled())
+				start();
+			else
+				startOnce();
+		}
+	}
+
 	public boolean isDisabledIMEIDispatch() {
 		return disableDispatchIMEI;
 	}
@@ -138,10 +153,10 @@ public class Plus1BannerAsker {
 		
 		return this;
 	}
-	
-	public Plus1BannerAsker start() {
-		if ((request == null) || (view == null) || mCurrentlyStarted || view.isExpanded())
-			return this;
+
+	private void start() {
+		if ((request == null) || (view == null) || mCurrentlyStarted)
+			return;
 
 		init();
 		
@@ -159,30 +174,24 @@ public class Plus1BannerAsker {
 		handler.postDelayed(downloader, 100);
 
 		mCurrentlyStarted = true;
-
-		return this;
 	}
-	
-	public Plus1BannerAsker stop() {
+
+	private void stop() {
 		if (!isDisabledAutoDetectLocation())
 			locationManager.removeUpdates(locationListener);
 		
 		handler.removeCallbacks(downloader);
 
 		mCurrentlyStarted = false;
-
-		return this;
 	}
-	
-	public Plus1BannerAsker startOnce() {
-		if ((request == null) || (view == null) || mCurrentlyStarted || view.isExpanded())
-			return this;
+
+	private void startOnce() {
+		if ((request == null) || (view == null) || mCurrentlyStarted)
+			return;
 
 		init();
 		downloader
 			.removeHandler()
 			.run();
-
-		return this;
 	}
 }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -46,7 +47,8 @@ public class BartActivity extends Activity implements View.OnClickListener
 			new Plus1BannerAsker(
 				new Plus1BannerRequest()
 					//.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/")
-					.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/testmraid.php")
+					//.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/testmraid.php")
+					.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/testmraid_sz.php")
 					//.setApplicationId(352),
 					.setApplicationId(105261),
 				mBannerView
@@ -67,20 +69,14 @@ public class BartActivity extends Activity implements View.OnClickListener
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
-		mAsker.start();
+		Log.d("MAIN", "Resume");
+		mAsker.onResume();
 	}
 	
 	@Override
 	protected void onPause() {
 		super.onPause();
-		
-		mAsker.stop();
+		Log.d("MAIN", "Pause");
+		mAsker.onPause();
 	}
-
-    @Override
-    protected void onDestroy() {
-        mBannerView.destroy();
-        super.onDestroy();
-    }
 }
