@@ -154,6 +154,17 @@ public class Plus1BannerAsker {
 		return this;
 	}
 
+	// NOTE: for manual refreshing
+	public void refreshBanner() {
+		if (!view.isExpanded()) {
+			stop();
+			if (view.getAutorefreshEnabled())
+				start();
+			else
+				startOnce();
+		}
+	}
+
 	private void start() {
 		if ((request == null) || (view == null) || mCurrentlyStarted)
 			return;

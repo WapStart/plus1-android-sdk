@@ -52,7 +52,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 					//.setApplicationId(352),
 					.setApplicationId(105261),
 				mBannerView
-					.setAutorefreshEnabled(true)
+					.setAutorefreshEnabled(false)
 					.enableAnimationFromTop()
 					.enableCloseButton()
 			)
@@ -64,6 +64,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 			this.mp = MediaPlayer.create(getApplicationContext(), R.raw.laugh);
 
 		mp.start();
+		mAsker.refreshBanner();
 	}
 	
 	@Override
