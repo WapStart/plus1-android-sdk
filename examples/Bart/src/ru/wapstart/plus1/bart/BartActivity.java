@@ -21,7 +21,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 
     /** Called when the activity is first created. */
     @Override
-    public void onCreate(Bundle savedInstanceState)
+    protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
@@ -58,7 +58,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 			)
 			.setTimeout(10);
 
-		Log.d("MAIN", "onCreate fired");
+		Log.d("BartActivity", "onCreate fired");
     }
 
 	public void onClick(View view) {
@@ -74,7 +74,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 		super.onResume();
 
 		mAsker.onResume();
-		Log.d("MAIN", "onResume fired");
+		Log.d("BartActivity", "onResume fired");
 	}
 	
 	@Override
@@ -82,6 +82,6 @@ public class BartActivity extends Activity implements View.OnClickListener
 		super.onPause();
 
 		mAsker.onPause();
-		Log.d("MAIN", "onPause fired");
+		Log.d("BartActivity", "onPause fired");
 	}
 }
