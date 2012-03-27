@@ -50,6 +50,10 @@ final public class Plus1AdAnimator extends FrameLayout {
 		mBaseView = new FrameLayout(context);
 	}
 
+	public BaseAdView getCurrentView() {
+		return mCurrentView;
+	}
+
 	public ViewGroup getBaseView() {
 		return mBaseView;
 	}
@@ -67,6 +71,9 @@ final public class Plus1AdAnimator extends FrameLayout {
 		if (mNewView != null) {
 
 			if (mCurrentView != null) {
+				if (mCurrentView instanceof MraidView)
+					((MraidView)mCurrentView).unregisterBroadcastReceiver();
+
 				mCurrentView.startAnimation(makeFadeOutAnimation());
 
 				mCurrentView.getAnimation().setAnimationListener(new Animation.AnimationListener() {
@@ -99,10 +106,13 @@ final public class Plus1AdAnimator extends FrameLayout {
 
 			mCurrentView = mNewView;
 			mNewView = null;
+
+			if (mCurrentView instanceof MraidView)
+				((MraidView)mCurrentView).registerBroadcastReceiver();
 		}
 	}
 
-	public void removeAllViews() {
+	/*public void removeAllViews() {
 		if (mCurrentView != null) {
 			mCurrentView.destroy();
 			mCurrentView = null;
@@ -116,7 +126,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 		setNewRemovedAdView(null); // safe destroy removed ad
 
 		mBaseView.removeAllViews();
-	}
+	}*/
 
 	private Animation makeFadeInAnimation()
 	{

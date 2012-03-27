@@ -30,8 +30,6 @@
 package ru.wapstart.plus1.sdk;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.graphics.Movie;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -75,9 +73,20 @@ public class Plus1BannerView extends FrameLayout {
 		setVerticalScrollBarEnabled(false);
 	}
 
-	public void removeAllViews() {
-		if (mAdAnimator != null)
-			mAdAnimator.removeAllViews();
+	public void onPause() {
+		if (
+			mAdAnimator != null
+			&& mAdAnimator.getCurrentView() instanceof MraidView
+		)
+			((MraidView)mAdAnimator.getCurrentView()).unregisterBroadcastReceiver();
+	}
+
+	public void onResume() {
+		if (
+			mAdAnimator != null
+			&& mAdAnimator.getCurrentView() instanceof MraidView
+		)
+			((MraidView)mAdAnimator.getCurrentView()).registerBroadcastReceiver();
 	}
 
 	public boolean isHaveCloseButton() {

@@ -129,10 +129,6 @@ class MraidDisplayController extends MraidAbstractController {
 		mViewState = ViewState.LOADING;
 		initializeScreenMetrics();
 		initializeViewabilityTimer();
-		getView().getContext().registerReceiver(mOrientationBroadcastReceiver,
-			new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED));
-
-		Log.d(LOGTAG, "Orientation broadcast receiver registered");
 	}
 
 	private void initializeScreenMetrics() {
@@ -179,9 +175,18 @@ class MraidDisplayController extends MraidAbstractController {
 
 	public void destroy() {
 		mHandler.removeCallbacks(mCheckViewabilityTask);
-		getView().getContext().unregisterReceiver(mOrientationBroadcastReceiver);
+	}
 
-		Log.d(LOGTAG, "Orientation broadcast receiver unregistered");
+	public void registerBroadcastReceiver() {
+		getView().getContext().registerReceiver(mOrientationBroadcastReceiver,
+			new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED));
+
+		Log.d(LOGTAG, "Orientation broadcast receiver is registered");
+	}
+
+	public void unregisterBroadcastReceiver() {
+		getView().getContext().unregisterReceiver(mOrientationBroadcastReceiver);
+		Log.d(LOGTAG, "Orientation broadcast receiver was unregistered");
 	}
 
 	protected void initializeJavaScriptState() {

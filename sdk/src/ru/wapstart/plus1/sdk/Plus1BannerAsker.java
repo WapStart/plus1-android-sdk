@@ -80,7 +80,7 @@ public class Plus1BannerAsker {
 	public void onPause() {
 		stop();
 
-		view.removeAllViews();
+		view.onPause();
 	}
 
 	public void onResume() {
@@ -90,6 +90,8 @@ public class Plus1BannerAsker {
 			else
 				startOnce();
 		}
+
+		view.onResume();
 	}
 
 	public boolean isDisabledIMEIDispatch() {

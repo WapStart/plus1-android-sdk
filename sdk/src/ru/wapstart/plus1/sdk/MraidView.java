@@ -165,6 +165,16 @@ public class MraidView extends BaseAdView {
 		loadHtmlData(out.toString());
 	}
 
+	public void registerBroadcastReceiver() {
+		if (mDisplayController != null)
+			mDisplayController.registerBroadcastReceiver();
+	}
+
+	public void unregisterBroadcastReceiver() {
+		if (mDisplayController != null)
+			mDisplayController.unregisterBroadcastReceiver();
+	}
+
 	private void notifyOnFailureListener() {
 		if (mListenerInfo.mOnFailureListener != null) {
 			mListenerInfo.mOnFailureListener.onFailure(this);
