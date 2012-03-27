@@ -57,6 +57,8 @@ public class BartActivity extends Activity implements View.OnClickListener
 					.enableCloseButton()
 			)
 			.setTimeout(10);
+
+		Log.d("MAIN", "onCreate fired");
     }
 
 	public void onClick(View view) {
@@ -70,14 +72,16 @@ public class BartActivity extends Activity implements View.OnClickListener
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Log.d("MAIN", "Resume");
+
 		mAsker.onResume();
+		Log.d("MAIN", "onResume fired");
 	}
 	
 	@Override
 	protected void onPause() {
 		super.onPause();
-		Log.d("MAIN", "Pause");
+
 		mAsker.onPause();
+		Log.d("MAIN", "onPause fired");
 	}
 }
