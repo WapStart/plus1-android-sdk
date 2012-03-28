@@ -298,6 +298,8 @@ abstract class BaseBannerDownloader extends AsyncTask<Void, Void, Void> {
 			Log.e(getClass().getName(), "URL parsing failed: " + url);
 		} catch (IOException e) {
 			Log.d(getClass().getName(), "URL " + url + " doesn't exist");
+		} catch (Exception e) {
+			Log.d(getClass().getName(), "Unexpected exception: " + e);
 		}
 		
 		return stream;
