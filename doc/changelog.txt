@@ -1,3 +1,7 @@
+Android WapStart SDK 1.2, 2012-03-29
+----------------------
+- Fixed bug: application crashes while connection because of unexpected NullPointerException
+
 Android WapStart SDK 1.1, 2012-03-12
 ----------------------
 - Fixed bug: network activity on the UI thread breaks application
