@@ -42,7 +42,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 	private ViewGroup mBaseView;
 	private BaseAdView mCurrentView;
 	private BaseAdView mNewView;
-	private BaseAdView mRemovedAdView;
+	private BaseAdView mWillDestroyedAdView;
 
 	public Plus1AdAnimator(Context context) {
 		super(context);
@@ -60,7 +60,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 
 	public void setAdView(BaseAdView child) {
 		if (mNewView != null) {
-			safeRemove(mNewView);
+			mNewView.destroy();
 			Log.w(LOGTAG, "Not shown ad view was removed. Did you call setAdView() twice?");
 		}
 
@@ -82,7 +82,8 @@ final public class Plus1AdAnimator extends FrameLayout {
 					}
 
 					public void onAnimationEnd(Animation anmtn) {
-						setNewRemovedAdView(null); // safe destroy removed ad
+						if (mWillDestroyedAdView != null)
+							mWillDestroyedAdView.destroy();
 						Log.d(LOGTAG, "Ad view was destroyed in animation end context");
 					}
 
@@ -91,7 +92,13 @@ final public class Plus1AdAnimator extends FrameLayout {
 					}
 				});
 
-				safeRemove(mCurrentView);
+				mBaseView.removeView(mCurrentView);
+				if (mWillDestroyedAdView != null) {
+					mWillDestroyedAdView.clearAnimation();
+					mWillDestroyedAdView.destroy();
+				}
+				// NOTE: adView will be destroyed after fade out animation
+				mWillDestroyedAdView = mCurrentView;
 			}
 
 			mNewView.startAnimation(makeFadeInAnimation());
@@ -111,22 +118,6 @@ final public class Plus1AdAnimator extends FrameLayout {
 				((MraidView)mCurrentView).registerBroadcastReceiver();
 		}
 	}
-
-	/*public void removeAllViews() {
-		if (mCurrentView != null) {
-			mCurrentView.destroy();
-			mCurrentView = null;
-		}
-
-		if (mNewView != null) {
-			mNewView.destroy();
-			mNewView = null;
-		}
-
-		setNewRemovedAdView(null); // safe destroy removed ad
-
-		mBaseView.removeAllViews();
-	}*/
 
 	private Animation makeFadeInAnimation()
 	{
@@ -152,18 +143,5 @@ final public class Plus1AdAnimator extends FrameLayout {
 		animation.setDuration(600);
 
 		return animation;
-	}
-
-	private void safeRemove(BaseAdView view) {
-		mBaseView.removeView(view);
-		setNewRemovedAdView(view);
-	}
-
-	// FIXME: more flexible way to unregister events
-	private void setNewRemovedAdView(BaseAdView view) {
-		if (mRemovedAdView != null)
-			mRemovedAdView.destroy();
-
-		mRemovedAdView = view;
 	}
 }
