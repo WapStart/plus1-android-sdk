@@ -67,7 +67,7 @@ public class Plus1BannerView extends LinearLayout {
 	private Animation hideAnimation = null;
 	private Animation showAnimation = null;
 	
-	private boolean haveCloseButton	= false;
+	private boolean closeButton	    = false;
 	private boolean closed			= false;
 	private boolean initialized		= false;
 
@@ -81,19 +81,28 @@ public class Plus1BannerView extends LinearLayout {
 		super(context, attr);
 	}
 
+	public boolean hasCloseButton()
+	{
+		return closeButton;
+	}	
+	
+	/**
+	 * Use hasCloseButton() instead of this
+	 */
+	@Deprecated
 	public boolean isHaveCloseButton()
 	{
-		return haveCloseButton;
+		return hasCloseButton();
 	}
 	
 	public Plus1BannerView enableCloseButton() {
-		this.haveCloseButton = true;
+		this.closeButton = true;
 		
 		return this;
 	}
 	
 	public Plus1BannerView setCloseButtonEnabled(boolean closeButtonEnabled) {
-		this.haveCloseButton = closeButtonEnabled;
+		this.closeButton = closeButtonEnabled;
 		
 		return this;
 	}
