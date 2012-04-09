@@ -116,12 +116,12 @@ abstract class BaseBannerDownloader extends AsyncTask<Void, Void, Void> {
 		while( running ) {
 			if (view.isClosed())
 				return null;
-   
+
 			updateBanner();
         	
 			if (runOnce)
 				return null;
-    		
+			
 			try {
 				Thread.sleep(1000 * timeout);
 			} catch (InterruptedException e) {
@@ -133,25 +133,32 @@ abstract class BaseBannerDownloader extends AsyncTask<Void, Void, Void> {
 	}
 
 	protected void updateBanner()
-	{		
-		final Plus1Banner banner = getBanner();
-		
-		view.post(new Runnable() {
-			public void run() {
-				view.setBanner(banner);
+	{
+		try {
+			final Plus1Banner banner = getBanner();
+			
+			view.post(new Runnable() {
+				public void run() {
+					view.setBanner(banner);
+				}
+			});	
+			
+			if (banner != null) {
+				String imageUrl = null;
+				
+				if (!banner.getPictureUrl().equals(""))
+					imageUrl = banner.getPictureUrl();
+				else if (!banner.getPictureUrlPng().equals(""))
+					imageUrl = banner.getPictureUrlPng();	
+				
+				if (imageUrl != null)
+					downloadImage(imageUrl);
 			}
-		});	
-		
-		if (banner != null) {
-			String imageUrl = null;
-			
-			if (!banner.getPictureUrl().equals(""))
-				imageUrl = banner.getPictureUrl();
-			else if (!banner.getPictureUrlPng().equals(""))
-				imageUrl = banner.getPictureUrlPng();	
-			
-			if (imageUrl != null)
-				downloadImage(imageUrl);
+		} catch(Exception e) {
+			Log.e(
+				getClass().getName(),
+				"Unexpected exception while updating banner: " + e.getMessage()
+			);
 		}
 	}
 	
@@ -205,14 +212,13 @@ abstract class BaseBannerDownloader extends AsyncTask<Void, Void, Void> {
 					stream,
 					BUFFER_SIZE
 				);
-			
-			if (bufStream != null)
-				while ((count = bufStream.read(buffer)) != -1)
-					result += new String(buffer, 0, count);
+
+			while ((count = bufStream.read(buffer)) != -1)
+				result += new String(buffer, 0, count);
 			
 			bufStream.close();
-		} catch (IOException e) {
-			Log.e(getClass().getName(), "IOException in InputStream: " + e.toString());
+		} catch (Exception e) {
+			Log.e(getClass().getName(), "Exception while downloading banner: " + e);
 
 			if (bannerDownloadListener != null)
 				bannerDownloadListener.onBannerLoadFailed(
