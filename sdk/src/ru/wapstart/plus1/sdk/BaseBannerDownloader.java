@@ -106,7 +106,7 @@ abstract class BaseBannerDownloader extends AsyncTask<Void, Void, Void> {
 	}
 	
     public void stop()
-    {
+    {	
         running = false;
     }	
 	
@@ -201,7 +201,7 @@ abstract class BaseBannerDownloader extends AsyncTask<Void, Void, Void> {
 	{
 		InputStream stream = getStream(request.getRequestUri());
 		
-		String result = new String();
+		String result = "";
 		
 		try {
 			byte[] buffer = new byte[BUFFER_SIZE];
@@ -218,7 +218,10 @@ abstract class BaseBannerDownloader extends AsyncTask<Void, Void, Void> {
 			
 			bufStream.close();
 		} catch (Exception e) {
-			Log.e(getClass().getName(), "Exception while downloading banner: " + e);
+			Log.e(
+				getClass().getName(),
+				"Exception while downloading banner: " + e.getMessage()
+			);
 
 			if (bannerDownloadListener != null)
 				bannerDownloadListener.onBannerLoadFailed(
@@ -305,7 +308,7 @@ abstract class BaseBannerDownloader extends AsyncTask<Void, Void, Void> {
 		} catch (IOException e) {
 			Log.d(getClass().getName(), "URL " + url + " doesn't exist");
 		} catch (Exception e) {
-			Log.d(getClass().getName(), "Unexpected exception: " + e);
+			Log.d(getClass().getName(), "Unexpected exception: " + e.getMessage());
 		}
 		
 		return stream;

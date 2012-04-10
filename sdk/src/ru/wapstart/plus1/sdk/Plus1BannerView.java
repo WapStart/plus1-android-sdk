@@ -81,18 +81,9 @@ public class Plus1BannerView extends LinearLayout {
 		super(context, attr);
 	}
 
-	public boolean hasCloseButton()
-	{
-		return closeButton;
-	}	
-	
-	/**
-	 * Use hasCloseButton() instead of this
-	 */
-	@Deprecated
 	public boolean isHaveCloseButton()
 	{
-		return hasCloseButton();
+		return closeButton;
 	}
 	
 	public Plus1BannerView enableCloseButton() {
@@ -162,6 +153,7 @@ public class Plus1BannerView extends LinearLayout {
 				}
 				
 			} else if (getVisibility() == VISIBLE) {
+				
 				if (hideAnimation != null)
 					startAnimation(hideAnimation);
 				

@@ -42,9 +42,10 @@ import android.util.Log;
 public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	private Plus1BannerRequest request						= null;
 	private Plus1BannerView view							= null;
+	private Handler handler                                 = null;
 	private BaseBannerDownloader downloaderTask				= null;
-	private Runnable askerStoper							= null;
-
+	private Runnable askerStopper							= null;
+	
 	private String deviceId									= null;
 	private boolean disableDispatchIMEI						= false;
 	private boolean disableAutoDetectLocation				= false;
@@ -147,6 +148,8 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 
 		if (visibilityTimeout == 0)
 			visibilityTimeout = timeout * 3;
+		
+		handler = new Handler(); 
 
 		initialized = true;
 		
@@ -195,23 +198,22 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	}
 
 	public void onShowBannerView() {
-		if (askerStoper != null) {
-			askerStoper = null;
-		}
+		if (askerStopper != null)
+			handler.removeCallbacks(askerStopper);
 	}
 
 	public void onHideBannerView() {
-		if (askerStoper != null)
+		if (askerStopper != null)
 			return;
 
-		askerStoper =
+		askerStopper =
 			new Runnable() {
 				public void run() {
 					stop();
 				}
 			};
 
-		new Handler().postDelayed(askerStoper, visibilityTimeout * 1000);
+		handler.postDelayed(askerStopper, visibilityTimeout * 1000);
 	}
 
 	public void onCloseBannerView() {
