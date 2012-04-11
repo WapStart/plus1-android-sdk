@@ -37,6 +37,7 @@ import android.graphics.drawable.Drawable;
 import android.text.SpannableStringBuilder;
 import android.text.style.UnderlineSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
@@ -66,7 +67,7 @@ public class Plus1BannerView extends LinearLayout {
 	private Animation hideAnimation = null;
 	private Animation showAnimation = null;
 	
-	private boolean haveCloseButton	= false;
+	private boolean closeButton	    = false;
 	private boolean closed			= false;
 	private boolean initialized		= false;
 
@@ -82,17 +83,17 @@ public class Plus1BannerView extends LinearLayout {
 
 	public boolean isHaveCloseButton()
 	{
-		return haveCloseButton;
+		return closeButton;
 	}
 	
 	public Plus1BannerView enableCloseButton() {
-		this.haveCloseButton = true;
+		this.closeButton = true;
 		
 		return this;
 	}
 	
 	public Plus1BannerView setCloseButtonEnabled(boolean closeButtonEnabled) {
-		this.haveCloseButton = closeButtonEnabled;
+		this.closeButton = closeButtonEnabled;
 		
 		return this;
 	}
@@ -129,35 +130,43 @@ public class Plus1BannerView extends LinearLayout {
 	}
 
 	public void setBanner(Plus1Banner banner) {
-		if (!initialized)
-			init();
-		
-		this.banner = banner;
-		
-		if ((banner != null) && (banner.getId() > 0)) {
-			flipper.stopFlipping();
-			
-			SpannableStringBuilder text = 
-				new SpannableStringBuilder(banner.getTitle());
-			text.setSpan(new UnderlineSpan(), 0, banner.getTitle().length(), 0);				
-			title.setText(text);
-			content.setText(banner.getContent());
-				
-			if (!banner.isImageBanner()) {
-				if (flipper.getCurrentView().equals(image))
-					flipper.showNext();
-				
-				show();
-			}
-			
-		} else if (getVisibility() == VISIBLE) {
-			if (hideAnimation != null)
-				startAnimation(hideAnimation);
-			
-			setVisibility(INVISIBLE);
+		try {
+			if (!initialized)
+				init();
 
-			if (viewStateListener != null)
-				viewStateListener.onHideBannerView();
+			this.banner = banner;
+			
+			if ((banner != null) && (banner.getId() > 0)) {
+				flipper.stopFlipping();
+				
+				SpannableStringBuilder text = 
+					new SpannableStringBuilder(banner.getTitle());
+				text.setSpan(new UnderlineSpan(), 0, banner.getTitle().length(), 0);				
+				title.setText(text);
+				content.setText(banner.getContent());
+					
+				if (!banner.isImageBanner()) {
+					if (flipper.getCurrentView().equals(image))
+						flipper.showNext();
+					
+					show();
+				}
+				
+			} else if (getVisibility() == VISIBLE) {
+				
+				if (hideAnimation != null)
+					startAnimation(hideAnimation);
+				
+				setVisibility(INVISIBLE);
+	
+				if (viewStateListener != null)
+					viewStateListener.onHideBannerView();
+			}
+		} catch(OutOfMemoryError e) {
+			Log.e(
+				getClass().getName(),
+				"Out of memory error while setting banner: " + e.getMessage()
+			);
 		}
 	}
 
@@ -173,7 +182,7 @@ public class Plus1BannerView extends LinearLayout {
 	
 	private void imageDownloaded()
 	{
-		if (banner.isImageBanner()) {
+		if (banner != null && banner.isImageBanner()) {
 			if (!flipper.getCurrentView().equals(image))
 				flipper.showNext();
 		} else
@@ -188,11 +197,11 @@ public class Plus1BannerView extends LinearLayout {
 		
 		setBackgroundResource(R.drawable.wp_banner_background);
 
-		ImageView shild = new ImageView(getContext());
-		shild.setImageResource(R.drawable.wp_banner_shild);
-		shild.setMaxWidth(9);
+		ImageView shield = new ImageView(getContext());
+		shield.setImageResource(R.drawable.wp_banner_shild);
+		shield.setMaxWidth(9);
 		addView(
-			shild,
+			shield,
 			new LinearLayout.LayoutParams(
 				LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT,

@@ -45,8 +45,8 @@ final class Plus1Banner {
 	private String content = null;
 	private String singleLineContent = null;
 	private String link = null;
-	private String pictureUrl = null;
-	private String pictureUrlPng = null;
+	private String pictureUrl = "";
+	private String pictureUrlPng = "";
 	private String cookieSetterUrl = null;
 	private ResponseType responseType = ResponseType.UNKNOWN;
 
