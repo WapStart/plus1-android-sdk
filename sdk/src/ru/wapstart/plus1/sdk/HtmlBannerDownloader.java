@@ -121,7 +121,8 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 
 	protected void updateBanner()
 	{
-		fetchBanner();
+		if (!fetchBanner())
+			return;
 
 		if (mBannerData.equals("")) {
 			if (bannerDownloadListener != null)
