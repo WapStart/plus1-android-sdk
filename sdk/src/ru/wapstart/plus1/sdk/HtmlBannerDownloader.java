@@ -58,6 +58,9 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 	protected int timeout					= 0;
 	protected boolean runOnce               = false;
 
+	protected String mBannerData			= null;
+	protected String mBannerAdType			= null;
+
 	protected Plus1BannerDownloadListener bannerDownloadListener = null;
 
 	public HtmlBannerDownloader(Plus1BannerView view) {
@@ -118,59 +121,43 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 
 	protected void updateBanner()
 	{
-		final String result = getBannerData();
+		fetchBanner();
 
-		if (!result.equals("") && !result.equals(NO_BANNER)) {
-			view.post(new Runnable() {
-				public void run() {
-					view.loadAd(result.toString(), "");//connection.getHeaderField("X-Adtype"));
-				}
-			});
-		}
-	}
-
-	/*protected Plus1Banner getBanner()
-	{
-		final String result = getBannerData();
-
-		Log.d(getClass().getName(), "answer: " + result.toString());
-
-		Plus1Banner banner = null;
-
-		if (result.equals("")) {
+		if (mBannerData.equals("")) {
 			if (bannerDownloadListener != null)
 				bannerDownloadListener.onBannerLoadFailed(
 					LoadError.UnknownAnswer
 				);
-		} else if (result.equals(NO_BANNER)) {
+		} else if (mBannerData.equals(NO_BANNER)) {
 			if (bannerDownloadListener != null)
 				bannerDownloadListener.onBannerLoadFailed(
 					LoadError.NoHaveBanner
 				);
 		} else {
-			banner = parse(result);
+			view.post(new Runnable() {
+				public void run() {
+					view.loadAd(mBannerData, mBannerAdType);
+				}
+			});
 
-			if ((banner != null) && (banner.getId() > 0)) {
-				if (bannerDownloadListener != null)
-					bannerDownloadListener.onBannerLoaded();
-			} else {
-				if (bannerDownloadListener != null)
-					bannerDownloadListener.onBannerLoadFailed(
-						LoadError.UnknownAnswer
-					);
-			}
+			if (bannerDownloadListener != null)
+				bannerDownloadListener.onBannerLoaded();
 		}
+	}
 
-		return banner;
-	}*/
-
-	protected String getBannerData()
+	protected boolean fetchBanner()
 	{
-		InputStream stream = getStream(request.getRequestUri());
+		HttpURLConnection connection = makeConnection(request.getRequestUri());
+
+		if (connection == null)
+			return false;
 
 		String result = "";
+		boolean fetched = false;
 
 		try {
+			InputStream stream = connection.getInputStream();
+
 			byte[] buffer = new byte[BUFFER_SIZE];
 			int count = 0;
 
@@ -184,6 +171,16 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 				result += new String(buffer, 0, count);
 
 			bufStream.close();
+
+			mBannerData = result.toString();
+			mBannerAdType = connection.getHeaderField("X-Adtype");
+
+			Log.d(LOGTAG, "Answer: " + mBannerData);
+			Log.d(LOGTAG, "X-Adtype: " + mBannerAdType);
+
+			fetched = true;
+		} catch (IOException e) {
+			Log.d(getClass().getName(), "URL " + request.getRequestUri() + " doesn't exist");
 		} catch (Exception e) {
 			Log.e(
 				getClass().getName(),
@@ -194,11 +191,11 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 				bannerDownloadListener.onBannerLoadFailed(
 					LoadError.DownloadFailed
 				);
+		} finally {
+			connection.disconnect();
 		}
 
-		Log.d(LOGTAG, "answer: " + result.toString());
-
-		return result;
+		return fetched;
 	}
 
 	protected void modifyConnection(HttpURLConnection connection) {
@@ -242,25 +239,20 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 			+ String.valueOf(metrics.heightPixels);
 	}
 
-	protected InputStream getStream(String url)
+	protected HttpURLConnection makeConnection(String url)
 	{
-		InputStream stream = null;
-		HttpURLConnection connection;
+		HttpURLConnection connection = null;
 
 		try {
 			connection = (HttpURLConnection) new URL(url).openConnection();
 			modifyConnection(connection);
 			connection.connect();
-
-			stream = connection.getInputStream();
 		} catch (MalformedURLException e) {
 			Log.e(getClass().getName(), "URL parsing failed: " + url);
-		} catch (IOException e) {
-			Log.d(getClass().getName(), "URL " + url + " doesn't exist");
 		} catch (Exception e) {
 			Log.d(getClass().getName(), "Unexpected exception: " + e.getMessage());
 		}
 
-		return stream;
+		return connection;
 	}
 }
