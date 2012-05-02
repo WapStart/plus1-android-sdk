@@ -48,8 +48,7 @@ public final class Plus1BannerRequest {
 	private static final Integer REQUEST_VERSION = 2;
 
 	public static enum Gender {Unknown, Male, Female;}
-	public static enum RequestType {XML, JSON};
-	public static enum BannerType {Undefined, Mixed, Text, Graphic};
+	public static enum BannerType {Undefined, Mixed, Text, Graphic, RichMedia};
 
 	private String rotatorUrl		= "http://ro.plus1.wapstart.ru/";
 	private int age					= 0;
@@ -59,7 +58,6 @@ public final class Plus1BannerRequest {
 	private Set<BannerType> types	= null;
 
 	private String pageId			= null;
-	private RequestType requestType	= RequestType.XML;
 	private Location location		= null;
 
 	public static Plus1BannerRequest create() {
@@ -149,7 +147,7 @@ public final class Plus1BannerRequest {
 
 		String url =
 			getRotatorUrl()
-			+ "?area=application"
+			+ "?area=applicationWebView"
 			+ "&version=" + REQUEST_VERSION
 			+ "&sdkver=" + SDK_VERSION
 			+ "&id=" + getApplicationId()
@@ -160,6 +158,10 @@ public final class Plus1BannerRequest {
 
 		if (getAge() != 0)
 			url += "&age=" + getAge();
+
+		if ((types != null) && !types.isEmpty())
+			for (BannerType bt : types)
+				url += "&type[]=" + bt.ordinal();
 
 		try {
 			if (getLogin() != null)
