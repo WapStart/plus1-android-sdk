@@ -148,8 +148,6 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 			this.locationListener = new Plus1LocationListener(request);
 		}
 
-		downloaderTask = getDownloaderTask();
-		
 		if (viewStateListener != null)
 			view.setViewStateListener(viewStateListener);
 		else
@@ -193,7 +191,9 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 		}
 
 		mCurrentlyStarted = true;
-	
+
+		downloaderTask = makeDownloaderTask();
+
 		downloaderTask.execute();
 	}
 
@@ -201,7 +201,8 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 		if (!isDisabledAutoDetectLocation())
 			locationManager.removeUpdates(locationListener);
 
-		downloaderTask.stop();
+		downloaderTask.cancel(true);
+		downloaderTask = null;
 		
 		mCurrentlyStarted = false;
 	}
@@ -211,6 +212,8 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 			return;
 
 		init();
+
+		downloaderTask = makeDownloaderTask();
 
 		downloaderTask.setRunOnce().execute();
 	}
@@ -238,7 +241,7 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 		stop();
 	}
 	
-	protected HtmlBannerDownloader getDownloaderTask()
+	protected HtmlBannerDownloader makeDownloaderTask()
 	{
 		HtmlBannerDownloader task = new HtmlBannerDownloader(view);
 

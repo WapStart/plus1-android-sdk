@@ -57,8 +57,6 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 	protected Plus1BannerRequest request	= null;
 	protected int timeout					= 0;
 	protected boolean runOnce               = false;
-	
-	private boolean running = true;
 
 	protected Plus1BannerDownloadListener bannerDownloadListener = null;
 	
@@ -97,24 +95,19 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 
 		return this;
 	}
-	
-    public void stop()
-    {	
-        running = false;
-    }
 
-	@Override	
+	@Override
 	protected Void doInBackground(Void... voids)
 	{
-		while( running ) {
-			if (view.isClosed())
+		while (!isCancelled()) {
+			if (view.isClosed() || view.isExpanded())
 				return null;
 
 			updateBanner();
 
 			if (runOnce)
 				return null;
-			
+
 			try {
 				Thread.sleep(1000 * timeout);
 			} catch (InterruptedException e) {
