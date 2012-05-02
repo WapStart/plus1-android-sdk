@@ -197,13 +197,13 @@ public class Plus1BannerView extends FrameLayout {
 		return this;
 	}
 
-	/*public Plus1BannerView setViewStateListener(
+	public Plus1BannerView setViewStateListener(
 		Plus1BannerViewStateListener viewStateListener
 	) {
 		this.viewStateListener = viewStateListener;
 
 		return this;
-	}*/
+	}
 
 	public boolean getAutorefreshEnabled() {
 		return mAutorefreshEnabled;

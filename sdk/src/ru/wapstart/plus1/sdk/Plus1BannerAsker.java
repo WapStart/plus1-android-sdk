@@ -51,14 +51,13 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	private int timeout										= 10;
 	private int visibilityTimeout							= 0;
 	
-	private boolean initialized						= false;
-	private boolean mCurrentlyStarted				= false;
+	private boolean initialized								= false;
+	private boolean mCurrentlyStarted						= false;
 
-	private LocationManager locationManager			= null;
-	private Plus1LocationListener locationListener	= null;
-	private HtmlBannerDownloader downloader			= null;
+	private LocationManager locationManager					= null;
+	private Plus1LocationListener locationListener			= null;
 
-	//private Plus1BannerViewStateListener viewStateListener	= null;
+	private Plus1BannerViewStateListener viewStateListener	= null;
 	private Plus1BannerDownloadListener downloadListener	= null;
 	
 	public static Plus1BannerAsker create(
@@ -126,7 +125,7 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 		return this;
 	}
 
-	/*public Plus1BannerAsker setVisibilityTimeout(int visibilityTimeout) {
+	public Plus1BannerAsker setVisibilityTimeout(int visibilityTimeout) {
 		this.visibilityTimeout = visibilityTimeout;
 
 		return this;
@@ -138,7 +137,7 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 		this.viewStateListener = viewStateListener;
 
 		return this;
-	}*/
+	}
 
 	public Plus1BannerAsker setDownloadListener(
 		Plus1BannerDownloadListener downloadListener
@@ -170,22 +169,20 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 			this.deviceId = telephonyManager.getDeviceId();
 		}
 
-		this.downloader = new HtmlBannerDownloader(view);
+		downloaderTask = new HtmlBannerDownloader(view);
 		
-		downloader
+		downloaderTask
 			.setDeviceId(deviceId)
 			.setRequest(request)
 			.setTimeout(timeout);
 		
-		this.handler = new Handler();
-
-		/*if (viewStateListener != null)
+		if (viewStateListener != null)
 			view.setViewStateListener(viewStateListener);
 		else
 			view.setViewStateListener(this);
 
 		if (visibilityTimeout == 0)
-			visibilityTimeout = timeout * 3;*/
+			visibilityTimeout = timeout * 3;
 		
 		handler = new Handler(); 
 
@@ -198,6 +195,7 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	public void refreshBanner() {
 		if (!view.isExpanded()) {
 			stop();
+
 			if (view.getAutorefreshEnabled())
 				start();
 			else
@@ -206,7 +204,7 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	}
 
 	private void start() {
-		if ((request == null) || (view == null) || mCurrentlyStarted)
+		if (request == null || view == null || mCurrentlyStarted)
 			return;
 
 		init();
@@ -219,45 +217,29 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 				locationListener
 			);
 		}
-//
-		//downloader.setHandler(handler);
-		//handler.removeCallbacks(downloader);
-		//handler.postDelayed(downloader, 100);
 
-		//mCurrentlyStarted = true;
+		mCurrentlyStarted = true;
 
 		downloaderTask = getDownloaderTask();		
-		downloaderTask.execute();	
-		
-		//return this;
+		downloaderTask.execute();
 	}
 
 	private void stop() {
 		if (!isDisabledAutoDetectLocation())
 			locationManager.removeUpdates(locationListener);
-		
-		//handler.removeCallbacks(downloader);
-
-		//mCurrentlyStarted = false;
 
 		downloaderTask.stop();
 		
-		//return this;
+		mCurrentlyStarted = false;
 	}
 
 	private void startOnce() {
-		if ((request == null) || (view == null) || mCurrentlyStarted)
+		if (request == null || view == null || mCurrentlyStarted)
 			return;
 
 		init();
-//
-		/*downloader
-			.removeHandler()
-			.run();*/
 
-		downloaderTask.setRunOnce().execute();		
-		
-		//return this;
+		downloaderTask.setRunOnce().execute();
 	}
 
 	public void onShowBannerView() {

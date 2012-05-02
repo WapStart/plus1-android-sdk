@@ -40,7 +40,6 @@ import java.util.Locale;
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 
 import android.app.Activity;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -79,30 +78,12 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 		
 		return this;
 	}
-
-	/*public HtmlBannerDownloader setHandler(Handler handler) {
-		this.handler = handler;
-		
-		return this;
-	}
-	
-	public HtmlBannerDownloader removeHandler() {
-		this.handler = null;
-		
-		return this;
-	}*/
 	
 	public HtmlBannerDownloader setTimeout(int timeout) {
 		this.timeout = timeout;
 		
 		return this;
-	}	
-	
-	/*@Override
-	public void run() {
-		if (request != null)
-			this.url = request.getRequestUri();
-	}*/
+	}
 
 	public HtmlBannerDownloader setRunOnce() {
 		this.runOnce = true;
@@ -136,9 +117,8 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 			if (view.isClosed())
 				return null;
 
-			// FIXME XXX: update
-			//updateBanner();
-        	
+			updateBanner();
+
 			if (runOnce)
 				return null;
 			
@@ -152,36 +132,19 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 		return null;
 	}
 
-	/*protected void updateBanner()
+	protected void updateBanner()
 	{
-		try {
-			final Plus1Banner banner = getBanner();
-			
+		final String result = getBannerData();
+
+		if (!result.equals("") && !result.equals(NO_BANNER)) {
 			view.post(new Runnable() {
 				public void run() {
-					view.setBanner(banner);
+					view.loadAd(result.toString(), "");//connection.getHeaderField("X-Adtype"));
 				}
-			});	
-			
-			if (banner != null) {
-				String imageUrl = null;
-				
-				if (!banner.getPictureUrl().equals(""))
-					imageUrl = banner.getPictureUrl();
-				else if (!banner.getPictureUrlPng().equals(""))
-					imageUrl = banner.getPictureUrlPng();	
-				
-				if (imageUrl != null)
-					downloadImage(imageUrl);
-			}
-		} catch(Exception e) {
-			Log.e(
-				getClass().getName(),
-				"Unexpected exception while updating banner: " + e.getMessage()
-			);
+			});
 		}
-	}*/
-	
+	}
+
 	/*protected Plus1Banner getBanner()
 	{
 		final String result = getBannerData();
@@ -250,29 +213,9 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 		}
 		
 		Log.d(LOGTAG, "answer: " + result.toString());
-		
-		if (!result.equals("") && !result.equals(NO_BANNER)) 
-			view.loadAd(result.toString(), "");//connection.getHeaderField("X-Adtype"));
-		//FIXME XXX set x-adtype
+
 		return result;
 	}
-	
-	/*protected void downloadImage(String imageUrl)
-	{
-		InputStream stream = getStream(imageUrl);
-		
-		if (stream == null) 
-			return;
-		
-		final Drawable img = Drawable.createFromStream(stream, "src");
->>>>>>> master:sdk/src/ru/wapstart/plus1/sdk/BaseBannerDownloader.java
-		
-		view.post(new Runnable() {
-			public void run() {
-				view.setImage(img);
-			}
-		});		
-	}*/
 	
 	protected void modifyConnection(HttpURLConnection connection) {
 		connection.setRequestProperty(
