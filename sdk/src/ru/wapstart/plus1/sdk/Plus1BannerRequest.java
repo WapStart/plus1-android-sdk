@@ -29,9 +29,6 @@
 
 package ru.wapstart.plus1.sdk;
 
-import android.util.Log;
-
-import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
 import java.io.UnsupportedEncodingException;
@@ -185,12 +182,8 @@ public final class Plus1BannerRequest {
 	}
 
 	private String getPageId() {
-		try {
-			if (pageId == null)
-				pageId = Plus1Helper.getUniqueHash();
-		} catch (NoSuchAlgorithmException e) {
-			Log.e(LOGTAG, "NoSuchAlgorithmException: " + e.toString());
-		}
+		if (pageId == null)
+			pageId = Plus1Helper.getUniqueHash();
 
 		return pageId;
 	}
