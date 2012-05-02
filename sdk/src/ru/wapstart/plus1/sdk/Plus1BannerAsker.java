@@ -32,7 +32,6 @@ package ru.wapstart.plus1.sdk;
 import android.content.Context;
 import android.location.LocationManager;
 import android.os.Handler;
-import android.telephony.TelephonyManager;
 
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
@@ -48,7 +47,7 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	private boolean disableAutoDetectLocation				= false;
 	private int timeout										= 10;
 	private int visibilityTimeout							= 0;
-	
+
 	private boolean initialized								= false;
 	private boolean mCurrentlyStarted						= false;
 
@@ -57,7 +56,7 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 
 	private Plus1BannerViewStateListener viewStateListener	= null;
 	private Plus1BannerDownloadListener downloadListener	= null;
-	
+
 	public static Plus1BannerAsker create(
 		Plus1BannerRequest request, Plus1BannerView view
 	) {
@@ -100,7 +99,7 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	public boolean isDisabledAutoDetectLocation() {
 		return disableAutoDetectLocation;
 	}
-	
+
 	public Plus1BannerAsker disableAutoDetectLocation(boolean disable) {
 		this.disableAutoDetectLocation = disable;
 
@@ -109,7 +108,7 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 
 	public Plus1BannerAsker setTimeout(int timeout) {
 		this.timeout = timeout;
-		
+
 		return this;
 	}
 
@@ -138,13 +137,13 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	public Plus1BannerAsker init() {
 		if (initialized)
 			return this;
-		
+
 		if (!isDisabledAutoDetectLocation()) {
-			this.locationManager = 
+			this.locationManager =
 				(LocationManager) view.getContext().getSystemService(
 					Context.LOCATION_SERVICE
 				);
-			
+
 			this.locationListener = new Plus1LocationListener(request);
 		}
 
@@ -155,11 +154,11 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 
 		if (visibilityTimeout == 0)
 			visibilityTimeout = timeout * 3;
-		
-		handler = new Handler(); 
+
+		handler = new Handler();
 
 		initialized = true;
-		
+
 		return this;
 	}
 
@@ -173,49 +172,6 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 			else
 				startOnce();
 		}
-	}
-
-	private void start() {
-		if (request == null || view == null || mCurrentlyStarted)
-			return;
-
-		init();
-		
-		if (!isDisabledAutoDetectLocation()) {
-			locationManager.requestLocationUpdates(
-				LocationManager.GPS_PROVIDER,
-				timeout * 10000,
-				500f,
-				locationListener
-			);
-		}
-
-		mCurrentlyStarted = true;
-
-		downloaderTask = makeDownloaderTask();
-
-		downloaderTask.execute();
-	}
-
-	private void stop() {
-		if (!isDisabledAutoDetectLocation())
-			locationManager.removeUpdates(locationListener);
-
-		downloaderTask.cancel(true);
-		downloaderTask = null;
-		
-		mCurrentlyStarted = false;
-	}
-
-	private void startOnce() {
-		if (request == null || view == null || mCurrentlyStarted)
-			return;
-
-		init();
-
-		downloaderTask = makeDownloaderTask();
-
-		downloaderTask.setRunOnce().execute();
 	}
 
 	public void onShowBannerView() {
@@ -240,8 +196,51 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	public void onCloseBannerView() {
 		stop();
 	}
-	
-	protected HtmlBannerDownloader makeDownloaderTask()
+
+	private void start() {
+		if (request == null || view == null || mCurrentlyStarted)
+			return;
+
+		init();
+
+		if (!isDisabledAutoDetectLocation()) {
+			locationManager.requestLocationUpdates(
+				LocationManager.GPS_PROVIDER,
+				timeout * 10000,
+				500f,
+				locationListener
+			);
+		}
+
+		mCurrentlyStarted = true;
+
+		downloaderTask = makeDownloaderTask();
+
+		downloaderTask.execute();
+	}
+
+	private void stop() {
+		if (!isDisabledAutoDetectLocation())
+			locationManager.removeUpdates(locationListener);
+
+		downloaderTask.cancel(true);
+		downloaderTask = null;
+
+		mCurrentlyStarted = false;
+	}
+
+	private void startOnce() {
+		if (request == null || view == null || mCurrentlyStarted)
+			return;
+
+		init();
+
+		downloaderTask = makeDownloaderTask();
+
+		downloaderTask.setRunOnce().execute();
+	}
+
+	private HtmlBannerDownloader makeDownloaderTask()
 	{
 		HtmlBannerDownloader task = new HtmlBannerDownloader(view);
 
@@ -251,7 +250,7 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 
 		if (downloadListener != null)
 			task.setDownloadListener(downloadListener);
-		
+
 		return task;
 	}
 }

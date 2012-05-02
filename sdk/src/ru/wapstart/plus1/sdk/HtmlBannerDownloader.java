@@ -52,42 +52,40 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 	private static final String LOGTAG = "HtmlBannerDownloader";
 	private static final Integer BUFFER_SIZE = 8192;
 	private static final String NO_BANNER = "<!-- i4jgij4pfd4ssd -->";
-	
+
 	protected Plus1BannerView view			= null;
 	protected Plus1BannerRequest request	= null;
 	protected int timeout					= 0;
 	protected boolean runOnce               = false;
 
 	protected Plus1BannerDownloadListener bannerDownloadListener = null;
-	
+
 	public HtmlBannerDownloader(Plus1BannerView view) {
 		this.view = view;
 	}
 
 	public HtmlBannerDownloader setRequest(Plus1BannerRequest request) {
 		this.request = request;
-		
+
 		return this;
 	}
-	
+
 	public HtmlBannerDownloader setTimeout(int timeout) {
 		this.timeout = timeout;
-		
+
 		return this;
 	}
 
 	public HtmlBannerDownloader setRunOnce() {
-		this.runOnce = true;
-
-		return this;
+		return setRunOnce(true);
 	}
 
 	public HtmlBannerDownloader setRunOnce(boolean runOnce) {
 		this.runOnce = runOnce;
 
 		return this;
-	}	
-	
+	}
+
 	public HtmlBannerDownloader setDownloadListener(
 		Plus1BannerDownloadListener bannerDownloadListener
 	) {
@@ -114,7 +112,7 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 				e.printStackTrace();
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -134,9 +132,9 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 	/*protected Plus1Banner getBanner()
 	{
 		final String result = getBannerData();
-		
+
 		Log.d(getClass().getName(), "answer: " + result.toString());
-		
+
 		Plus1Banner banner = null;
 
 		if (result.equals("")) {
@@ -144,7 +142,7 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 				bannerDownloadListener.onBannerLoadFailed(
 					LoadError.UnknownAnswer
 				);
-		} else if (result.equals(NO_BANNER)) { 
+		} else if (result.equals(NO_BANNER)) {
 			if (bannerDownloadListener != null)
 				bannerDownloadListener.onBannerLoadFailed(
 					LoadError.NoHaveBanner
@@ -162,21 +160,21 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 					);
 			}
 		}
-		
+
 		return banner;
 	}*/
-	
+
 	protected String getBannerData()
 	{
 		InputStream stream = getStream(request.getRequestUri());
-		
+
 		String result = "";
-		
+
 		try {
 			byte[] buffer = new byte[BUFFER_SIZE];
 			int count = 0;
-			
-			BufferedInputStream bufStream = 
+
+			BufferedInputStream bufStream =
 				new BufferedInputStream (
 					stream,
 					BUFFER_SIZE
@@ -184,7 +182,7 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 
 			while ((count = bufStream.read(buffer)) != -1)
 				result += new String(buffer, 0, count);
-			
+
 			bufStream.close();
 		} catch (Exception e) {
 			Log.e(
@@ -197,63 +195,63 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 					LoadError.DownloadFailed
 				);
 		}
-		
+
 		Log.d(LOGTAG, "answer: " + result.toString());
 
 		return result;
 	}
-	
+
 	protected void modifyConnection(HttpURLConnection connection) {
 		connection.setRequestProperty(
-			"User-Agent", 
+			"User-Agent",
 			Plus1Helper.getUserAgent()
 		);
-		
+
 		connection.setRequestProperty(
-			"Cookies", 
+			"Cookies",
 			"wssid="+Plus1Helper.getClientSessionId(view.getContext())
 		);
-		
+
 		connection.setRequestProperty(
-			"x-display-metrics", 
+			"x-display-metrics",
 			getDisplayMetrics()
 		);
-		
+
 		connection.setRequestProperty(
 			"x-application-type",
 			"android"
 		);
-		
+
 		connection.setRequestProperty(
 			"x-preferred-locale",
 			Locale.getDefault().getDisplayName(Locale.US)
 		);
 	}
-	
+
 	protected String getDisplayMetrics()
 	{
 		DisplayMetrics metrics = new DisplayMetrics();
-		
+
 		((Activity)view.getContext()).
 			getWindowManager().
 			getDefaultDisplay().
 			getMetrics(metrics);
-		
-		return 
-			String.valueOf(metrics.widthPixels) + "x" 
+
+		return
+			String.valueOf(metrics.widthPixels) + "x"
 			+ String.valueOf(metrics.heightPixels);
 	}
-	
+
 	protected InputStream getStream(String url)
 	{
 		InputStream stream = null;
 		HttpURLConnection connection;
-		
+
 		try {
 			connection = (HttpURLConnection) new URL(url).openConnection();
 			modifyConnection(connection);
 			connection.connect();
-			
+
 			stream = connection.getInputStream();
 		} catch (MalformedURLException e) {
 			Log.e(getClass().getName(), "URL parsing failed: " + url);
@@ -262,7 +260,7 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 		} catch (Exception e) {
 			Log.d(getClass().getName(), "Unexpected exception: " + e.getMessage());
 		}
-		
+
 		return stream;
-	}	
+	}
 }

@@ -31,18 +31,18 @@ public class BartActivity extends Activity implements View.OnClickListener
 
 		imageView.setBackgroundColor(
 			Color.rgb(
-				random.nextInt(256), 
-				random.nextInt(256), 
+				random.nextInt(256),
+				random.nextInt(256),
 				random.nextInt(256))
 		);
 
 		imageView.setImageResource(R.drawable.bartsimpson);
 
 		imageView.setOnClickListener(this);
-		
+
 		mBannerView =
 			(Plus1BannerView) findViewById(R.id.plus1BannerView);
-		
+
 		mAsker =
 			new Plus1BannerAsker(
 				new Plus1BannerRequest()
@@ -68,7 +68,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 		mp.start();
 		mAsker.refreshBanner();
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -76,7 +76,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 		mAsker.onResume();
 		Log.d("BartActivity", "onResume fired");
 	}
-	
+
 	@Override
 	protected void onPause() {
 		super.onPause();
