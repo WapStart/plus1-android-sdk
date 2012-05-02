@@ -38,15 +38,18 @@ import android.telephony.TelephonyManager;
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
-public class Plus1BannerAsker {
-	private Plus1BannerRequest request				= null;
-	private Plus1BannerView view					= null;
-	private Handler handler							= null;
+public class Plus1BannerAsker implements Plus1BannerViewStateListener {
+	private Plus1BannerRequest request						= null;
+	private Plus1BannerView view							= null;
+	private Handler handler									= null;
+	private HtmlBannerDownloader downloaderTask				= null;
+	private Runnable askerStopper							= null;
 	
-	private String deviceId							= null;
-	private boolean disableDispatchIMEI				= false;
-	private boolean disableAutoDetectLocation		= false;
-	private int timeout								= 10;
+	private String deviceId									= null;
+	private boolean disableDispatchIMEI						= false;
+	private boolean disableAutoDetectLocation				= false;
+	private int timeout										= 10;
+	private int visibilityTimeout							= 0;
 	
 	private boolean initialized						= false;
 	private boolean mCurrentlyStarted				= false;
@@ -54,6 +57,9 @@ public class Plus1BannerAsker {
 	private LocationManager locationManager			= null;
 	private Plus1LocationListener locationListener	= null;
 	private HtmlBannerDownloader downloader			= null;
+
+	//private Plus1BannerViewStateListener viewStateListener	= null;
+	private Plus1BannerDownloadListener downloadListener	= null;
 	
 	public static Plus1BannerAsker create(
 		Plus1BannerRequest request, Plus1BannerView view
@@ -119,7 +125,29 @@ public class Plus1BannerAsker {
 		
 		return this;
 	}
-	
+
+	/*public Plus1BannerAsker setVisibilityTimeout(int visibilityTimeout) {
+		this.visibilityTimeout = visibilityTimeout;
+
+		return this;
+	}
+
+	public Plus1BannerAsker setViewStateListener(
+		Plus1BannerViewStateListener viewStateListener
+	) {
+		this.viewStateListener = viewStateListener;
+
+		return this;
+	}*/
+
+	public Plus1BannerAsker setDownloadListener(
+		Plus1BannerDownloadListener downloadListener
+	) {
+		this.downloadListener = downloadListener;
+
+		return this;
+	}
+
 	public Plus1BannerAsker init() {
 		if (initialized)
 			return this;
@@ -150,7 +178,17 @@ public class Plus1BannerAsker {
 			.setTimeout(timeout);
 		
 		this.handler = new Handler();
+
+		/*if (viewStateListener != null)
+			view.setViewStateListener(viewStateListener);
+		else
+			view.setViewStateListener(this);
+
+		if (visibilityTimeout == 0)
+			visibilityTimeout = timeout * 3;*/
 		
+		handler = new Handler(); 
+
 		initialized = true;
 		
 		return this;
@@ -181,21 +219,30 @@ public class Plus1BannerAsker {
 				locationListener
 			);
 		}
-		
-		downloader.setHandler(handler);
-		handler.removeCallbacks(downloader);
-		handler.postDelayed(downloader, 100);
+//
+		//downloader.setHandler(handler);
+		//handler.removeCallbacks(downloader);
+		//handler.postDelayed(downloader, 100);
 
-		mCurrentlyStarted = true;
+		//mCurrentlyStarted = true;
+
+		downloaderTask = getDownloaderTask();		
+		downloaderTask.execute();	
+		
+		//return this;
 	}
 
 	private void stop() {
 		if (!isDisabledAutoDetectLocation())
 			locationManager.removeUpdates(locationListener);
 		
-		handler.removeCallbacks(downloader);
+		//handler.removeCallbacks(downloader);
 
-		mCurrentlyStarted = false;
+		//mCurrentlyStarted = false;
+
+		downloaderTask.stop();
+		
+		//return this;
 	}
 
 	private void startOnce() {
@@ -203,8 +250,53 @@ public class Plus1BannerAsker {
 			return;
 
 		init();
-		downloader
+//
+		/*downloader
 			.removeHandler()
-			.run();
+			.run();*/
+
+		downloaderTask.setRunOnce().execute();		
+		
+		//return this;
+	}
+
+	public void onShowBannerView() {
+		if (askerStopper != null)
+			handler.removeCallbacks(askerStopper);
+	}
+
+	public void onHideBannerView() {
+		if (askerStopper != null)
+			return;
+
+		askerStopper =
+			new Runnable() {
+				public void run() {
+					stop();
+				}
+			};
+
+		handler.postDelayed(askerStopper, visibilityTimeout * 1000);
+	}
+
+	public void onCloseBannerView() {
+		stop();
+	}
+	
+	protected HtmlBannerDownloader getDownloaderTask()
+	{
+		HtmlBannerDownloader task;
+		
+		task = new HtmlBannerDownloader(view);
+
+		task
+			.setDeviceId(deviceId)
+			.setRequest(request)
+			.setTimeout(timeout);
+
+		if (downloadListener != null)
+			task.setDownloadListener(downloadListener);
+		
+		return task;
 	}
 }

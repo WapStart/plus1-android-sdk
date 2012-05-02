@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Movie;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -73,28 +72,5 @@ final class Plus1ImageView extends View {
 				getHeight() - movie.height()
 			);
 		}
-	}
-
-	private void startInvalidateThread()
-	{
-		final Handler handler = new Handler();
-		final View view = this;
-		
-		new Thread() {
-		    @Override public void run() {
-		        while(!Thread.currentThread().isInterrupted()) {
-		            handler.post(new Runnable() {
-		                public void run(){
-		                    view.invalidate();
-		                }
-		            });
-		            try {
-		                Thread.sleep(40); // yields 25 fps
-		            } catch (InterruptedException e) {
-		                Thread.currentThread().interrupt();
-		            }
-		        }
-		    }
-		}.start();
 	}
 }

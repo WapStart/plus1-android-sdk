@@ -31,6 +31,7 @@ package ru.wapstart.plus1.sdk;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
@@ -61,6 +62,8 @@ public class Plus1BannerView extends FrameLayout {
 	private boolean mInitialized		= false;
 	private boolean mAutorefreshEnabled = true;
 	private boolean mExpanded			= false;
+
+	private Plus1BannerViewStateListener viewStateListener = null;
 
 	public Plus1BannerView(Context context) {
 		this(context, null);
@@ -194,6 +197,14 @@ public class Plus1BannerView extends FrameLayout {
 		return this;
 	}
 
+	/*public Plus1BannerView setViewStateListener(
+		Plus1BannerViewStateListener viewStateListener
+	) {
+		this.viewStateListener = viewStateListener;
+
+		return this;
+	}*/
+
 	public boolean getAutorefreshEnabled() {
 		return mAutorefreshEnabled;
 	}
@@ -253,6 +264,23 @@ public class Plus1BannerView extends FrameLayout {
 					mClosed = true;
 					setAutorefreshEnabled(false);
 					hide();
+			
+			/*closeButton.setOnClickListener(
+				new OnClickListener() {
+					public void onClick(View v) {
+						closed = true;
+						flipper.stopFlipping();
+						
+						if (getVisibility() == VISIBLE) {
+							if (hideAnimation != null)
+								startAnimation(hideAnimation);
+							
+							setVisibility(INVISIBLE);
+
+							if (viewStateListener != null)
+								viewStateListener.onCloseBannerView();
+						}
+					}*/
 				}
 			});
 
@@ -291,6 +319,9 @@ public class Plus1BannerView extends FrameLayout {
 				startAnimation(mShowAnimation);
 
 			setVisibility(VISIBLE);
+
+			if (viewStateListener != null)
+				viewStateListener.onShowBannerView();
 		}
 
 		mAdAnimator.showAd();

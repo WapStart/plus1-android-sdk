@@ -26,47 +26,26 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package ru.wapstart.plus1.sdk;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.TimerTask;
-import android.util.Log;
 
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
-abstract class BaseDownloader extends TimerTask {
-	protected HttpURLConnection connection	= null;
-	protected InputStream stream			= null;
-	protected String url					= null;
-	
-	public BaseDownloader setUrl(String url) {
-		this.url = url;
-		
-		return this;
+public interface Plus1BannerDownloadListener {
+	public static enum LoadError {
+		UnknownAnswer,
+		DownloadFailed,
+		NoHaveBanner
 	}
-	
-	@Override
-	public void run() {
-		try {
-			connection = (HttpURLConnection) new URL(url).openConnection();
-			connection.setDoOutput(true);
-			modifyConnection(connection);
-			connection.connect();
-			
-			stream = connection.getInputStream();
-		} catch (MalformedURLException e) {
-			Log.e(getClass().getName(), "Url parsing failed: " + url);
-		} catch (IOException e) {
-			Log.d(getClass().getName(), "Url " + url + " doesn't exists");
-		}		
-	}
-	
-	abstract protected void modifyConnection(HttpURLConnection connection);
+
+	/**
+	 * Raised on banner successfully loaded
+	 */
+	abstract public void onBannerLoaded();
+
+	/**
+	 * Raised if banner can't be load on some reason
+	 */
+	abstract public void onBannerLoadFailed(LoadError error);
 }

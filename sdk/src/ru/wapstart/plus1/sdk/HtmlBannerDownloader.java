@@ -31,11 +31,17 @@ package ru.wapstart.plus1.sdk;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Locale;
 
+import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
+
 import android.app.Activity;
-import android.os.Handler;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
@@ -43,16 +49,20 @@ import android.util.Log;
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
  * @copyright Copyright (c) 2011, Wapstart
  */
-final class HtmlBannerDownloader extends BaseDownloader {
+final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 	private static final String LOGTAG = "HtmlBannerDownloader";
 	private static final Integer BUFFER_SIZE = 8192;
 	private static final String NO_BANNER = "<!-- i4jgij4pfd4ssd -->";
 	
 	protected Plus1BannerView view			= null;
 	protected Plus1BannerRequest request	= null;
-	protected Handler handler				= null;
 	protected String deviceId				= null;
 	protected int timeout					= 0;
+	protected boolean runOnce               = false;
+	
+	private boolean running = true;
+
+	protected Plus1BannerDownloadListener bannerDownloadListener = null;
 	
 	public HtmlBannerDownloader(Plus1BannerView view) {
 		this.view = view;
@@ -69,8 +79,8 @@ final class HtmlBannerDownloader extends BaseDownloader {
 		
 		return this;
 	}
-	
-	public HtmlBannerDownloader setHandler(Handler handler) {
+
+	/*public HtmlBannerDownloader setHandler(Handler handler) {
 		this.handler = handler;
 		
 		return this;
@@ -80,7 +90,7 @@ final class HtmlBannerDownloader extends BaseDownloader {
 		this.handler = null;
 		
 		return this;
-	}
+	}*/
 	
 	public HtmlBannerDownloader setTimeout(int timeout) {
 		this.timeout = timeout;
@@ -88,14 +98,130 @@ final class HtmlBannerDownloader extends BaseDownloader {
 		return this;
 	}	
 	
-	@Override
+	/*@Override
 	public void run() {
 		if (request != null)
 			this.url = request.getRequestUri();
+	}*/
+
+	public HtmlBannerDownloader setRunOnce() {
+		this.runOnce = true;
+
+		return this;
+	}
+
+	public HtmlBannerDownloader setRunOnce(boolean runOnce) {
+		this.runOnce = runOnce;
+
+		return this;
+	}	
+	
+	public HtmlBannerDownloader setDownloadListener(
+		Plus1BannerDownloadListener bannerDownloadListener
+	) {
+		this.bannerDownloadListener = bannerDownloadListener;
+
+		return this;
+	}
+	
+    public void stop()
+    {	
+        running = false;
+    }
+
+	@Override	
+	protected Void doInBackground(Void... voids)
+	{
+		while( running ) {
+			if (view.isClosed())
+				return null;
+
+			// FIXME XXX: update
+			//updateBanner();
+        	
+			if (runOnce)
+				return null;
+			
+			try {
+				Thread.sleep(1000 * timeout);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 		
-		super.run();
+		return null;
+	}
+
+	/*protected void updateBanner()
+	{
+		try {
+			final Plus1Banner banner = getBanner();
+			
+			view.post(new Runnable() {
+				public void run() {
+					view.setBanner(banner);
+				}
+			});	
+			
+			if (banner != null) {
+				String imageUrl = null;
+				
+				if (!banner.getPictureUrl().equals(""))
+					imageUrl = banner.getPictureUrl();
+				else if (!banner.getPictureUrlPng().equals(""))
+					imageUrl = banner.getPictureUrlPng();	
+				
+				if (imageUrl != null)
+					downloadImage(imageUrl);
+			}
+		} catch(Exception e) {
+			Log.e(
+				getClass().getName(),
+				"Unexpected exception while updating banner: " + e.getMessage()
+			);
+		}
+	}*/
+	
+	/*protected Plus1Banner getBanner()
+	{
+		final String result = getBannerData();
 		
-		String result = new String();
+		Log.d(getClass().getName(), "answer: " + result.toString());
+		
+		Plus1Banner banner = null;
+
+		if (result.equals("")) {
+			if (bannerDownloadListener != null)
+				bannerDownloadListener.onBannerLoadFailed(
+					LoadError.UnknownAnswer
+				);
+		} else if (result.equals(NO_BANNER)) { 
+			if (bannerDownloadListener != null)
+				bannerDownloadListener.onBannerLoadFailed(
+					LoadError.NoHaveBanner
+				);
+		} else {
+			banner = parse(result);
+
+			if ((banner != null) && (banner.getId() > 0)) {
+				if (bannerDownloadListener != null)
+					bannerDownloadListener.onBannerLoaded();
+			} else {
+				if (bannerDownloadListener != null)
+					bannerDownloadListener.onBannerLoadFailed(
+						LoadError.UnknownAnswer
+					);
+			}
+		}
+		
+		return banner;
+	}*/
+	
+	protected String getBannerData()
+	{
+		InputStream stream = getStream(request.getRequestUri());
+		
+		String result = "";
 		
 		try {
 			byte[] buffer = new byte[BUFFER_SIZE];
@@ -106,24 +232,47 @@ final class HtmlBannerDownloader extends BaseDownloader {
 					stream,
 					BUFFER_SIZE
 				);
-			
-			if (bufStream != null)
-				while ((count = bufStream.read(buffer)) != -1)
-					result += new String(buffer, 0, count);
+
+			while ((count = bufStream.read(buffer)) != -1)
+				result += new String(buffer, 0, count);
 			
 			bufStream.close();
-		} catch (IOException e) {
-			Log.e(LOGTAG, "IOException in InputStream");
+		} catch (Exception e) {
+			Log.e(
+				getClass().getName(),
+				"Exception while downloading banner: " + e.getMessage()
+			);
+
+			if (bannerDownloadListener != null)
+				bannerDownloadListener.onBannerLoadFailed(
+					LoadError.DownloadFailed
+				);
 		}
 		
 		Log.d(LOGTAG, "answer: " + result.toString());
 		
 		if (!result.equals("") && !result.equals(NO_BANNER)) 
-			view.loadAd(result.toString(), connection.getHeaderField("X-Adtype"));
-		
-		if (handler != null)
-			handler.postDelayed(this, timeout * 1000);
+			view.loadAd(result.toString(), "");//connection.getHeaderField("X-Adtype"));
+		//FIXME XXX set x-adtype
+		return result;
 	}
+	
+	/*protected void downloadImage(String imageUrl)
+	{
+		InputStream stream = getStream(imageUrl);
+		
+		if (stream == null) 
+			return;
+		
+		final Drawable img = Drawable.createFromStream(stream, "src");
+>>>>>>> master:sdk/src/ru/wapstart/plus1/sdk/BaseBannerDownloader.java
+		
+		view.post(new Runnable() {
+			public void run() {
+				view.setImage(img);
+			}
+		});		
+	}*/
 	
 	protected void modifyConnection(HttpURLConnection connection) {
 		connection.setRequestProperty(
@@ -168,4 +317,26 @@ final class HtmlBannerDownloader extends BaseDownloader {
 			String.valueOf(metrics.widthPixels) + "x" 
 			+ String.valueOf(metrics.heightPixels);
 	}
+	
+	protected InputStream getStream(String url)
+	{
+		InputStream stream = null;
+		HttpURLConnection connection;
+		
+		try {
+			connection = (HttpURLConnection) new URL(url).openConnection();
+			modifyConnection(connection);
+			connection.connect();
+			
+			stream = connection.getInputStream();
+		} catch (MalformedURLException e) {
+			Log.e(getClass().getName(), "URL parsing failed: " + url);
+		} catch (IOException e) {
+			Log.d(getClass().getName(), "URL " + url + " doesn't exist");
+		} catch (Exception e) {
+			Log.d(getClass().getName(), "Unexpected exception: " + e.getMessage());
+		}
+		
+		return stream;
+	}	
 }

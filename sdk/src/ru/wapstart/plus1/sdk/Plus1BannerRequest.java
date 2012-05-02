@@ -34,7 +34,8 @@ import android.util.Log;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
-
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import android.location.Location;
 
 /**
@@ -160,17 +161,23 @@ public final class Plus1BannerRequest {
 		if (getAge() != 0)
 			url += "&age=" + getAge();
 
-		if (getLogin() != null)
-			url += "&login=" + getLogin();
-
-		if ((types != null) && !types.isEmpty())
-			for (BannerType bt : types)
-				url += "&type[]=" + bt.ordinal();
-
-		if (getLocation() != null)
-			url +=
-				"&location=" + getLocation().getLatitude()
-				+ ";" + getLocation().getLongitude();
+		try {
+			if (getLogin() != null)
+				url += "&login=" + URLEncoder.encode(getLogin(), "UTF-8");					
+						
+			if (getLocation() != null)
+				url += 
+					"&location=" + URLEncoder.encode(getLocation().getLatitude() 
+					+ ";" + getLocation().getLongitude(), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			if (getLogin() != null)
+				url += "&login=" + getLogin();					
+						
+			if (getLocation() != null)
+				url += 
+					"&location=" + getLocation().getLatitude() 
+					+ ";" + getLocation().getLongitude();			
+		}
 
 		return url;
 	}
