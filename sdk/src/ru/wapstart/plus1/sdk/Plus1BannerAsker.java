@@ -49,7 +49,6 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	private int visibilityTimeout							= 0;
 
 	private boolean initialized								= false;
-	private boolean mCurrentlyStarted						= false;
 
 	private LocationManager locationManager					= null;
 	private Plus1LocationListener locationListener			= null;
@@ -198,7 +197,7 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	}
 
 	private void start() {
-		if (request == null || view == null || mCurrentlyStarted)
+		if (request == null || view == null || downloaderTask != null)
 			return;
 
 		init();
@@ -212,32 +211,29 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 			);
 		}
 
-		mCurrentlyStarted = true;
-
 		downloaderTask = makeDownloaderTask();
 
 		downloaderTask.execute();
 	}
 
 	private void stop() {
+		if (downloaderTask == null)
+			return;
+
 		if (!isDisabledAutoDetectLocation())
 			locationManager.removeUpdates(locationListener);
 
-		downloaderTask.cancel(true);
+		downloaderTask.cancel(false);
 		downloaderTask = null;
-
-		mCurrentlyStarted = false;
 	}
 
 	private void startOnce() {
-		if (request == null || view == null || mCurrentlyStarted)
+		if (request == null || view == null || downloaderTask != null)
 			return;
 
 		init();
 
-		downloaderTask = makeDownloaderTask();
-
-		downloaderTask.setRunOnce().execute();
+		makeDownloaderTask().setRunOnce().execute();
 	}
 
 	private HtmlBannerDownloader makeDownloaderTask()
