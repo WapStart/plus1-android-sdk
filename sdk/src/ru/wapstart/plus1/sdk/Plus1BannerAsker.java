@@ -44,9 +44,7 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	private Handler handler									= null;
 	private HtmlBannerDownloader downloaderTask				= null;
 	private Runnable askerStopper							= null;
-	
-	private String deviceId									= null;
-	private boolean disableDispatchIMEI						= false;
+
 	private boolean disableAutoDetectLocation				= false;
 	private int timeout										= 10;
 	private int visibilityTimeout							= 0;
@@ -99,16 +97,6 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 		view.onResume();
 	}
 
-	public boolean isDisabledIMEIDispatch() {
-		return disableDispatchIMEI;
-	}
-
-	public Plus1BannerAsker disableDispatchIMEI(boolean disable) {
-		this.disableDispatchIMEI = disable;
-
-		return this;
-	}
-
 	public boolean isDisabledAutoDetectLocation() {
 		return disableAutoDetectLocation;
 	}
@@ -159,22 +147,8 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 			
 			this.locationListener = new Plus1LocationListener(request);
 		}
-		
-		if (!isDisabledIMEIDispatch()) {
-			TelephonyManager telephonyManager = 
-				(TelephonyManager) view.getContext().getSystemService(
-					Context.TELEPHONY_SERVICE
-				);
-			
-			this.deviceId = telephonyManager.getDeviceId();
-		}
 
-		downloaderTask = new HtmlBannerDownloader(view);
-		
-		downloaderTask
-			.setDeviceId(deviceId)
-			.setRequest(request)
-			.setTimeout(timeout);
+		downloaderTask = getDownloaderTask();
 		
 		if (viewStateListener != null)
 			view.setViewStateListener(viewStateListener);
@@ -219,8 +193,7 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 		}
 
 		mCurrentlyStarted = true;
-
-		downloaderTask = getDownloaderTask();		
+	
 		downloaderTask.execute();
 	}
 
@@ -267,12 +240,9 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	
 	protected HtmlBannerDownloader getDownloaderTask()
 	{
-		HtmlBannerDownloader task;
-		
-		task = new HtmlBannerDownloader(view);
+		HtmlBannerDownloader task = new HtmlBannerDownloader(view);
 
 		task
-			.setDeviceId(deviceId)
 			.setRequest(request)
 			.setTimeout(timeout);
 

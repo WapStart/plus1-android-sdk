@@ -55,7 +55,6 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 	
 	protected Plus1BannerView view			= null;
 	protected Plus1BannerRequest request	= null;
-	protected String deviceId				= null;
 	protected int timeout					= 0;
 	protected boolean runOnce               = false;
 	
@@ -66,13 +65,7 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 	public HtmlBannerDownloader(Plus1BannerView view) {
 		this.view = view;
 	}
-	
-	public HtmlBannerDownloader setDeviceId(String deviceId) {
-		this.deviceId = deviceId;
-		
-		return this;
-	}
-	
+
 	public HtmlBannerDownloader setRequest(Plus1BannerRequest request) {
 		this.request = request;
 		
@@ -242,9 +235,6 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 			"x-preferred-locale",
 			Locale.getDefault().getDisplayName(Locale.US)
 		);
-		
-		if ((deviceId != null) && !deviceId.equals(""))
-			connection.setRequestProperty("x-device-imei", deviceId);
 	}
 	
 	protected String getDisplayMetrics()
