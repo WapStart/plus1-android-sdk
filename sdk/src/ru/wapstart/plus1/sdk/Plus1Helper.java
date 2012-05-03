@@ -91,6 +91,7 @@ final class Plus1Helper {
 			clientSessionId = preferences.getString(PREFERENCES_KEY, null);
 
 			if (clientSessionId == null) {
+				// TODO: try base on Secure.ANDROID_ID or MAC address
 				clientSessionId = getUniqueHash();
 
 				SharedPreferences.Editor editor = preferences.edit();
