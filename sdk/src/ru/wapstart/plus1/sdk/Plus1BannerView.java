@@ -31,7 +31,6 @@ package ru.wapstart.plus1.sdk;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
@@ -39,8 +38,9 @@ import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.FrameLayout;
-
+import android.widget.LinearLayout;
 import android.util.Log;
+
 import ru.wapstart.plus1.sdk.MraidView.ViewState;
 
 /**
@@ -63,7 +63,7 @@ public class Plus1BannerView extends FrameLayout {
 	private boolean mAutorefreshEnabled = true;
 	private boolean mExpanded			= false;
 
-	private Plus1BannerViewStateListener viewStateListener = null;
+	private Plus1BannerViewStateListener mViewStateListener = null;
 
 	public Plus1BannerView(Context context) {
 		this(context, null);
@@ -200,7 +200,7 @@ public class Plus1BannerView extends FrameLayout {
 	public Plus1BannerView setViewStateListener(
 		Plus1BannerViewStateListener viewStateListener
 	) {
-		this.viewStateListener = viewStateListener;
+		mViewStateListener = viewStateListener;
 
 		return this;
 	}
@@ -231,28 +231,30 @@ public class Plus1BannerView extends FrameLayout {
 		// background
 		setBackgroundResource(R.drawable.wp_banner_background);
 
+		// shild
+		ImageView shild = new ImageView(getContext());
+		shild.setImageResource(R.drawable.wp_banner_shild);
+		shild.setMaxWidth(9);
+		shild.setLayoutParams(
+			new FrameLayout.LayoutParams(
+				9,
+				FrameLayout.LayoutParams.WRAP_CONTENT,
+				Gravity.LEFT | Gravity.CENTER_VERTICAL
+			)
+		);
+
 		mAdAnimator = new Plus1AdAnimator(getContext());
 
 		addView(
 			mAdAnimator.getBaseView(),
 			new FrameLayout.LayoutParams(
+				getWidth() - 9,
 				FrameLayout.LayoutParams.FILL_PARENT,
-				FrameLayout.LayoutParams.FILL_PARENT
+				Gravity.RIGHT
 			)
 		);
 
-		// shild
-		ImageView shild = new ImageView(getContext());
-		shild.setImageResource(R.drawable.wp_banner_shild);
-		shild.setMaxWidth(9);
-		addView(
-			shild,
-			new FrameLayout.LayoutParams(
-				FrameLayout.LayoutParams.WRAP_CONTENT,
-				FrameLayout.LayoutParams.WRAP_CONTENT,
-				Gravity.LEFT | Gravity.CENTER_VERTICAL
-			)
-		);
+		addView(shild);
 
 		// close button
 		if (isHaveCloseButton()) {
@@ -264,23 +266,6 @@ public class Plus1BannerView extends FrameLayout {
 					mClosed = true;
 					setAutorefreshEnabled(false);
 					hide();
-			
-			/*closeButton.setOnClickListener(
-				new OnClickListener() {
-					public void onClick(View v) {
-						closed = true;
-						flipper.stopFlipping();
-						
-						if (getVisibility() == VISIBLE) {
-							if (hideAnimation != null)
-								startAnimation(hideAnimation);
-							
-							setVisibility(INVISIBLE);
-
-							if (viewStateListener != null)
-								viewStateListener.onCloseBannerView();
-						}
-					}*/
 				}
 			});
 
@@ -320,8 +305,8 @@ public class Plus1BannerView extends FrameLayout {
 
 			setVisibility(VISIBLE);
 
-			if (viewStateListener != null)
-				viewStateListener.onShowBannerView();
+			if (mViewStateListener != null)
+				mViewStateListener.onShowBannerView();
 		}
 
 		mAdAnimator.showAd();
@@ -333,6 +318,9 @@ public class Plus1BannerView extends FrameLayout {
 				startAnimation(mHideAnimation);
 
 			setVisibility(INVISIBLE);
+
+			if (mViewStateListener != null)
+				mViewStateListener.onCloseBannerView();
 		}
 	}
 
