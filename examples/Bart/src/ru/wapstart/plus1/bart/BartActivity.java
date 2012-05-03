@@ -46,11 +46,12 @@ public class BartActivity extends Activity implements View.OnClickListener
 		mAsker =
 			new Plus1BannerAsker(
 				new Plus1BannerRequest()
-					//.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/")
+					.setRotatorUrl("http://ro.zlex.plus1.oemtest.ru/")
 					//.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/testmraid.php")
-					.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/testmraid_sz.php")
+					//.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/testmraid_sz.php")
 					//.setApplicationId(352),
-					.setApplicationId(105261),
+					.setApplicationId(4550),
+					//.setApplicationId(105261),
 				mBannerView
 					.setAutorefreshEnabled(false)
 					.enableAnimationFromTop()
