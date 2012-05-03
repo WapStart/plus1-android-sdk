@@ -37,6 +37,7 @@ import java.util.Random;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.provider.Settings.Secure;
 
 /**
  * @author Alexander Klestov <a.klestov@co.wapstart.ru>
@@ -53,27 +54,28 @@ final class Plus1Helper {
 	
 	private Plus1Helper() { /*_*/ }
 
-	public static String getUniqueHash() {
-		MessageDigest sha1;
-
-		try {
-			sha1 = MessageDigest.getInstance("SHA-1");
-		} catch (NoSuchAlgorithmException e) {
-			Log.e(LOGTAG, "NoSuchAlgorithmException: " + e.toString());
-
-			return null;
-		}
-
-		sha1.update(Calendar.getInstance().getTime().toString().getBytes());
-
+	public static String getUniqueHash()
+	{
+		String uniqueStr = Calendar.getInstance().getTime().toString();
 		Random rnd = new Random();
 
 		for (int i = 0; i < 10; i++)
-			sha1.update((byte)rnd.nextInt(255));
-		
-		return getHex(sha1.digest());
+			uniqueStr += rnd.nextInt(255);
+
+		return getHash(uniqueStr);
 	}
-	
+
+	public static String getHash(String text)
+	{
+		try {
+			return SHA1(text);
+		} catch (NoSuchAlgorithmException e) {
+			Log.e(LOGTAG, "NoSuchAlgorithmException: " + e.toString());
+
+			return null; // FIXME: add other hash logic
+		}
+	}
+
 	// TODO: find out needs of our network
 	public static String getUserAgent() {
 		return
@@ -91,8 +93,16 @@ final class Plus1Helper {
 			clientSessionId = preferences.getString(PREFERENCES_KEY, null);
 
 			if (clientSessionId == null) {
-				// TODO: try base on Secure.ANDROID_ID or MAC address
-				clientSessionId = getUniqueHash();
+				String androidId =
+					Secure.getString(
+						context.getContentResolver(),
+						Secure.ANDROID_ID
+					);
+
+				clientSessionId =
+					androidId != null
+						? getHash(androidId)
+						: getUniqueHash();
 
 				SharedPreferences.Editor editor = preferences.edit();
 				editor.putString(PREFERENCES_KEY, clientSessionId);
@@ -102,8 +112,19 @@ final class Plus1Helper {
 
 		return clientSessionId;
 	}
-	
-	private static String getHex(byte[] raw)
+
+	private static String SHA1(String text) throws NoSuchAlgorithmException
+	{
+		MessageDigest md = MessageDigest.getInstance("SHA-1");
+
+		byte[] sha1hash = new byte[40];
+		md.update(text.getBytes());
+		sha1hash = md.digest();
+
+		return convertToHex(sha1hash);
+	}
+
+	private static String convertToHex(byte[] raw)
 	{
 		final StringBuilder hex = new StringBuilder(raw.length * 2);
 
