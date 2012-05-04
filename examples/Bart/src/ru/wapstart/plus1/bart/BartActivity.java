@@ -53,7 +53,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 					.setApplicationId(4550),
 					//.setApplicationId(105261),
 				mBannerView
-					.setAutorefreshEnabled(false)
+					.setAutorefreshEnabled(true)
 					.enableAnimationFromTop()
 					.enableCloseButton()
 			)

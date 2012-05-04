@@ -128,8 +128,7 @@ public class Plus1BannerView extends FrameLayout {
 	}
 
 	public void loadAd(String html, String adType) {
-		if (!mInitialized)
-			init();
+		init();
 
 		BaseAdView adView =
 			"mraid".equals(adType)
@@ -237,7 +236,7 @@ public class Plus1BannerView extends FrameLayout {
 		shild.setMaxWidth(9);
 		shild.setLayoutParams(
 			new FrameLayout.LayoutParams(
-				9,
+				FrameLayout.LayoutParams.WRAP_CONTENT,
 				FrameLayout.LayoutParams.WRAP_CONTENT,
 				Gravity.LEFT | Gravity.CENTER_VERTICAL
 			)
@@ -248,7 +247,7 @@ public class Plus1BannerView extends FrameLayout {
 		addView(
 			mAdAnimator.getBaseView(),
 			new FrameLayout.LayoutParams(
-				getWidth() - 9,
+				getWidth() - 8,
 				FrameLayout.LayoutParams.FILL_PARENT,
 				Gravity.RIGHT
 			)
