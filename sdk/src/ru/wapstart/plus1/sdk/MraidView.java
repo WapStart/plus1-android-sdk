@@ -130,7 +130,7 @@ public class MraidView extends BaseAdView {
 
 		// Inject the MRAID JavaScript bridge.
 		if (mMraidPath == null)
-			mMraidPath = "file:/" + copyRawResourceToFilesDir(R.raw.mraid, "mraid.js");
+			mMraidPath = "file://" + copyRawResourceToFilesDir(R.raw.mraid, "mraid.js");
 
 		data = data.replace("<head>", "<head><script src='" + mMraidPath + "'></script>");
 
