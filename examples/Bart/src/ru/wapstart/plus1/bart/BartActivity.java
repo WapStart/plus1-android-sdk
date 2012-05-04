@@ -47,17 +47,12 @@ public class BartActivity extends Activity implements View.OnClickListener
 			new Plus1BannerAsker(
 				new Plus1BannerRequest()
 					.setRotatorUrl("http://ro.zlex.plus1.oemtest.ru/")
-					//.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/testmraid.php")
-					//.setRotatorUrl("http://ro.trunk.plus1.oemtest.ru/testmraid_sz.php")
-					//.setApplicationId(352),
 					.setApplicationId(4550),
-					//.setApplicationId(105261),
 				mBannerView
-					.setAutorefreshEnabled(true)
 					.enableAnimationFromTop()
 					.enableCloseButton()
 			)
-			.setTimeout(10);
+			.setTimeout(10); // default value
 
 		Log.d("BartActivity", "onCreate fired");
     }
