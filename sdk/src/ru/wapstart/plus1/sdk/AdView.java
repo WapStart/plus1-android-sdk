@@ -37,6 +37,8 @@ import android.net.Uri;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.util.Log;
+import android.view.View;
+import android.view.MotionEvent;
 
 public class AdView extends BaseAdView {
 
@@ -74,6 +76,12 @@ public class AdView extends BaseAdView {
 		setVerticalScrollBarEnabled(false);
 		setVerticalScrollbarOverlay(false);
 		getSettings().setSupportZoom(false);
+
+		setOnTouchListener(new View.OnTouchListener() {
+			public boolean onTouch(View v, MotionEvent event) {
+				return (event.getAction() == MotionEvent.ACTION_MOVE);
+			}
+		});
 	}
 
 	public interface OnReadyListener {
