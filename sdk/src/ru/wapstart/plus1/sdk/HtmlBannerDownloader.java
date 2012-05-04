@@ -112,7 +112,7 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 			try {
 				Thread.sleep(1000 * timeout);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				return null;
 			}
 		}
 

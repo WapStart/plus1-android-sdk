@@ -223,7 +223,7 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 		if (!isDisabledAutoDetectLocation())
 			locationManager.removeUpdates(locationListener);
 
-		downloaderTask.cancel(false);
+		downloaderTask.cancel(true);
 		downloaderTask = null;
 	}
 
