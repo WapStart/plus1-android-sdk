@@ -35,10 +35,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import android.location.Location;
 
-/**
- * @author Alexander Klestov <a.klestov@co.wapstart.ru>
- * @copyright Copyright (c) 2010, Wapstart
- */
 public final class Plus1BannerRequest {
 	private static final String LOGTAG = "Plus1BannerRequest";
 	private static final String SDK_VERSION = "2.0";

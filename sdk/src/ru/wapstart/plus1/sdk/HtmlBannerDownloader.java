@@ -44,10 +44,6 @@ import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
-/**
- * @author Alexander Klestov <a.klestov@co.wapstart.ru>
- * @copyright Copyright (c) 2011, Wapstart
- */
 final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 	private static final String LOGTAG = "HtmlBannerDownloader";
 	private static final Integer BUFFER_SIZE = 8192;

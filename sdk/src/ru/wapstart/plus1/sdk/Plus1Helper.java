@@ -39,10 +39,6 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import android.provider.Settings.Secure;
 
-/**
- * @author Alexander Klestov <a.klestov@co.wapstart.ru>
- * @copyright Copyright (c) 2010, Wapstart
- */
 final class Plus1Helper {
 
 	private static final String PREFERENCES_STORAGE = "WapstartPlus1";

@@ -42,10 +42,6 @@ import android.util.Log;
 
 import ru.wapstart.plus1.sdk.MraidView.ViewState;
 
-/**
- * @author Alexander Klestov <a.klestov@co.wapstart.ru>
- * @copyright Copyright (c) 2011, Wapstart
- */
 public class Plus1BannerView extends FrameLayout {
     private static final String LOGTAG = "Plus1BannerView";
 

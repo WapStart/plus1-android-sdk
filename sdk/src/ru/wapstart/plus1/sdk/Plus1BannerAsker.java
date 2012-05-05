@@ -33,10 +33,6 @@ import android.content.Context;
 import android.location.LocationManager;
 import android.os.Handler;
 
-/**
- * @author Alexander Klestov <a.klestov@co.wapstart.ru>
- * @copyright Copyright (c) 2011, Wapstart
- */
 public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	private Plus1BannerRequest request						= null;
 	private Plus1BannerView view							= null;
