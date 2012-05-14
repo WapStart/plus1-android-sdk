@@ -212,6 +212,11 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 		);
 
 		connection.setRequestProperty(
+			"x-container-metrics",
+			getContainerMetrics()
+		);
+
+		connection.setRequestProperty(
 			"x-application-type",
 			"android"
 		);
@@ -234,6 +239,13 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 		return
 			String.valueOf(metrics.widthPixels) + "x"
 			+ String.valueOf(metrics.heightPixels);
+	}
+
+	protected String getContainerMetrics()
+	{
+		return
+			String.valueOf(view.getWidth()) + "x"
+			+ String.valueOf(view.getHeight());
 	}
 
 	protected HttpURLConnection makeConnection(String url)
