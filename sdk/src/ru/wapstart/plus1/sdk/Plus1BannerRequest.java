@@ -36,7 +36,6 @@ import java.net.URLEncoder;
 import android.location.Location;
 
 public final class Plus1BannerRequest {
-	private static final String LOGTAG = "Plus1BannerRequest";
 	private static final String SDK_VERSION = "2.0";
 	private static final Integer REQUEST_VERSION = 2;
 
