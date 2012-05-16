@@ -139,6 +139,11 @@ public class MraidView extends BaseAdView {
 
 	@Override
 	public void loadUrl(String url) {
+		if (url.startsWith("file:")) {
+			super.loadUrl(url);
+			return;
+		}
+
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpGet httpGet = new HttpGet(url);
 		StringBuffer out = new StringBuffer();

@@ -57,6 +57,7 @@ public class Plus1BannerView extends FrameLayout {
 	private boolean mInitialized		= false;
 	private boolean mAutorefreshEnabled = true;
 	private boolean mExpanded			= false;
+	private boolean mPausedView			= false;
 
 	private Plus1BannerViewStateListener mViewStateListener = null;
 
@@ -72,6 +73,8 @@ public class Plus1BannerView extends FrameLayout {
 	}
 
 	public void onPause() {
+		mPausedView = true;
+
 		if (mAdAnimator != null && mAdAnimator.getCurrentView() != null) {
 			mAdAnimator.getCurrentView().pauseTimers();
 
@@ -87,6 +90,8 @@ public class Plus1BannerView extends FrameLayout {
 
 			mAdAnimator.getCurrentView().resumeTimers();
 		}
+
+		mPausedView = false;
 	}
 
 	public boolean isHaveCloseButton() {
@@ -142,7 +147,8 @@ public class Plus1BannerView extends FrameLayout {
 		Log.d(LOGTAG, "MraidView instance created");
 		adView.setOnReadyListener(new MraidView.OnReadyListener() {
 			public void onReady(MraidView view) {
-				show();
+				if (!mPausedView)
+					show();
 			}
 		});
 		adView.setOnExpandListener(new MraidView.OnExpandListener() {
@@ -171,7 +177,8 @@ public class Plus1BannerView extends FrameLayout {
 		Log.d(LOGTAG, "AdView instance created");
 		adView.setOnReadyListener(new AdView.OnReadyListener() {
 			public void onReady() {
-				show();
+				if (!mPausedView)
+					show();
 			}
 		});
 

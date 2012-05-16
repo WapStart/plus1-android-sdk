@@ -60,6 +60,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 
 	public void setAdView(BaseAdView child) {
 		if (mNewView != null) {
+			mNewView.stopLoading();
 			mNewView.destroy();
 			Log.w(LOGTAG, "Not shown ad view was removed. Did you call setAdView() twice?");
 		}
@@ -68,13 +69,25 @@ final public class Plus1AdAnimator extends FrameLayout {
 	}
 
 	public void showAd() {
+		Log.d(LOGTAG, "showAd method fired");
+
 		if (mNewView != null) {
 
 			if (mCurrentView != null) {
+				mCurrentView.stopLoading();
+
 				if (mCurrentView instanceof MraidView)
 					((MraidView)mCurrentView).unregisterBroadcastReceiver();
 
 				mCurrentView.startAnimation(makeFadeOutAnimation());
+
+				mBaseView.removeView(mCurrentView);
+				if (mWillDestroyedAdView != null) {
+					mWillDestroyedAdView.clearAnimation();
+					mWillDestroyedAdView.destroy();
+				}
+				// NOTE: adView will be destroyed after fade out animation
+				mWillDestroyedAdView = mCurrentView;
 
 				mCurrentView.getAnimation().setAnimationListener(new Animation.AnimationListener() {
 					public void onAnimationStart(Animation anmtn) {
@@ -91,14 +104,6 @@ final public class Plus1AdAnimator extends FrameLayout {
 						// nothing
 					}
 				});
-
-				mBaseView.removeView(mCurrentView);
-				if (mWillDestroyedAdView != null) {
-					mWillDestroyedAdView.clearAnimation();
-					mWillDestroyedAdView.destroy();
-				}
-				// NOTE: adView will be destroyed after fade out animation
-				mWillDestroyedAdView = mCurrentView;
 			}
 
 			mNewView.startAnimation(makeFadeInAnimation());
@@ -119,8 +124,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 		}
 	}
 
-	private Animation makeFadeInAnimation()
-	{
+	private Animation makeFadeInAnimation() {
 		Animation animation =
 			AnimationUtils.loadAnimation(
 				getContext(), 
@@ -132,8 +136,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 		return animation;
 	}
 
-	private Animation makeFadeOutAnimation()
-	{
+	private Animation makeFadeOutAnimation() {
 		Animation animation =
 			AnimationUtils.loadAnimation(
 				getContext(), 

@@ -164,8 +164,12 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 					BUFFER_SIZE
 				);
 
-			while ((count = bufStream.read(buffer)) != -1)
+			while ((count = bufStream.read(buffer)) != -1) {
+				if (isCancelled())
+					return false;
+
 				result += new String(buffer, 0, count);
+			}
 
 			bufStream.close();
 

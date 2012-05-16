@@ -40,6 +40,16 @@ public abstract class BaseAdView extends WebView {
 
 	abstract public void loadHtmlData(String data);
 
+	/**
+	 * NOTE: NPE workaround for WebView
+	 */
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		try {
+			super.onWindowFocusChanged(hasFocus);
+		} catch (NullPointerException npe) { }
+	}
+
 	protected String completeHtml(String data) {
         // If the string data lacks the HTML boilerplate, add it.
         if (data.indexOf("<html>") == -1) {

@@ -229,7 +229,9 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 
 		init();
 
-		makeDownloaderTask().setRunOnce().execute();
+		downloaderTask = makeDownloaderTask();
+
+		downloaderTask.setRunOnce().execute();
 	}
 
 	private HtmlBannerDownloader makeDownloaderTask()
