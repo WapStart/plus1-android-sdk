@@ -133,7 +133,8 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 		} else {
 			view.post(new Runnable() {
 				public void run() {
-					view.loadAd(mBannerData, mBannerAdType);
+					if (!isCancelled())
+						view.loadAd(mBannerData, mBannerAdType);
 				}
 			});
 

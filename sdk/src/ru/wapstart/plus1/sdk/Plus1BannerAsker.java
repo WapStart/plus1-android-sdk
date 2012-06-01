@@ -32,8 +32,10 @@ package ru.wapstart.plus1.sdk;
 import android.content.Context;
 import android.location.LocationManager;
 import android.os.Handler;
+import android.util.Log;
 
 public class Plus1BannerAsker implements Plus1BannerViewStateListener {
+	private static final String LOGTAG = "Plus1BannerAsker";
 	private Plus1BannerRequest request						= null;
 	private Plus1BannerView view							= null;
 	private Handler handler									= null;
@@ -193,6 +195,8 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	}
 
 	private void start() {
+		Log.d(LOGTAG, "start() method fired");
+
 		if (request == null || view == null || downloaderTask != null)
 			return;
 
@@ -213,6 +217,8 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	}
 
 	private void stop() {
+		Log.d(LOGTAG, "stop() method fired");
+
 		if (downloaderTask == null)
 			return;
 
@@ -224,6 +230,8 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	}
 
 	private void startOnce() {
+		Log.d(LOGTAG, "startOnce() method fired");
+
 		if (request == null || view == null || downloaderTask != null)
 			return;
 

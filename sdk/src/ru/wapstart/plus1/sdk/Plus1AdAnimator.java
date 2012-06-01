@@ -41,8 +41,9 @@ final public class Plus1AdAnimator extends FrameLayout {
 
 	private ViewGroup mBaseView;
 	private BaseAdView mCurrentView;
-	private BaseAdView mNewView;
-	private BaseAdView mWillDestroyedAdView;
+	private BaseAdView mLoadView;
+
+	private boolean mHtmlLoading	= false;
 
 	public Plus1AdAnimator(Context context) {
 		super(context);
@@ -58,70 +59,55 @@ final public class Plus1AdAnimator extends FrameLayout {
 		return mBaseView;
 	}
 
-	public void setAdView(BaseAdView child) {
-		if (mNewView != null) {
-			mNewView.stopLoading();
-			mNewView.destroy();
-			Log.w(LOGTAG, "Not shown ad view was removed. Did you call setAdView() twice?");
-		}
+	public void loadAdView(BaseAdView child, String html) {
+		stopLoading();
 
-		mNewView = child;
+		mLoadView = child;
+		mHtmlLoading = true;
+		mLoadView.loadHtmlData(html);
 	}
 
+	public void stopLoading() {
+		if (mHtmlLoading) {
+			mLoadView.stopLoading();
+			mHtmlLoading = false;
+			mLoadView.destroy();
+			mLoadView = null;
+			Log.w(LOGTAG, "Not shown ad view was removed");
+		}
+	}
+
+	// NOTE: fires after success html loading
 	public void showAd() {
 		Log.d(LOGTAG, "showAd method fired");
 
-		if (mNewView != null) {
+		if (mLoadView == null)
+			return;
 
-			if (mCurrentView != null) {
-				mCurrentView.stopLoading();
-
-				if (mCurrentView instanceof MraidView)
-					((MraidView)mCurrentView).unregisterBroadcastReceiver();
-
-				mCurrentView.startAnimation(makeFadeOutAnimation());
-
-				mBaseView.removeView(mCurrentView);
-				if (mWillDestroyedAdView != null) {
-					mWillDestroyedAdView.clearAnimation();
-					mWillDestroyedAdView.destroy();
-				}
-				// NOTE: adView will be destroyed after fade out animation
-				mWillDestroyedAdView = mCurrentView;
-
-				mCurrentView.getAnimation().setAnimationListener(new Animation.AnimationListener() {
-					public void onAnimationStart(Animation anmtn) {
-						// nothing
-					}
-
-					public void onAnimationEnd(Animation anmtn) {
-						if (mWillDestroyedAdView != null)
-							mWillDestroyedAdView.destroy();
-						Log.d(LOGTAG, "Ad view was destroyed in animation end context");
-					}
-
-					public void onAnimationRepeat(Animation anmtn) {
-						// nothing
-					}
-				});
-			}
-
-			mNewView.startAnimation(makeFadeInAnimation());
-			mNewView.setVisibility(VISIBLE);
-			mBaseView.addView(
-				mNewView,
-				new FrameLayout.LayoutParams(
-					FrameLayout.LayoutParams.FILL_PARENT,
-					FrameLayout.LayoutParams.FILL_PARENT
-				)
-			);
-
-			mCurrentView = mNewView;
-			mNewView = null;
+		if (mCurrentView != null) {
 
 			if (mCurrentView instanceof MraidView)
-				((MraidView)mCurrentView).registerBroadcastReceiver();
+				((MraidView)mCurrentView).unregisterBroadcastReceiver();
+
+			mBaseView.removeView(mCurrentView);
+			mCurrentView.destroy();
 		}
+
+		mCurrentView = mLoadView;
+		mLoadView = null;
+		mHtmlLoading = false;
+
+		mCurrentView.setVisibility(VISIBLE);
+		mBaseView.addView(
+			mCurrentView,
+			new FrameLayout.LayoutParams(
+				FrameLayout.LayoutParams.FILL_PARENT,
+				FrameLayout.LayoutParams.FILL_PARENT
+			)
+		);
+
+		if (mCurrentView instanceof MraidView)
+			((MraidView)mCurrentView).registerBroadcastReceiver();
 	}
 
 	private Animation makeFadeInAnimation() {
