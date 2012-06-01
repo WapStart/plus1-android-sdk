@@ -74,6 +74,7 @@ public class Plus1BannerView extends FrameLayout {
 	public void onPause() {
 		if (mAdAnimator != null) {
 			mAdAnimator.stopLoading();
+			mAdAnimator.clearAnimation();
 
 			if (mAdAnimator.getCurrentView() != null) {
 				mAdAnimator.getCurrentView().pauseTimers();

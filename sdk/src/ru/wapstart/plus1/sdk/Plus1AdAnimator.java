@@ -42,6 +42,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 	private ViewGroup mBaseView;
 	private BaseAdView mCurrentView;
 	private BaseAdView mLoadView;
+	private BaseAdView mFadeOutAdView;
 
 	private boolean mHtmlLoading	= false;
 
@@ -77,6 +78,15 @@ final public class Plus1AdAnimator extends FrameLayout {
 		}
 	}
 
+	// NOTE: need to clear animation on pause
+	public void clearAnimation() {
+		if (mFadeOutAdView != null) {
+			mFadeOutAdView.clearAnimation();
+			mFadeOutAdView.destroy();
+			mFadeOutAdView = null;
+		}
+	}
+
 	// NOTE: fires after success html loading
 	public void showAd() {
 		Log.d(LOGTAG, "showAd method fired");
@@ -85,12 +95,35 @@ final public class Plus1AdAnimator extends FrameLayout {
 			return;
 
 		if (mCurrentView != null) {
-
 			if (mCurrentView instanceof MraidView)
 				((MraidView)mCurrentView).unregisterBroadcastReceiver();
 
+			mCurrentView.startAnimation(makeFadeOutAnimation());
+
 			mBaseView.removeView(mCurrentView);
-			mCurrentView.destroy();
+			clearAnimation();
+
+			mCurrentView.getAnimation().setAnimationListener(new Animation.AnimationListener() {
+				public void onAnimationStart(Animation anmtn) {
+					// nothing
+				}
+
+				public void onAnimationEnd(Animation anmtn) {
+					if (mFadeOutAdView != null) {
+						mFadeOutAdView.destroy();
+						mFadeOutAdView = null;
+					}
+
+					Log.d(LOGTAG, "Ad view was destroyed in animation end context");
+				}
+
+				public void onAnimationRepeat(Animation anmtn) {
+					// nothing
+				}
+			});
+
+			// NOTE: adView will be destroyed after fade out animation
+			mFadeOutAdView = mCurrentView;
 		}
 
 		mCurrentView = mLoadView;
@@ -105,6 +138,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 				FrameLayout.LayoutParams.FILL_PARENT
 			)
 		);
+		mCurrentView.startAnimation(makeFadeInAnimation());
 
 		if (mCurrentView instanceof MraidView)
 			((MraidView)mCurrentView).registerBroadcastReceiver();
