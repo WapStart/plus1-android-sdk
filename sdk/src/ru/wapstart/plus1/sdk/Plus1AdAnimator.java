@@ -81,9 +81,13 @@ final public class Plus1AdAnimator extends FrameLayout {
 	// NOTE: need to clear animation on pause
 	public void clearAnimation() {
 		if (mFadeOutAdView != null) {
-			mFadeOutAdView.clearAnimation();
-			mFadeOutAdView.destroy();
-			mFadeOutAdView = null;
+			try {
+				mFadeOutAdView.clearAnimation();
+				mFadeOutAdView.destroy();
+				mFadeOutAdView = null;
+			} catch (NullPointerException e) {
+				// already destroyed in animation end context
+			}
 		}
 	}
 
