@@ -11,7 +11,9 @@ import android.widget.ImageView;
 import java.util.Random;
 import java.util.Date;
 
-import ru.wapstart.plus1.sdk.*;
+import ru.wapstart.plus1.sdk.Plus1BannerView;
+import ru.wapstart.plus1.sdk.Plus1BannerRequest;
+import ru.wapstart.plus1.sdk.Plus1BannerAsker;
 
 public class BartActivity extends Activity implements View.OnClickListener
 {
