@@ -46,8 +46,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 		mAsker =
 			new Plus1BannerAsker(
 				new Plus1BannerRequest()
-					.setRotatorUrl("http://ro.zlex.plus1.oemtest.ru/")
-					.setApplicationId(4504),
+					.setApplicationId(/* Place your WapStart Plus1 application id here */),
 				mBannerView
 					.enableAnimationFromTop()
 					.enableCloseButton()
