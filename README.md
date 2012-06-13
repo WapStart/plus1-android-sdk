@@ -75,7 +75,7 @@ protected void onCreate(Bundle savedInstanceState)
 }
 ```
 
-А затем предусмотреть вызов обработчиков *onResume()* и *onPause()*:
+А затем предусмотреть вызов обработчиков *onResume()* и *onPause()* класса [Plus1BannerAsker](doc/Plus1BannerAsker.md):
 
 ```java
 @Override
@@ -97,7 +97,12 @@ protected void onPause() {
 }
 ```
 
-// FIXME ссылки на описания методов классов
+Для подробного ознакомления смотрите описания интерфейсов и классов, а также исходные коды sdk:
+* [Plus1BannerAsker](doc/Plus1BannerAsker.md) - отвечает за получение объявлений с сервера
+* [Plus1BannerRequest](doc/Plus1BannerRequest.md) - отвечает за хранение информации о пользователе и формирование запроса к серверу
+* [Plus1BannerView](doc/Plus1BannerView.md) - отвечает за отображение объявления
+* [Plus1BannerViewStateListener](doc/Plus1BannerViewStateListener.md) - интерфейс наблюдателя за состоянием видимости [Plus1BannerView](doc/Plus1BannerView.md)
+* [Plus1BannerDownloadListener](doc/Plus1BannerDownloadListener.md) - интерфейс наблюдателя загрузки баннера
 
 # Контактная информация
 По всем возникающим у вас вопросам интеграции вы можете обратиться в службу поддержки пользователей:  
