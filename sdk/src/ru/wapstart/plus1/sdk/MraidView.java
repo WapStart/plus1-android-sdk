@@ -26,6 +26,8 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
+import android.view.View;
+import android.view.MotionEvent;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -101,6 +103,25 @@ public class MraidView extends BaseAdView {
 		setHorizontalScrollBarEnabled(false);
 
 		getSettings().setJavaScriptEnabled(true);
+
+		/**
+		 * NOTE: WebView workaround
+		 * @see http://code.google.com/p/android/issues/detail?id=7189
+		 */
+		setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				switch (event.getAction()) {
+					case MotionEvent.ACTION_DOWN:
+					case MotionEvent.ACTION_UP:
+						if (!v.hasFocus())
+							v.requestFocus();
+						break;
+				}
+
+				return false;
+			}
+		});
 
 		mBrowserController = new MraidBrowserController(this);
 		mDisplayController = new MraidDisplayController(this, expStyle, buttonStyle);

@@ -72,6 +72,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 		if (mHtmlLoading) {
 			mLoadView.stopLoading();
 			mHtmlLoading = false;
+			mLoadView.clearView();
 			mLoadView.destroy();
 			mLoadView = null;
 			Log.w(LOGTAG, "Not shown ad view was removed");
@@ -83,6 +84,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 		if (mFadeOutAdView != null) {
 			try {
 				mFadeOutAdView.clearAnimation();
+				mFadeOutAdView.clearView();
 				mFadeOutAdView.destroy();
 				mFadeOutAdView = null;
 			} catch (NullPointerException e) {
@@ -114,6 +116,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 
 				public void onAnimationEnd(Animation anmtn) {
 					if (mFadeOutAdView != null) {
+						mFadeOutAdView.clearView();
 						mFadeOutAdView.destroy();
 						mFadeOutAdView = null;
 					}
