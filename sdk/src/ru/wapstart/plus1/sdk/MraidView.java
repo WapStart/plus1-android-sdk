@@ -109,7 +109,6 @@ public class MraidView extends BaseAdView {
 		 * @see http://code.google.com/p/android/issues/detail?id=7189
 		 */
 		setOnTouchListener(new View.OnTouchListener() {
-			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				switch (event.getAction()) {
 					case MotionEvent.ACTION_DOWN:

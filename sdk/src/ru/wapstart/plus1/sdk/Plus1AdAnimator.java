@@ -72,7 +72,6 @@ final public class Plus1AdAnimator extends FrameLayout {
 		if (mHtmlLoading) {
 			mLoadView.stopLoading();
 			mHtmlLoading = false;
-			mLoadView.clearView();
 			mLoadView.destroy();
 			mLoadView = null;
 			Log.w(LOGTAG, "Not shown ad view was removed");
@@ -84,7 +83,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 		if (mFadeOutAdView != null) {
 			try {
 				mFadeOutAdView.clearAnimation();
-				mFadeOutAdView.clearView();
+				mFadeOutAdView.setOnTouchListener(null);
 				mFadeOutAdView.destroy();
 				mFadeOutAdView = null;
 			} catch (NullPointerException e) {
@@ -108,6 +107,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 
 			mBaseView.removeView(mCurrentView);
 			clearAnimation();
+			mCurrentView.setOnTouchListener(null);
 
 			mCurrentView.getAnimation().setAnimationListener(new Animation.AnimationListener() {
 				public void onAnimationStart(Animation anmtn) {
@@ -116,7 +116,6 @@ final public class Plus1AdAnimator extends FrameLayout {
 
 				public void onAnimationEnd(Animation anmtn) {
 					if (mFadeOutAdView != null) {
-						mFadeOutAdView.clearView();
 						mFadeOutAdView.destroy();
 						mFadeOutAdView = null;
 					}
