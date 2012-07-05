@@ -175,6 +175,19 @@ class MraidDisplayController extends MraidAbstractController {
 
 	public void destroy() {
 		mHandler.removeCallbacks(mCheckViewabilityTask);
+
+		if (mViewState == ViewState.EXPANDED) {
+			getView().post(new Runnable() {
+				public void run() {
+					RelativeLayout expansionLayout =
+						(RelativeLayout) mRootView.findViewById(
+							MraidView.MODAL_CONTAINER_LAYOUT_ID
+						);
+
+					mRootView.removeView(expansionLayout);
+				}
+			});
+		}
 	}
 
 	public void registerBroadcastReceiver() {

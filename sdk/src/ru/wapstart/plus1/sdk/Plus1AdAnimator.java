@@ -108,6 +108,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 			mBaseView.removeView(mCurrentView);
 			clearAnimation();
 			mCurrentView.setOnTouchListener(null);
+			mCurrentView.pauseTimers();
 
 			mCurrentView.getAnimation().setAnimationListener(new Animation.AnimationListener() {
 				public void onAnimationStart(Animation anmtn) {
