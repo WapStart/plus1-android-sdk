@@ -36,33 +36,42 @@ import java.util.Random;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
+import android.provider.Settings.Secure;
 
-/**
- * @author Alexander Klestov <a.klestov@co.wapstart.ru>
- * @copyright Copyright (c) 2010, Wapstart
- */
 final class Plus1Helper {
 
 	private static final String PREFERENCES_STORAGE = "WapstartPlus1";
 	private static final String PREFERENCES_KEY		= "session";
-	private static final String HEX_DIGITS = "0123456789abcdef";
+	private static final String HEX_DIGITS			= "0123456789abcdef";
+	private static final String LOGTAG				= "Plus1Helper";
 	
 	private static String clientSessionId = null;
 	
 	private Plus1Helper() { /*_*/ }
 
-	public static String getUniqueHash() throws NoSuchAlgorithmException {
-		MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
-		sha1.update(Calendar.getInstance().getTime().toString().getBytes());
-
+	public static String getUniqueHash()
+	{
+		String uniqueStr = Calendar.getInstance().getTime().toString();
 		Random rnd = new Random();
 
 		for (int i = 0; i < 10; i++)
-			sha1.update((byte)rnd.nextInt(255));
-		
-		return getHex(sha1.digest());
+			uniqueStr += rnd.nextInt(255);
+
+		return getHash(uniqueStr);
 	}
-	
+
+	public static String getHash(String text)
+	{
+		try {
+			return SHA1(text);
+		} catch (NoSuchAlgorithmException e) {
+			Log.e(LOGTAG, "NoSuchAlgorithmException: " + e.toString());
+
+			return null; // FIXME: add other hash logic
+		}
+	}
+
 	// TODO: find out needs of our network
 	public static String getUserAgent() {
 		return
@@ -73,35 +82,52 @@ final class Plus1Helper {
 	}
 
 	public static String getClientSessionId(Context context) {
-		SharedPreferences preferences =
-			context.getSharedPreferences(PREFERENCES_STORAGE, 0);
-		
-		if (clientSessionId == null)
+		if (clientSessionId == null) {
+			SharedPreferences preferences =
+				context.getSharedPreferences(PREFERENCES_STORAGE, 0);
+
 			clientSessionId = preferences.getString(PREFERENCES_KEY, null);
 
-		try {
 			if (clientSessionId == null) {
-				clientSessionId = getUniqueHash();
+				String androidId =
+					Secure.getString(
+						context.getContentResolver(),
+						Secure.ANDROID_ID
+					);
+
+				clientSessionId =
+					androidId != null
+						? getHash(androidId)
+						: getUniqueHash();
 
 				SharedPreferences.Editor editor = preferences.edit();
 				editor.putString(PREFERENCES_KEY, clientSessionId);
 				editor.commit();
 			}
-		} catch (NoSuchAlgorithmException e) {
-			// FIXME: log errors
 		}
 
-		return clientSessionId;		
+		return clientSessionId;
 	}
-	
-	private static String getHex(byte[] raw)
+
+	private static String SHA1(String text) throws NoSuchAlgorithmException
+	{
+		MessageDigest md = MessageDigest.getInstance("SHA-1");
+
+		byte[] sha1hash = new byte[40];
+		md.update(text.getBytes());
+		sha1hash = md.digest();
+
+		return convertToHex(sha1hash);
+	}
+
+	private static String convertToHex(byte[] raw)
 	{
 		final StringBuilder hex = new StringBuilder(raw.length * 2);
 
 		for (final byte b : raw) {
 			hex
-			.append(HEX_DIGITS.charAt((b & 0xF0) >> 4))
-			.append(HEX_DIGITS.charAt((b & 0x0F)));
+				.append(HEX_DIGITS.charAt((b & 0xF0) >> 4))
+				.append(HEX_DIGITS.charAt((b & 0x0F)));
 		}
 		
 		return hex.toString();

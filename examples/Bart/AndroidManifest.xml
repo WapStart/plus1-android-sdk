@@ -9,11 +9,14 @@
 <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <application android:label="Bart" android:icon="@drawable/icon">
         <activity android:name="BartActivity"
-                  android:label="@string/app_name">
+                  android:label="@string/app_name"
+                  android:configChanges="orientation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+		<activity android:name="ru.wapstart.plus1.sdk.MraidBrowser" />
     </application>
 </manifest> 

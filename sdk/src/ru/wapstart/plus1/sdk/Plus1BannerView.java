@@ -30,316 +30,306 @@
 package ru.wapstart.plus1.sdk;
 
 import android.content.Context;
-import android.content.Intent;
-
-import android.graphics.*;
-import android.graphics.drawable.Drawable;
-import android.text.SpannableStringBuilder;
-import android.text.style.UnderlineSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.LinearLayout;
-import android.widget.ViewFlipper;
+import android.widget.FrameLayout;
+import android.util.Log;
 
+import ru.wapstart.plus1.sdk.MraidView.ViewState;
 
-/**
- * @author Alexander Klestov <a.klestov@co.wapstart.ru>
- * @copyright Copyright (c) 2011, Wapstart
- */
-public class Plus1BannerView extends LinearLayout {
+public class Plus1BannerView extends FrameLayout {
+    private static final String LOGTAG = "Plus1BannerView";
 
-	private Plus1Banner banner;
+	private OnAutorefreshStateListener mOnAutorefreshChangeListener;
 
-	private TextView title;
-	private TextView content;
-	private Plus1ImageView image;
-	
-	private ViewFlipper flipper		= null;
-	
-	private Animation hideAnimation = null;
-	private Animation showAnimation = null;
-	
-	private boolean closeButton	    = false;
-	private boolean closed			= false;
-	private boolean initialized		= false;
+	private Plus1AdAnimator mAdAnimator	= null;
+
+	private Animation mHideAnimation	= null;
+	private Animation mShowAnimation	= null;
+
+	private boolean mHaveCloseButton	= false;
+	private boolean mClosed				= false;
+	private boolean mInitialized		= false;
+	private boolean mAutorefreshEnabled = true;
+	private boolean mExpanded			= false;
+
+	private Plus1BannerViewStateListener mViewStateListener = null;
 
 	private Plus1BannerViewStateListener viewStateListener = null;
 
 	public Plus1BannerView(Context context) {
-		super(context);
+		this(context, null);
 	}
 
 	public Plus1BannerView(Context context, AttributeSet attr) {
 		super(context, attr);
+
+		setHorizontalScrollBarEnabled(false);
+		setVerticalScrollBarEnabled(false);
 	}
 
-	public boolean isHaveCloseButton()
-	{
-		return closeButton;
+	public void onPause() {
+		if (mAdAnimator != null) {
+			mAdAnimator.stopLoading();
+			mAdAnimator.clearAnimation();
+
+			if (mAdAnimator.getCurrentView() != null) {
+				mAdAnimator.getCurrentView().pauseTimers();
+
+				if (mAdAnimator.getCurrentView() instanceof MraidView)
+					((MraidView)mAdAnimator.getCurrentView()).unregisterBroadcastReceiver();
+			}
+		}
 	}
-	
+
+	public void onResume() {
+		if (mAdAnimator != null && mAdAnimator.getCurrentView() != null) {
+			if (mAdAnimator.getCurrentView() instanceof MraidView)
+				((MraidView)mAdAnimator.getCurrentView()).registerBroadcastReceiver();
+
+			mAdAnimator.getCurrentView().resumeTimers();
+		}
+	}
+
+	public boolean isHaveCloseButton() {
+		return mHaveCloseButton;
+	}
+
 	public Plus1BannerView enableCloseButton() {
-		this.closeButton = true;
-		
+		mHaveCloseButton = true;
+
 		return this;
 	}
-	
+
 	public Plus1BannerView setCloseButtonEnabled(boolean closeButtonEnabled) {
-		this.closeButton = closeButtonEnabled;
-		
+		mHaveCloseButton = closeButtonEnabled;
+
 		return this;
 	}
-	
+
 	public boolean isClosed() {
-		return closed;
+		return mClosed;
 	}
-	
-	public Plus1Banner getBanner() {
-		return banner;
-	}
-	
+
 	public Plus1BannerView enableAnimationFromTop() {
 		return enableAnimation(-1f);
 	}
-	
+
 	public Plus1BannerView enableAnimationFromBottom() {
 		return enableAnimation(1f);
 	}
-	
+
 	public Plus1BannerView disableAnimation() {
-		this.showAnimation = null;
-		this.hideAnimation = null;
-		
+		mShowAnimation = null;
+		mHideAnimation = null;
+
+		return this;
+	}
+
+	public void loadAd(String html, String adType) {
+		init();
+
+		BaseAdView adView =
+			"mraid".equals(adType)
+				? makeMraidView()
+				: makeAdView();
+
+		mAdAnimator.loadAdView(adView, html);
+	}
+
+	public MraidView makeMraidView() {
+		MraidView adView = new MraidView(getContext());
+		Log.d(LOGTAG, "MraidView instance created");
+		adView.setOnReadyListener(new MraidView.OnReadyListener() {
+			public void onReady(MraidView view) {
+				show();
+			}
+		});
+		adView.setOnExpandListener(new MraidView.OnExpandListener() {
+			public void onExpand(MraidView view) {
+				setExpanded(true);
+
+				//setVisibility(INVISIBLE); // hide without animation
+			}
+		});
+		adView.setOnCloseListener(new MraidView.OnCloseListener() {
+			public void onClose(MraidView view, ViewState newViewState) {
+				setExpanded(false);
+			}
+		});
+		adView.setOnFailureListener(new MraidView.OnFailureListener() {
+			public void onFailure(MraidView view) {
+				Log.e(LOGTAG, "Mraid ad failed to load");
+			}
+		});
+
+		return adView;
+	}
+
+	public AdView makeAdView() {
+		AdView adView = new AdView(getContext());
+		Log.d(LOGTAG, "AdView instance created");
+		adView.setOnReadyListener(new AdView.OnReadyListener() {
+			public void onReady() {
+				show();
+			}
+		});
+
+		return adView;
+	}
+
+	public void setOnAutorefreshChangeListener(OnAutorefreshStateListener listener) {
+		mOnAutorefreshChangeListener = listener;
+	}
+
+	public Plus1BannerView setAutorefreshEnabled(boolean enabled) {
+		if (mAutorefreshEnabled != enabled) { // NOTE: really changed
+			mAutorefreshEnabled = enabled;
+
+			if (mOnAutorefreshChangeListener != null)
+				mOnAutorefreshChangeListener.onAutorefreshStateChanged(this);
+		}
+
 		return this;
 	}
 
 	public Plus1BannerView setViewStateListener(
 		Plus1BannerViewStateListener viewStateListener
 	) {
-		this.viewStateListener = viewStateListener;
+		mViewStateListener = viewStateListener;
 
 		return this;
 	}
 
-	public void setBanner(Plus1Banner banner) {
-		try {
-			if (!initialized)
-				init();
+	public boolean getAutorefreshEnabled() {
+		return mAutorefreshEnabled;
+	}
 
-			this.banner = banner;
-			
-			if ((banner != null) && (banner.getId() > 0)) {
-				flipper.stopFlipping();
-				
-				SpannableStringBuilder text = 
-					new SpannableStringBuilder(banner.getTitle());
-				text.setSpan(new UnderlineSpan(), 0, banner.getTitle().length(), 0);				
-				title.setText(text);
-				content.setText(banner.getContent());
-					
-				if (!banner.isImageBanner()) {
-					if (flipper.getCurrentView().equals(image))
-						flipper.showNext();
-					
-					show();
-				}
-				
-			} else if (getVisibility() == VISIBLE) {
-				
-				if (hideAnimation != null)
-					startAnimation(hideAnimation);
-				
-				setVisibility(INVISIBLE);
-	
-				if (viewStateListener != null)
-					viewStateListener.onHideBannerView();
-			}
-		} catch(OutOfMemoryError e) {
-			Log.e(
-				getClass().getName(),
-				"Out of memory error while setting banner: " + e.getMessage()
-			);
+	private void setExpanded(boolean orly) {
+		if (mExpanded != orly) { // NOTE: really changed
+			mExpanded = orly;
+
+			if (mExpanded)
+				mAdAnimator.stopLoading();
+
+			if (mOnAutorefreshChangeListener != null)
+				mOnAutorefreshChangeListener.onAutorefreshStateChanged(this);
 		}
 	}
 
-	public void setImage(Drawable drawable) {
-		image.setImage(drawable);
-		imageDownloaded();
+	public boolean isExpanded() {
+		return mExpanded;
 	}
-	
-	public void setMovie(Movie movie) {
-		image.setMovie(movie);
-		imageDownloaded();
-	}
-	
-	private void imageDownloaded()
-	{
-		if (banner != null && banner.isImageBanner()) {
-			if (!flipper.getCurrentView().equals(image))
-				flipper.showNext();
-		} else
-			flipper.startFlipping();
-		
-		show();
-	}
-	
+
 	private void init() {
-		if (initialized)
+		if (mInitialized)
 			return;
-		
-		setBackgroundResource(R.drawable.wp_banner_background);
-
-		ImageView shield = new ImageView(getContext());
-		shield.setImageResource(R.drawable.wp_banner_shild);
-		shield.setMaxWidth(9);
-		addView(
-			shield,
-			new LinearLayout.LayoutParams(
-				LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT,
-				0.03125f
-			)
-		);
-		
-		this.flipper = new ViewFlipper(getContext());
-		flipper.setFlipInterval(3000);
-		flipper.setInAnimation(
-			AnimationUtils.loadAnimation(
-				getContext(), 
-				android.R.anim.fade_in
-			)
-		);
-		flipper.setOutAnimation(
-			AnimationUtils.loadAnimation(
-				getContext(), 
-				android.R.anim.fade_out
-			)
-		);
-		
-		LinearLayout ll = new LinearLayout(getContext());
-		ll.setOrientation(VERTICAL);
-		
-		this.title = new TextView(getContext());
-		title.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
-		title.setTextSize(14f);
-		title.setTextColor(Color.rgb(115, 154, 208));
-		title.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-		ll.addView(title);
-		
-		this.content = new TextView(getContext());
-		content.setTypeface(Typeface.SANS_SERIF);
-		content.setTextSize(13f);
-		content.setTextColor(Color.WHITE);
-		content.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-		ll.addView(content);
-		flipper.addView(ll);
-		
-		this.image = new Plus1ImageView(getContext());
-		flipper.addView(image);
-		
-		addView(
-			flipper, 			
-			new LinearLayout.LayoutParams(
-				LayoutParams.FILL_PARENT,
-				LayoutParams.FILL_PARENT,
-				0.90625f + (isHaveCloseButton() ? 0f : 0.0625f)
-			)
-		);
-
-		if (isHaveCloseButton()) {
-			Button closeButton = new Button(getContext());
-			closeButton.setBackgroundResource(R.drawable.wp_banner_close);
-			
-			closeButton.setOnClickListener(
-				new OnClickListener() {
-					public void onClick(View v) {
-						closed = true;
-						flipper.stopFlipping();
-						
-						if (getVisibility() == VISIBLE) {
-							if (hideAnimation != null)
-								startAnimation(hideAnimation);
-							
-							setVisibility(INVISIBLE);
-
-							if (viewStateListener != null)
-								viewStateListener.onCloseBannerView();
-						}
-					}
-				}
-			);
-			
-			addView(
-				closeButton, 
-				new LinearLayout.LayoutParams(
-						18,
-						17,
-						0.0625f
-					)
-			);
-		}
-		
-		setOnClickListener(
-			new OnClickListener() {
-				public void onClick(View view) {
-					if (
-						(banner == null)
-						|| (banner.getLink() == null)
-					)
-						return;
-
-					// TODO: click2call
-					getContext().startActivity(
-						new Intent(
-							Intent.ACTION_VIEW,
-							android.net.Uri.parse(banner.getLink())
-						)
-					);
-				}
-			}
-		);
 
 		setVisibility(INVISIBLE);
 
-		if (viewStateListener != null)
-			viewStateListener.onHideBannerView();
+		// background
+		setBackgroundResource(R.drawable.wp_banner_background);
 
-		initialized = true;
-	}
-	
-	private Plus1BannerView enableAnimation(float toYDelta) {
-		this.showAnimation = new TranslateAnimation(
-				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
-				Animation.RELATIVE_TO_SELF, toYDelta, Animation.RELATIVE_TO_SELF, 0f
-			);
-		showAnimation.setDuration(500);
-		
-		this.hideAnimation = new TranslateAnimation(
-				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
-				Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, toYDelta
+		// shild
+		ImageView shild = new ImageView(getContext());
+		shild.setImageResource(R.drawable.wp_banner_shild);
+		shild.setMaxWidth(9);
+		shild.setLayoutParams(
+			new FrameLayout.LayoutParams(
+				FrameLayout.LayoutParams.WRAP_CONTENT,
+				FrameLayout.LayoutParams.WRAP_CONTENT,
+				Gravity.LEFT | Gravity.CENTER_VERTICAL
+			)
 		);
-		hideAnimation.setDuration(500);
-		
+
+		mAdAnimator = new Plus1AdAnimator(getContext());
+
+		addView(
+			mAdAnimator.getBaseView(),
+			new FrameLayout.LayoutParams(
+				getWidth() - 8,
+				FrameLayout.LayoutParams.FILL_PARENT,
+				Gravity.RIGHT
+			)
+		);
+
+		addView(shild);
+
+		// close button
+		if (isHaveCloseButton()) {
+			Button closeButton = new Button(getContext());
+			closeButton.setBackgroundResource(R.drawable.wp_banner_close);
+
+			closeButton.setOnClickListener(new OnClickListener() {
+				public void onClick(View v) {
+					mClosed = true;
+					setAutorefreshEnabled(false);
+					hide();
+				}
+			});
+
+			addView(
+				closeButton,
+				new FrameLayout.LayoutParams(
+					18,
+					17,
+					Gravity.RIGHT
+				)
+			);
+		}
+
+		mInitialized = true;
+	}
+
+	private Plus1BannerView enableAnimation(float toYDelta) {
+		mShowAnimation = new TranslateAnimation(
+			Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
+			Animation.RELATIVE_TO_SELF, toYDelta, Animation.RELATIVE_TO_SELF, 0f
+		);
+		mShowAnimation.setDuration(500);
+
+		mHideAnimation = new TranslateAnimation(
+			Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, 0f,
+			Animation.RELATIVE_TO_SELF, 0f, Animation.RELATIVE_TO_SELF, toYDelta
+		);
+		mHideAnimation.setDuration(500);
+
 		return this;
 	}
-	
+
 	private void show() {
 		if (getVisibility() == INVISIBLE) {
-			if (showAnimation != null)
-				startAnimation(showAnimation);
+			if (mShowAnimation != null)
+				startAnimation(mShowAnimation);
 
 			setVisibility(VISIBLE);
 
-			if (viewStateListener != null)
-				viewStateListener.onShowBannerView();
+			if (mViewStateListener != null)
+				mViewStateListener.onShowBannerView();
 		}
+
+		mAdAnimator.showAd();
+	}
+
+	private void hide() {
+		if (getVisibility() == VISIBLE) {
+			if (mHideAnimation != null)
+				startAnimation(mHideAnimation);
+
+			setVisibility(INVISIBLE);
+
+			if (mViewStateListener != null)
+				mViewStateListener.onCloseBannerView();
+		}
+	}
+
+	public interface OnAutorefreshStateListener {
+		public void onAutorefreshStateChanged(Plus1BannerView view);
 	}
 }

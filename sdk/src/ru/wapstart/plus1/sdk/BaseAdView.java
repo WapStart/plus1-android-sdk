@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011, Alexander Klestov <a.klestov@co.wapstart.ru>
+ * Copyright (c) 2012, Alexander Zaytsev <a.zaytsev@co.wapstart.ru>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,47 +26,37 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package ru.wapstart.plus1.sdk;
 
-import android.util.Log;
+import android.content.Context;
+import android.webkit.WebView;
 
-import java.util.Iterator;
-import org.json.JSONException;
-import org.json.JSONObject;
+public abstract class BaseAdView extends WebView {
 
-/**
- * @author Alexander Klestov <a.klestov@co.wapstart.ru>
- * @copyright Copyright (c) 2011, Wapstart
- */
-final class JSONBannerDownloader extends BaseBannerDownloader {
-
-	public JSONBannerDownloader(Plus1BannerView view) {
-		super(view);
+	public BaseAdView(Context context) {
+		super(context);
 	}
 
+	abstract public void loadHtmlData(String data);
+
+	/**
+	 * NOTE: NPE workaround for WebView
+	 */
 	@Override
-	protected Plus1Banner parse(String answer) {
-		Plus1Banner banner = new Plus1Banner();
-		
+	public void onWindowFocusChanged(boolean hasFocus) {
 		try {
-			JSONObject jsonObject = new JSONObject(answer);
-			// TODO: legacy API needs generics
-			@SuppressWarnings("unchecked")
-			Iterator<String> iterator = jsonObject.keys();
-			String propertyName = null;
-			
-			while (iterator.hasNext()) {
-				propertyName = iterator.next();
-				
-				banner.setProperty(
-					propertyName, 
-					jsonObject.get(propertyName).toString()
-				);
-			}
-		} catch (JSONException e) {
-			Log.e(getClass().getName(), "Can't handle json answer");
-		}
-		
-		return banner;
+			super.onWindowFocusChanged(hasFocus);
+		} catch (NullPointerException npe) { }
+	}
+
+	protected String completeHtml(String data) {
+        // If the string data lacks the HTML boilerplate, add it.
+        if (data.indexOf("<html>") == -1) {
+			data = "<html><head></head><body style='margin:0;padding:0;'>"
+					+ data + "</body></html>";
+        }
+
+		return data;
 	}
 }

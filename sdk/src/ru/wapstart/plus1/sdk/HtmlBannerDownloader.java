@@ -40,183 +40,149 @@ import java.util.Locale;
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 
 import android.app.Activity;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
-/**
- * @author Alexander Klestov <a.klestov@co.wapstart.ru>
- * @copyright Copyright (c) 2011, Wapstart
- */
-abstract class BaseBannerDownloader extends AsyncTask<Void, Void, Void> {
+final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
+	private static final String LOGTAG = "HtmlBannerDownloader";
 	private static final Integer BUFFER_SIZE = 8192;
 	private static final String NO_BANNER = "<!-- i4jgij4pfd4ssd -->";
-	
+
 	protected Plus1BannerView view			= null;
 	protected Plus1BannerRequest request	= null;
-	protected String deviceId				= null;
 	protected int timeout					= 0;
 	protected boolean runOnce               = false;
-	
-	private boolean running = true;
+
+	protected String mBannerData			= null;
+	protected String mBannerAdType			= null;
 
 	protected Plus1BannerDownloadListener bannerDownloadListener = null;
-	
-	public BaseBannerDownloader(Plus1BannerView view) {
+
+	public HtmlBannerDownloader(Plus1BannerView view) {
 		this.view = view;
 	}
-	
-	public BaseBannerDownloader setDeviceId(String deviceId) {
-		this.deviceId = deviceId;
-		
-		return this;
-	}
-	
-	public BaseBannerDownloader setRequest(Plus1BannerRequest request) {
+
+	public HtmlBannerDownloader setRequest(Plus1BannerRequest request) {
 		this.request = request;
-		
+
 		return this;
 	}
-	
-	public BaseBannerDownloader setTimeout(int timeout) {
+
+	public HtmlBannerDownloader setTimeout(int timeout) {
 		this.timeout = timeout;
-		
-		return this;
-	}
-
-	public BaseBannerDownloader setRunOnce() {
-		this.runOnce = true;
 
 		return this;
 	}
 
-	public BaseBannerDownloader setRunOnce(boolean runOnce) {
+	public HtmlBannerDownloader setRunOnce() {
+		return setRunOnce(true);
+	}
+
+	public HtmlBannerDownloader setRunOnce(boolean runOnce) {
 		this.runOnce = runOnce;
 
 		return this;
-	}	
-	
-	public BaseBannerDownloader setDownloadListener(
+	}
+
+	public HtmlBannerDownloader setDownloadListener(
 		Plus1BannerDownloadListener bannerDownloadListener
 	) {
 		this.bannerDownloadListener = bannerDownloadListener;
 
 		return this;
 	}
-	
-    public void stop()
-    {	
-        running = false;
-    }	
-	
-	@Override	
+
+	@Override
 	protected Void doInBackground(Void... voids)
 	{
-		while( running ) {
-			if (view.isClosed())
+		while (!isCancelled()) {
+			if (view.isClosed() || view.isExpanded())
 				return null;
 
 			updateBanner();
-        	
+
 			if (runOnce)
 				return null;
-			
+
 			try {
 				Thread.sleep(1000 * timeout);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				return null;
 			}
 		}
-		
+
 		return null;
 	}
 
 	protected void updateBanner()
 	{
-		try {
-			final Plus1Banner banner = getBanner();
-			
-			view.post(new Runnable() {
-				public void run() {
-					view.setBanner(banner);
-				}
-			});	
-			
-			if (banner != null) {
-				String imageUrl = null;
-				
-				if (!banner.getPictureUrl().equals(""))
-					imageUrl = banner.getPictureUrl();
-				else if (!banner.getPictureUrlPng().equals(""))
-					imageUrl = banner.getPictureUrlPng();	
-				
-				if (imageUrl != null)
-					downloadImage(imageUrl);
-			}
-		} catch(Exception e) {
-			Log.e(
-				getClass().getName(),
-				"Unexpected exception while updating banner: " + e.getMessage()
-			);
-		}
-	}
-	
-	protected Plus1Banner getBanner()
-	{
-		final String result = getBannerData();
-		
-		Log.d(getClass().getName(), "answer: " + result.toString());
-		
-		Plus1Banner banner = null;
+		if (!fetchBanner())
+			return;
 
-		if (result.equals("")) {
+		if (mBannerData.equals("")) {
 			if (bannerDownloadListener != null)
 				bannerDownloadListener.onBannerLoadFailed(
 					LoadError.UnknownAnswer
 				);
-		} else if (result.equals(NO_BANNER)) { 
+		} else if (mBannerData.equals(NO_BANNER)) {
 			if (bannerDownloadListener != null)
 				bannerDownloadListener.onBannerLoadFailed(
 					LoadError.NoHaveBanner
 				);
 		} else {
-			banner = parse(result);
+			view.post(new Runnable() {
+				public void run() {
+					if (!isCancelled())
+						view.loadAd(mBannerData, mBannerAdType);
+				}
+			});
 
-			if ((banner != null) && (banner.getId() > 0)) {
-				if (bannerDownloadListener != null)
-					bannerDownloadListener.onBannerLoaded();
-			} else {
-				if (bannerDownloadListener != null)
-					bannerDownloadListener.onBannerLoadFailed(
-						LoadError.UnknownAnswer
-					);
-			}
+			if (bannerDownloadListener != null)
+				bannerDownloadListener.onBannerLoaded();
 		}
-		
-		return banner;
 	}
-	
-	protected String getBannerData()
+
+	protected boolean fetchBanner()
 	{
-		InputStream stream = getStream(request.getRequestUri());
-		
+		HttpURLConnection connection = makeConnection(request.getRequestUri());
+
+		if (connection == null)
+			return false;
+
 		String result = "";
-		
+		boolean fetched = false;
+
 		try {
+			InputStream stream = connection.getInputStream();
+
 			byte[] buffer = new byte[BUFFER_SIZE];
 			int count = 0;
-			
-			BufferedInputStream bufStream = 
+
+			BufferedInputStream bufStream =
 				new BufferedInputStream (
 					stream,
 					BUFFER_SIZE
 				);
 
-			while ((count = bufStream.read(buffer)) != -1)
+			while ((count = bufStream.read(buffer)) != -1) {
+				if (isCancelled())
+					return false;
+
 				result += new String(buffer, 0, count);
-			
+			}
+
 			bufStream.close();
+
+			mBannerData = result.toString();
+			mBannerAdType = connection.getHeaderField("X-Adtype");
+
+			Log.d(LOGTAG, "Answer: " + mBannerData);
+			Log.d(LOGTAG, "X-Adtype: " + mBannerAdType);
+
+			fetched = true;
+		} catch (IOException e) {
+			Log.d(getClass().getName(), "URL " + request.getRequestUri() + " doesn't exist");
 		} catch (Exception e) {
 			Log.e(
 				getClass().getName(),
@@ -227,92 +193,80 @@ abstract class BaseBannerDownloader extends AsyncTask<Void, Void, Void> {
 				bannerDownloadListener.onBannerLoadFailed(
 					LoadError.DownloadFailed
 				);
+		} finally {
+			connection.disconnect();
 		}
-		
-		return result;
+
+		return fetched;
 	}
-	
-	protected void downloadImage(String imageUrl)
-	{
-		InputStream stream = getStream(imageUrl);
-		
-		if (stream == null) 
-			return;
-		
-		final Drawable img = Drawable.createFromStream(stream, "src");
-		
-		view.post(new Runnable() {
-			public void run() {
-				view.setImage(img);
-			}
-		});		
-	}
-	
+
 	protected void modifyConnection(HttpURLConnection connection) {
 		connection.setRequestProperty(
-			"User-Agent", 
+			"User-Agent",
 			Plus1Helper.getUserAgent()
 		);
-		
+
 		connection.setRequestProperty(
-			"Cookies", 
+			"Cookies",
 			"wssid="+Plus1Helper.getClientSessionId(view.getContext())
 		);
-		
+
 		connection.setRequestProperty(
-			"x-display-metrics", 
+			"x-display-metrics",
 			getDisplayMetrics()
 		);
-		
+
+		connection.setRequestProperty(
+			"x-container-metrics",
+			getContainerMetrics()
+		);
+
 		connection.setRequestProperty(
 			"x-application-type",
 			"android"
 		);
-		
+
 		connection.setRequestProperty(
 			"x-preferred-locale",
 			Locale.getDefault().getDisplayName(Locale.US)
 		);
-		
-		if ((deviceId != null) && !deviceId.equals(""))
-			connection.setRequestProperty("x-device-imei", deviceId);
 	}
-	
+
 	protected String getDisplayMetrics()
 	{
 		DisplayMetrics metrics = new DisplayMetrics();
-		
+
 		((Activity)view.getContext()).
 			getWindowManager().
 			getDefaultDisplay().
 			getMetrics(metrics);
-		
-		return 
-			String.valueOf(metrics.widthPixels) + "x" 
+
+		return
+			String.valueOf(metrics.widthPixels) + "x"
 			+ String.valueOf(metrics.heightPixels);
 	}
-	
-	protected InputStream getStream(String url)
+
+	protected String getContainerMetrics()
 	{
-		InputStream stream = null;
-		HttpURLConnection connection;
-		
+		return
+			String.valueOf(view.getWidth()) + "x"
+			+ String.valueOf(view.getHeight());
+	}
+
+	protected HttpURLConnection makeConnection(String url)
+	{
+		HttpURLConnection connection = null;
+
 		try {
 			connection = (HttpURLConnection) new URL(url).openConnection();
 			modifyConnection(connection);
 			connection.connect();
-			
-			stream = connection.getInputStream();
 		} catch (MalformedURLException e) {
 			Log.e(getClass().getName(), "URL parsing failed: " + url);
-		} catch (IOException e) {
-			Log.d(getClass().getName(), "URL " + url + " doesn't exist");
 		} catch (Exception e) {
 			Log.d(getClass().getName(), "Unexpected exception: " + e.getMessage());
 		}
-		
-		return stream;
-	}	
-	
-	abstract protected Plus1Banner parse(String answer);
+
+		return connection;
+	}
 }

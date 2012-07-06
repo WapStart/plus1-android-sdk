@@ -33,10 +33,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 
-/**
- * @author Alexander Klestov <a.klestov@co.wapstart.ru>
- * @copyright Copyright (c) 2011, Wapstart
- */
 final class Plus1LocationListener implements LocationListener {
 	
 	private Plus1BannerRequest request = null;

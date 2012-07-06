@@ -29,23 +29,18 @@
 
 package ru.wapstart.plus1.sdk;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
 import java.util.Set;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import android.location.Location;
 
-/**
- * @author Alexander Klestov <a.klestov@co.wapstart.ru>
- * @copyright Copyright (c) 2010, Wapstart
- */
 public final class Plus1BannerRequest {
+	private static final String SDK_VERSION = "2.0";
+	private static final Integer REQUEST_VERSION = 2;
+
 	public static enum Gender {Unknown, Male, Female;}
-	public static enum RequestType {XML, JSON};
-	public static enum BannerType {Undefined, Mixed, Text, Graphic};
-	
-	private static final Integer VERSION			= 2;
+	public static enum BannerType {Undefined, Mixed, Text, Graphic, RichMedia};
 
 	private String rotatorUrl		= "http://ro.plus1.wapstart.ru/";
 	private int age					= 0;
@@ -55,13 +50,12 @@ public final class Plus1BannerRequest {
 	private Set<BannerType> types	= null;
 
 	private String pageId			= null;
-	private RequestType requestType	= RequestType.XML;
 	private Location location		= null;
-	
+
 	public static Plus1BannerRequest create() {
 		return new Plus1BannerRequest();
 	}
-	
+
 	public Plus1BannerRequest() {}
 
 	public int getAge() {
@@ -70,7 +64,7 @@ public final class Plus1BannerRequest {
 
 	public Plus1BannerRequest setAge(int age) {
 		this.age = age;
-		
+
 		return this;
 	}
 
@@ -80,7 +74,7 @@ public final class Plus1BannerRequest {
 
 	public Plus1BannerRequest setApplicationId(int applicationId) {
 		this.applicationId = applicationId;
-		
+
 		return this;
 	}
 
@@ -90,90 +84,77 @@ public final class Plus1BannerRequest {
 
 	public Plus1BannerRequest setGender(Gender sex) {
 		this.gender = sex;
-		
+
 		return this;
 	}
-	
+
 	public String getLogin() {
 		return login;
 	}
-	
+
 	public Plus1BannerRequest setLogin(String login) {
 		this.login = login;
-		
+
 		return this;
 	}
-	
+
 	public Plus1BannerRequest addType(BannerType type) {
 		if (types == null)
 			this.types = new HashSet<BannerType>();
-	
+
 		if (!type.equals(BannerType.Undefined))
 			types.add(type);
-		
-		return this; 
+
+		return this;
 	}
-	
+
 	public Plus1BannerRequest clearTypes() {
 		if (types != null)
 			types.clear();
-		
+
 		return this;
 	}
-	
-	public RequestType getRequestType() {
-		return requestType;
-	}
 
-	public Plus1BannerRequest setRequestType(RequestType type) throws Exception {
-		throw new Exception("types not supported while");
-		/* this.type = type;
-		
-		return this; */
-	}
-	
 	public String getRotatorUrl() {
 		return rotatorUrl;
 	}
-	
+
 	public Plus1BannerRequest setRotatorUrl(String rotatorUrl) {
 		this.rotatorUrl = rotatorUrl;
-		
+
 		return this;
 	}
-	
+
 	public Location getLocation() {
 		return location;
 	}
-	
+
 	public Plus1BannerRequest setLocation(Location location) {
 		this.location = location;
-		
+
 		return this;
 	}
-	
+
 	public String getRequestUri() {
 
-		String url = 
+		String url =
 			getRotatorUrl()
-			+ "?area=application"
-			+ "&version=" + VERSION
+			+ "?area=applicationWebView"
+			+ "&version=" + REQUEST_VERSION
+			+ "&sdkver=" + SDK_VERSION
 			+ "&id=" + getApplicationId()
 			+ "&pageId=" + getPageId();
-				
+
 		if (!getGender().equals(Gender.Unknown))
 			url += "&sex=" + getGender().ordinal();
 
 		if (getAge() != 0)
 			url += "&age=" + getAge();
-		
+
 		if ((types != null) && !types.isEmpty())
 			for (BannerType bt : types)
 				url += "&type[]=" + bt.ordinal();
-		
-		if (getRequestType() == RequestType.JSON)
-			url += "&json=1";
-		
+
 		try {
 			if (getLogin() != null)
 				url += "&login=" + URLEncoder.encode(getLogin(), "UTF-8");					
@@ -191,17 +172,13 @@ public final class Plus1BannerRequest {
 					"&location=" + getLocation().getLatitude() 
 					+ ";" + getLocation().getLongitude();			
 		}
-		
+
 		return url;
 	}
 
 	private String getPageId() {
-		try {
-			if (pageId == null)
-				pageId = Plus1Helper.getUniqueHash();
-		} catch (NoSuchAlgorithmException e) {
-			// FIXME: log errors
-		}
+		if (pageId == null)
+			pageId = Plus1Helper.getUniqueHash();
 
 		return pageId;
 	}
