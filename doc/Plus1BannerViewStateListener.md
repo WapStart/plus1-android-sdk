@@ -1,6 +1,6 @@
 Plus1BannerViewStateListener
 ============================
-Интерфейс наблюдателя за состоянием видимости [Plus1BannerView](doc/Plus1BannerView.md).
+Интерфейс наблюдателя за состоянием видимости [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md).
 
 ```java
 public interface Plus1BannerViewStateListener {

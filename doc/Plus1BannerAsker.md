@@ -1,6 +1,6 @@
 Plus1BannerAsker
 ================
-Отвечает за получение объявлений с сервера. Взаимодействует с [Plus1BannerRequest](doc/Plus1BannerRequest.md), [Plus1BannerView](doc/Plus1BannerView.md) и Activity вашего приложения.
+Отвечает за получение объявлений с сервера. Взаимодействует с [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md), [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) и Activity вашего приложения.
 
 Основные методы
 ------------------
@@ -14,9 +14,9 @@ Plus1BannerAsker
 * `public Plus1BannerAsker disableAutoDetectLocation(boolean disable)`
   Отключает/включает механизм автоматического определения местоположения пользователя через *LocationManager*.
 * `public Plus1BannerAsker setViewStateListener(Plus1BannerViewStateListener viewStateListener)`  
-  Устанавливает наблюдателя за состоянием видимости [Plus1BannerView](doc/Plus1BannerView.md). Подробнее см. интерфейс [Plus1BannerViewStateListener](doc/Plus1BannerViewStateListener.md).
+  Устанавливает наблюдателя за состоянием видимости [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md). Подробнее см. интерфейс [Plus1BannerViewStateListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerViewStateListener.md).
 * `public Plus1BannerAsker setDownloadListener(Plus1BannerDownloadListener downloadListener)`  
-  Устанавливает наблюдателя загрузки объявления. Подробнее см. интерфейс [Plus1BannerDownloadListener](doc/Plus1BannerDownloadListener.md).
+  Устанавливает наблюдателя загрузки объявления. Подробнее см. интерфейс [Plus1BannerDownloadListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerDownloadListener.md).
 * `public void refreshBanner()`  
   Метод для обновления баннера в "ручном" режиме.
 

@@ -1,6 +1,6 @@
 Plus1BannerView
 ===============
-Отвечает за отображение объявления. Взаимодействует с [Plus1BannerAsker](doc/Plus1BannerAsker.md).
+Отвечает за отображение объявления. Взаимодействует с [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md).
 
 Основные методы
 ------------------

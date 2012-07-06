@@ -1,27 +1,27 @@
 WapStart Plus1 Android SDK
 ==========================
-Это open source библиотека для интеграции рекламы системы WapStart Plus1 в ваши Android-приложения.
+Это open source библиотека для интеграции рекламы системы [Plus1 WapStart](http://plus1.wapstart.ru/) в ваши Android-приложения.
 
-WapStart Plus1 Android SDK распространяется под свободной лицензией BSD (as is).
+Plus1 WapStart Android SDK распространяется под свободной лицензией BSD (as is).
 
 # Установка и настройка
 
-1. Скачайте последнюю версию SDK: https://github.com/Wapstart/plus1-android-sdk/tags
+1. Скачайте последнюю версию SDK: https://github.com/WapStart/plus1-android-sdk/tags
 2. Для начала работы необходимо добавить SDK к проекту в качестве библиотеки;
 
 Приложение должно обладать правами на доступ к сети интернет (**android.permission.INTERNET**) и на получение текущего метоположения (**android.permission.ACCESS_FINE_LOCATION**). Второе не является обязательным, но желательно для более точного определения подходящего рекламного объявления.
 
-Если ваше приложение использует геолокацию, вы можете самостоятельно устанавливать текущее местоположение (см. описание интерфейсов - Plus1BannerRequest.class). При этом рекомендуется отключать автоматическое определение местоположения.
+Если ваше приложение использует геолокацию, вы можете самостоятельно устанавливать текущее местоположение (см. описание интерфейсов - [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md)). При этом рекомендуется отключать автоматическое определение местоположения.
 
-Для работы тестового приложения вам нужно передать идентификатор площадки WapStart Plus1 в методе *setApplicationId()* в файле *BartActivity.java*.
+Для работы тестового приложения вам нужно передать идентификатор площадки WapStart Plus1 в методе **setApplicationId()** в файле *[BartActivity.java](https://github.com/WapStart/plus1-android-sdk/blob/master/examples/Bart/src/ru/wapstart/plus1/bart/BartActivity.java#L51)*.
 
-Идентификатор площадки можно узнать на странице **Код для площадки** после регистрации в системе [WapStart Plus1](https://plus1.wapstart.ru/) и добавления площадки типа Android.
+Идентификатор площадки можно узнать на странице **Код для площадки** после регистрации в системе [WapStart Plus1](http://plus1.wapstart.ru/) и добавления площадки типа Android.
 
 # Использование SDK
 Примеры настройки и конфигурации баннеров можно посмотреть в тестовом приложении **Bart**. В этом разделе даются краткие пояснения для быстрой настройки собственного проекта.
 
 ## Добавление баннера в приложение
-Добавьте *Plus1BannerView* в layout:
+Добавьте [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) в layout:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -49,7 +49,7 @@ import ru.wapstart.plus1.sdk.Plus1BannerRequest;
 import ru.wapstart.plus1.sdk.Plus1BannerAsker;
 ```
 
-На этапе инициализации создайте и настройте объекты *Plus1BannerRequest* и *Plus1BannerAsker* следующим образом:
+На этапе инициализации создайте и настройте объекты [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md) и [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md) следующим образом:
 
 ```java
 @Override
@@ -75,7 +75,7 @@ protected void onCreate(Bundle savedInstanceState)
 }
 ```
 
-А затем предусмотреть вызов обработчиков *onResume()* и *onPause()* класса [Plus1BannerAsker](doc/Plus1BannerAsker.md):
+А затем предусмотреть вызов обработчиков *onResume()* и *onPause()* класса [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md):
 
 ```java
 @Override
@@ -98,13 +98,13 @@ protected void onPause() {
 ```
 
 Для подробного ознакомления смотрите описания интерфейсов и классов, а также исходные коды sdk:
-* [Plus1BannerAsker](doc/Plus1BannerAsker.md) - отвечает за получение объявлений с сервера
-* [Plus1BannerRequest](doc/Plus1BannerRequest.md) - отвечает за хранение информации о пользователе и формирование запроса к серверу
-* [Plus1BannerView](doc/Plus1BannerView.md) - отвечает за отображение объявления
-* [Plus1BannerViewStateListener](doc/Plus1BannerViewStateListener.md) - интерфейс наблюдателя за состоянием видимости [Plus1BannerView](doc/Plus1BannerView.md)
-* [Plus1BannerDownloadListener](doc/Plus1BannerDownloadListener.md) - интерфейс наблюдателя загрузки баннера
+* [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md) - отвечает за получение объявлений с сервера
+* [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md) - отвечает за хранение информации о пользователе и формирование запроса к серверу
+* [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) - отвечает за отображение объявления
+* [Plus1BannerViewStateListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerViewStateListener.md) - интерфейс наблюдателя за состоянием видимости [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md)
+* [Plus1BannerDownloadListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerDownloadListener.md) - интерфейс наблюдателя загрузки баннера
 
 # Контактная информация
 По всем возникающим у вас вопросам интеграции вы можете обратиться в службу поддержки пользователей:  
-E-mail: clientsupport@co.wapstart.ru  
+E-Mail: clientsupport@co.wapstart.ru  
 ICQ: 553425962
