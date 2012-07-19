@@ -212,6 +212,11 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 		);
 
 		connection.setRequestProperty(
+			"x-original-user-agent",
+			view.getWebViewUserAgent()
+		);
+
+		connection.setRequestProperty(
 			"x-display-metrics",
 			getDisplayMetrics()
 		);

@@ -40,6 +40,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.FrameLayout;
 import android.util.Log;
+import android.webkit.WebView;
 
 import ru.wapstart.plus1.sdk.MraidView.ViewState;
 
@@ -52,6 +53,7 @@ public class Plus1BannerView extends FrameLayout {
 
 	private Animation mHideAnimation	= null;
 	private Animation mShowAnimation	= null;
+	private String mWebViewUserAgent	= null;
 
 	private boolean mHaveCloseButton	= false;
 	private boolean mClosed				= false;
@@ -72,6 +74,8 @@ public class Plus1BannerView extends FrameLayout {
 
 		setHorizontalScrollBarEnabled(false);
 		setVerticalScrollBarEnabled(false);
+
+		mWebViewUserAgent = new WebView(context).getSettings().getUserAgentString();
 	}
 
 	public void onPause() {
@@ -95,6 +99,10 @@ public class Plus1BannerView extends FrameLayout {
 
 			mAdAnimator.getCurrentView().resumeTimers();
 		}
+	}
+
+	public String getWebViewUserAgent() {
+		return mWebViewUserAgent;
 	}
 
 	public boolean isHaveCloseButton() {
