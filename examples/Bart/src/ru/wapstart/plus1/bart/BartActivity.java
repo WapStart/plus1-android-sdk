@@ -6,6 +6,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.KeyEvent;
 import android.widget.ImageView;
 
 import java.util.Random;
@@ -80,5 +81,16 @@ public class BartActivity extends Activity implements View.OnClickListener
 
 		mAsker.onPause();
 		Log.d("BartActivity", "onPause fired");
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		Log.d("BartActivity", "onKeyDown fired");
+		if ((keyCode == KeyEvent.KEYCODE_BACK) && mBannerView.canGoBack()) {
+			mBannerView.goBack();
+			return true;
+		}
+
+		return super.onKeyDown(keyCode, event);
 	}
 }

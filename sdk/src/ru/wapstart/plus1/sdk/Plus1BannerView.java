@@ -63,8 +63,6 @@ public class Plus1BannerView extends FrameLayout {
 
 	private Plus1BannerViewStateListener mViewStateListener = null;
 
-	private Plus1BannerViewStateListener viewStateListener = null;
-
 	public Plus1BannerView(Context context) {
 		this(context, null);
 	}
@@ -99,6 +97,17 @@ public class Plus1BannerView extends FrameLayout {
 
 			mAdAnimator.getCurrentView().resumeTimers();
 		}
+	}
+
+	public boolean canGoBack() {
+		return
+			mAdAnimator.getCurrentView() != null
+			&& mAdAnimator.getCurrentView().canGoBack();
+	}
+
+	public void goBack() {
+		if (mAdAnimator.getCurrentView() != null)
+			mAdAnimator.getCurrentView().goBack();
 	}
 
 	public String getWebViewUserAgent() {

@@ -2,7 +2,6 @@ package ru.wapstart.plus1.sdk;
 
 import java.util.ArrayList;
 
-import ru.wapstart.plus1.sdk.R;
 import ru.wapstart.plus1.sdk.MraidView.ExpansionStyle;
 import ru.wapstart.plus1.sdk.MraidView.NativeCloseButtonStyle;
 import ru.wapstart.plus1.sdk.MraidView.PlacementType;
@@ -39,6 +38,13 @@ class MraidDisplayController extends MraidAbstractController {
 	private static final long VIEWABILITY_TIMER_MILLIS = 3000;
 	private static final int CLOSE_BUTTON_SIZE_DP = 50;
 
+	private static final FrameLayout.LayoutParams CUSTOM_VIEW_LAYOUT_PARAMS =
+		new FrameLayout.LayoutParams(
+			ViewGroup.LayoutParams.FILL_PARENT,
+			ViewGroup.LayoutParams.FILL_PARENT,
+			Gravity.CENTER
+		);
+
 	// The view's current state.
 	private ViewState mViewState = ViewState.HIDDEN;
 
@@ -53,6 +59,9 @@ class MraidDisplayController extends MraidAbstractController {
 
 	// A reference to the root view.
 	private FrameLayout mRootView;
+
+	// Container for custom views of WebView
+	private FrameLayout mCustomViewContainer;
 
 	// Tracks whether this controller's view is currently on-screen.
 	private boolean mIsViewable;
@@ -200,6 +209,42 @@ class MraidDisplayController extends MraidAbstractController {
 	public void unregisterBroadcastReceiver() {
 		getView().getContext().unregisterReceiver(mOrientationBroadcastReceiver);
 		Log.d(LOGTAG, "Orientation broadcast receiver was unregistered");
+	}
+
+	public void showCustomView(View view) {
+		if (mRootView == null || !isExpanded()) {
+			Log.e(LOGTAG, "Only expand mode usage allowed");
+			return;
+		}
+
+		RelativeLayout expansionLayout = (RelativeLayout) mRootView.findViewById(
+			MraidView.MODAL_CONTAINER_LAYOUT_ID);
+
+		expansionLayout.setVisibility(View.GONE);
+
+		FrameLayout customViewContainer = getCustomViewContainer();
+
+		customViewContainer.addView(view, CUSTOM_VIEW_LAYOUT_PARAMS);
+		customViewContainer.setVisibility(View.VISIBLE);
+		customViewContainer.bringToFront();
+	}
+
+	public void hideCustomView(View view) {
+		if (mRootView == null || !isExpanded()) {
+			Log.e(LOGTAG, "Only expand mode usage allowed");
+			return;
+		}
+
+		FrameLayout customViewContainer = getCustomViewContainer();
+
+		customViewContainer.setVisibility(View.GONE);
+		customViewContainer.removeView(view);
+		removeCustomViewContainer();
+
+		RelativeLayout expansionLayout = (RelativeLayout) mRootView.findViewById(
+			MraidView.MODAL_CONTAINER_LAYOUT_ID);
+
+		expansionLayout.setVisibility(View.VISIBLE);
 	}
 
 	protected void initializeJavaScriptState() {
@@ -374,6 +419,30 @@ class MraidDisplayController extends MraidAbstractController {
 			activity.setRequestedOrientation(requestedOrientation);
 		} catch (ClassCastException e) {
 			Log.d(LOGTAG, "Unable to modify device orientation.");
+		}
+	}
+
+	private FrameLayout getCustomViewContainer() {
+		if (mCustomViewContainer == null) {
+			mCustomViewContainer = new FrameLayout(getView().getContext());
+			mCustomViewContainer.setVisibility(View.GONE);
+			mCustomViewContainer.setBackgroundColor(Color.BLACK);
+			mRootView.addView(
+				mCustomViewContainer,
+				new FrameLayout.LayoutParams(
+					ViewGroup.LayoutParams.FILL_PARENT,
+					ViewGroup.LayoutParams.FILL_PARENT
+				)
+			);
+		}
+
+		return mCustomViewContainer;
+	}
+
+	private void removeCustomViewContainer() {
+		if (mCustomViewContainer != null) {
+			mRootView.removeView(mCustomViewContainer);
+			mCustomViewContainer = null;
 		}
 	}
 

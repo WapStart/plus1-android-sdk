@@ -15,8 +15,6 @@ import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import ru.wapstart.plus1.sdk.R;
-
 public class MraidBrowser extends Activity {
 
 	public static final String URL_EXTRA = "extra_url";

@@ -23,18 +23,28 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.view.MotionEvent;
+import android.view.LayoutInflater;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
+import android.widget.VideoView;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnErrorListener;
 
 public class MraidView extends BaseAdView {
 	private static final String LOGTAG = "MraidView";
+
+	private View mCustomView;
 
 	private MraidBrowserController mBrowserController;
 	private MraidDisplayController mDisplayController;
@@ -198,6 +208,21 @@ public class MraidView extends BaseAdView {
 	public void unregisterBroadcastReceiver() {
 		if (mDisplayController != null)
 			mDisplayController.unregisterBroadcastReceiver();
+	}
+
+	@Override
+	public boolean canGoBack() {
+		return
+			mCustomView != null
+			|| super.canGoBack();
+	}
+
+	@Override
+	public void goBack() {
+		if (mCustomView != null)
+			mWebChromeClient.onHideCustomView();
+		else
+			super.goBack();
 	}
 
 	private void notifyOnFailureListener() {
@@ -400,6 +425,86 @@ public class MraidView extends BaseAdView {
 	}
 
 	private class MraidWebChromeClient extends WebChromeClient {
+		private WebChromeClient.CustomViewCallback mCustomViewCallback;
+
+		private Bitmap mDefaultVideoPoster;
+		private View mVideoProgressView;
+
+		@Override
+		public void onShowCustomView(View view, CustomViewCallback callback) {
+			/*((Activity)getContext()).getWindow().addFlags(
+				WindowManager.LayoutParams.FLAG_FULLSCREEN
+			);*/
+
+			if (mCustomView != null) {
+				callback.onCustomViewHidden();
+			} else {
+				mCustomView = view;
+				mCustomViewCallback = callback;
+
+				VideoView customVideoView =
+					(
+						mCustomView instanceof FrameLayout
+						&& ((FrameLayout)mCustomView).getFocusedChild() instanceof VideoView
+					)
+						? (VideoView) ((FrameLayout)mCustomView).getFocusedChild()
+						: null;
+
+				getDisplayController().showCustomView(mCustomView);
+
+				if (customVideoView != null) {
+					customVideoView.setOnCompletionListener(new OnCompletionListener() {
+						public void onCompletion(MediaPlayer mp) {
+							mp.stop();
+							Log.d(LOGTAG, "onCompletion() fired");
+							onHideCustomView();
+						}
+					});
+					customVideoView.setOnErrorListener(new OnErrorListener() {
+						public boolean onError(MediaPlayer mp, int what, int extra) {
+							Log.e(LOGTAG, "Error in custom video, type " + what);
+							return true;
+						}
+					});
+					//customVideoView.start();
+				}
+			}
+		}
+
+		@Override
+		public void onHideCustomView() {
+			if (mCustomView != null) {
+				getDisplayController().hideCustomView(mCustomView);
+				mCustomViewCallback.onCustomViewHidden();
+				mCustomView = null;
+			}
+
+			/*((Activity)getContext()).getWindow().clearFlags(
+				WindowManager.LayoutParams.FLAG_FULLSCREEN
+			);*/
+		}
+
+		@Override
+		public Bitmap getDefaultVideoPoster() {
+			if (mDefaultVideoPoster == null) {
+				mDefaultVideoPoster = BitmapFactory.decodeResource(
+					getResources(), R.drawable.default_video_poster);
+			}
+
+			return mDefaultVideoPoster;
+		}
+
+		@Override
+		public View getVideoLoadingProgressView() {
+			if (mVideoProgressView == null) {
+				LayoutInflater inflater = LayoutInflater.from(getContext());
+				mVideoProgressView =
+					inflater.inflate(R.layout.video_loading_progress, null);
+			}
+
+			return mVideoProgressView;
+		}
+
 		@Override
 		public boolean onJsAlert(WebView view, String url, String message, JsResult result) {
 			Log.d(LOGTAG, message);
