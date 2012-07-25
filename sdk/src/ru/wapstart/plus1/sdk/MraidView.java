@@ -214,6 +214,7 @@ public class MraidView extends BaseAdView {
 	public boolean canGoBack() {
 		return
 			mCustomView != null
+			|| getDisplayController().isExpanded()
 			|| super.canGoBack();
 	}
 
@@ -221,6 +222,8 @@ public class MraidView extends BaseAdView {
 	public void goBack() {
 		if (mCustomView != null)
 			mWebChromeClient.onHideCustomView();
+		else if (getDisplayController().isExpanded())
+			getDisplayController().close();
 		else
 			super.goBack();
 	}
