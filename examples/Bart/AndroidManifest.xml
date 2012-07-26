@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="ru.wapstart.plus1.bart"
-      android:versionCode="1"
-      android:versionName="1.0">
-<uses-sdk android:minSdkVersion="7" />
-<uses-permission android:name="android.permission.INTERNET"></uses-permission>
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
-<uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <application android:label="Bart" android:icon="@drawable/icon">
-        <activity android:name="BartActivity"
-                  android:label="@string/app_name"
-                  android:configChanges="orientation">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+		package="ru.wapstart.plus1.bart"
+		android:versionCode="6"
+		android:versionName="2.1.0">
+	<uses-sdk android:minSdkVersion="7" />
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+	<application android:label="Bart" android:icon="@drawable/icon">
+		<activity android:name="BartActivity"
+				android:label="@string/app_name"
+				android:configChanges="orientation">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
 
 		<activity android:name="ru.wapstart.plus1.sdk.MraidBrowser" />
-    </application>
+	</application>
 </manifest> 
