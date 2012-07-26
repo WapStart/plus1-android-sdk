@@ -79,6 +79,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 	}
 
 	// NOTE: need to clear animation on pause
+	@Override
 	public void clearAnimation() {
 		if (mFadeOutAdView != null) {
 			try {
@@ -103,10 +104,10 @@ final public class Plus1AdAnimator extends FrameLayout {
 			if (mCurrentView instanceof MraidView)
 				((MraidView)mCurrentView).unregisterBroadcastReceiver();
 
+			clearAnimation();
 			mCurrentView.startAnimation(makeFadeOutAnimation());
 
 			mBaseView.removeView(mCurrentView);
-			clearAnimation();
 			mCurrentView.setOnTouchListener(null);
 			mCurrentView.pauseTimers();
 
@@ -117,11 +118,15 @@ final public class Plus1AdAnimator extends FrameLayout {
 
 				public void onAnimationEnd(Animation anmtn) {
 					if (mFadeOutAdView != null) {
-						mFadeOutAdView.destroy();
-						mFadeOutAdView = null;
+						mFadeOutAdView.post(new Runnable() {
+							public void run() {
+								mFadeOutAdView.resumeTimers();
+								mFadeOutAdView.destroy();
+								mFadeOutAdView = null;
+								Log.d(LOGTAG, "Ad view was destroyed after fadeout animation");
+							}
+						});
 					}
-
-					Log.d(LOGTAG, "Ad view was destroyed in animation end context");
 				}
 
 				public void onAnimationRepeat(Animation anmtn) {
