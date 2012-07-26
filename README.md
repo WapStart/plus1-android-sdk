@@ -4,20 +4,47 @@ Plus1 WapStart Android SDK
 
 Plus1 WapStart Android SDK распространяется под свободной лицензией BSD (as is).
 
+
 # Установка и настройка
 
 1. Скачайте последнюю версию SDK: https://github.com/WapStart/plus1-android-sdk/tags
 2. Для начала работы необходимо добавить SDK к проекту в качестве библиотеки;
+3. Сконфигурируйте манифест согласно нижеприведённым инструкциям.
 
-Приложение должно обладать правами на доступ к сети интернет (**android.permission.INTERNET**) и на получение текущего метоположения (**android.permission.ACCESS_FINE_LOCATION**). Второе не является обязательным, но желательно для более точного определения подходящего рекламного объявления.
+## Конфигурирование манифеста
+Для корректной работы SDK приложение должно обладать правами на доступ к сети Интернет и на получение текущего местоположения:
 
-Если ваше приложение использует геолокацию, вы можете самостоятельно устанавливать текущее местоположение (см. описание интерфейсов - [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md)). При этом рекомендуется отключать автоматическое определение местоположения.
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+```
 
+При этом **ACCESS_FINE_LOCATION** не является обязательным, но рекомендуется для подбора релевантных рекламных объявлений.
+
+Если ваше приложение использует геолокацию, вы можете самостоятельно устанавливать текущее местоположение (см. описание интерфейсов - [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md)). При этом рекомендуется отключать автоматическое определние местоположения в SDK.
+
+В блок *<application>* требуется добавить информацию об используемых Activity:
+
+```xml
+<application android:label="Bart" android:icon="@drawable/icon">
+	<activity android:name="<app Activity name>" ... >
+		...
+	</activity>
+
+	<activity android:name="ru.wapstart.plus1.sdk.MraidBrowser" />
+</application>
+```
+
+*[MraidBrowser](https://github.com/WapStart/plus1-android-sdk/blob/master/sdk/src/ru/wapstart/plus1/sdk/MraidBrowser.java)* используется для перехода по ссылкам баннеров формата Rich Media внутри приложения.
+
+## Настройка тестового приложения
 Для работы тестового приложения вам нужно передать идентификатор площадки [Plus1 WapStart](https://plus1.wapstart.ru) в методе **setApplicationId()** в файле *[BartActivity.java](https://github.com/WapStart/plus1-android-sdk/blob/master/examples/Bart/src/ru/wapstart/plus1/bart/BartActivity.java#L51)*.
 
 Идентификатор площадки можно узнать на странице **Код для площадки** после регистрации в сети [Plus1 WapStart](https://plus1.wapstart.ru) и добавления площадки типа Android.
 
+
 # Использование SDK
+
 Примеры настройки и конфигурации баннеров можно посмотреть в тестовом приложении **Bart**. В этом разделе даются краткие пояснения для быстрой настройки собственного проекта.
 
 ## Добавление баннера в приложение
@@ -66,7 +93,7 @@ protected void onCreate(Bundle savedInstanceState)
 	mAsker =
 		new Plus1BannerAsker(
 			new Plus1BannerRequest()
-				.setApplicationId(4242),
+				.setApplicationId(...),
 			mBannerView
 				.enableAnimationFromTop()
 				.enableCloseButton()
@@ -75,7 +102,9 @@ protected void onCreate(Bundle savedInstanceState)
 }
 ```
 
-А затем предусмотреть вызов обработчиков *onResume()* и *onPause()* класса [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md):
+В методе **setApplicationId()** задайте идентификатор вашей рекламной площадки. Его можно узнать на странице **Код для площадки** после регистрации в сети [Plus1 WapStart](https://plus1.wapstart.ru) и добавления площадки типа Android.
+
+Затем необходимо предусмотреть вызов обработчиков *onResume()* и *onPause()* класса [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md):
 
 ```java
 @Override
@@ -97,6 +126,20 @@ protected void onPause() {
 }
 ```
 
+Для баннеров формата Rich Media в [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) необходимо передавать событие нажатия клавиши "Назад".
+
+```java
+@Override
+public boolean onKeyDown(int keyCode, KeyEvent event) {
+	if ((keyCode == KeyEvent.KEYCODE_BACK) && mBannerView.canGoBack()) {
+		mBannerView.goBack();
+		return true;
+	}
+
+	return super.onKeyDown(keyCode, event);
+}
+```
+
 Для подробного ознакомления смотрите описания интерфейсов и классов, а также исходные коды sdk:
 * [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md) - отвечает за получение объявлений с сервера
 * [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md) - отвечает за хранение информации о пользователе и формирование запроса к серверу
@@ -104,7 +147,12 @@ protected void onPause() {
 * [Plus1BannerViewStateListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerViewStateListener.md) - интерфейс наблюдателя за состоянием видимости [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md)
 * [Plus1BannerDownloadListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerDownloadListener.md) - интерфейс наблюдателя загрузки баннера
 
+
 # Контактная информация
+
 По всем возникающим у вас вопросам интеграции вы можете обратиться в службу поддержки пользователей:  
 E-Mail: clientsupport@co.wapstart.ru  
 ICQ: 553425962
+
+## Обратная связь и багфиксы
+Мы постоянно улучшаем наши SDK, делаем их удобнее и стабильнее. Будем рады вашему [участию в разработке](https://github.com/Wapstart/plus1-android-sdk/pulls), с радостью рассмотрим и обсудим [ваши предложениия](https://github.com/WapStart/plus1-android-sdk/issues)!
