@@ -1,3 +1,9 @@
+Plus1 WapStart Android SDK 2.1.0, 2012-08-06
+----------------------
+- Added html5 play video feature
+- Back key support for expanded layer
+- Destroy WebView in UI thread after fadeout animation
+
 Plus1 WapStart Android SDK 2.0.1, 2012-07-19
 ----------------------
 - Send additional x-original-user-agent header
