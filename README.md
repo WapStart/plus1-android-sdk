@@ -27,7 +27,7 @@ The application must have the permission to access the Internet and the current 
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 ```
 
-**ACCESS_FINE_LOCATION** is optional but it is recommend for matching the relevant ads.
+**ACCESS_FINE_LOCATION** is optional but it is recommended for matching the relevant ads.
 
 If your application used the geolocation, you can establish the current location by yourself (see more - [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md)). It is recommended to turn off the automatic location detection in the SDK (method *disableAutoDetectLocation()* in [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md)).
 
@@ -53,7 +53,7 @@ You can find the site ID on the **Код для площадки** page after si
 
 # SDK using
 
-Примеры настройки и конфигурации баннеров можно посмотреть в тестовом приложении **Bart**. В этом разделе даются краткие пояснения для быстрой настройки собственного проекта.
+You can find the examples of the settings and the configurations of the banners in the **Bart** test application. The short explanations for a quick setup are given below.
 
 ## Adding the banner to the application
 Add [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) into layout:
@@ -74,7 +74,7 @@ Add [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/
 </FrameLayout>
 
 ```
-View адаптировано под размер 320x50. Рекомендуется использовать именно данные параметры.
+View is adapted to the 320x50 size. We recommend to use these settings.
 
 Подключите необходимые классы в файле вашего Activity, где планируете показывать рекламу:
 
