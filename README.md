@@ -1,6 +1,6 @@
 Plus1 WapStart Android SDK
 ==========================
-It is an open source library интеграции рекламы сети [Plus1 WapStart](https://plus1.wapstart.ru) в ваши Android-приложения.
+It is an open source library to use for integration with [Plus1 WapStart](https://plus1.wapstart.ru) ad network.
 
 Plus1 WapStart Android SDK распространяется под свободной лицензией BSD (as is).
 
@@ -10,7 +10,7 @@ Plus1 WapStart Android SDK распространяется под свобод�
   * [Test application setup](#test-application-setup)
 * [Использование SDK](#Использование-SDK)
   * [Добавление баннера в приложение](#Добавление-баннера-в-приложение)
-* [Contacts](#Contacts)
+* [Contacts](#сontacts)
 
 
 # Setup Guide
