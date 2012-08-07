@@ -7,7 +7,7 @@ Plus1 WapStart Android SDK распространяется под свобод�
 **Contents:**
 * [Setup Guide](#Setup-Guide)
   * [Manifest configuration](#manifest-configuration)
-  * [Test application setup](#Настройка-тестового-приложения)
+  * [Test application setup](#test-application-setup)
 * [Использование SDK](#Использование-SDK)
   * [Добавление баннера в приложение](#Добавление-баннера-в-приложение)
 * [Contacts](#Contacts)
@@ -45,7 +45,7 @@ Plus1 WapStart Android SDK распространяется под свобод�
 
 *[MraidBrowser](https://github.com/WapStart/plus1-android-sdk/blob/master/sdk/src/ru/wapstart/plus1/sdk/MraidBrowser.java)* используется для перехода по ссылкам баннеров формата Rich Media внутри приложения.
 
-## Настройка тестового приложения
+## Test application setup
 Для работы тестового приложения вам нужно передать идентификатор площадки [Plus1 WapStart](https://plus1.wapstart.ru) в методе **setApplicationId()** в файле *[BartActivity.java](https://github.com/WapStart/plus1-android-sdk/blob/master/examples/Bart/src/ru/wapstart/plus1/bart/BartActivity.java#L51)*.
 
 Идентификатор площадки можно узнать на странице **Код для площадки** после регистрации в сети [Plus1 WapStart](https://plus1.wapstart.ru) и добавления площадки типа Android.
