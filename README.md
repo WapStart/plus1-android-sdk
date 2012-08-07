@@ -16,7 +16,7 @@ Plus1 WapStart Android SDK распространяется под свобод�
 # Setup Guide
 
 1. Download the latest SDK: https://github.com/WapStart/plus1-android-sdk/tags
-2. Для начала работы необходимо добавить SDK к проекту в качестве библиотеки;
+2. Add the SDK to your project to start working;
 3. Follow these steps to set up the manifest.
 
 ## Manifest configuration
