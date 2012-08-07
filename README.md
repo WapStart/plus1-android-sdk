@@ -5,12 +5,12 @@ It is an open source library интеграции рекламы сети [Plus1
 Plus1 WapStart Android SDK распространяется под свободной лицензией BSD (as is).
 
 **Contents:**
-* [Setup Guide](#Setup Guide)
+* [Setup Guide](#Setup-Guide)
   * [Конфигурирование манифеста](#Конфигурирование-манифеста)
   * [Настройка тестового приложения](#Настройка-тестового-приложения)
 * [Использование SDK](#Использование-SDK)
   * [Добавление баннера в приложение](#Добавление-баннера-в-приложение)
-* [Contacts](#Контактная-информация)
+* [Contacts](#Contacts)
 
 
 # Setup Guide
@@ -156,9 +156,9 @@ public boolean onKeyDown(int keyCode, KeyEvent event) {
 * [Plus1BannerDownloadListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerDownloadListener.md) - интерфейс наблюдателя загрузки баннера
 
 
-# Контактная информация
+# Contacts
 
-По всем возникающим у вас вопросам интеграции вы можете обратиться в службу поддержки пользователей:  
+If you have the questions, please, contact our clientsupport:  
 E-Mail: clientsupport@co.wapstart.ru  
 ICQ: 553425962
 
