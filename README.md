@@ -2,7 +2,7 @@ Plus1 WapStart Android SDK
 ==========================
 It is an open source library to use for integration with [Plus1 WapStart](https://plus1.wapstart.ru) ad network.
 
-Plus1 WapStart Android SDK распространяется под свободной лицензией BSD (as is).
+Plus1 WapStart Android SDK is provided by the free BSD license (as is).
 
 **Contents:**
 * [Setup Guide](#Setup-Guide)
@@ -20,7 +20,7 @@ Plus1 WapStart Android SDK распространяется под свобод�
 3. Follow these steps to set up the manifest.
 
 ## Manifest configuration
-Для корректной работы SDK приложение должно обладать правами на доступ к сети Интернет и на получение текущего местоположения:
+The application must have the permissions to access Internet and current location for correct SDK working:
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
