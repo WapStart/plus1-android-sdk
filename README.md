@@ -76,7 +76,7 @@ Add [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/
 ```
 View is adapted to the 320x50 size. We recommend to use these settings.
 
-Подключите необходимые классы в файле вашего Activity, где планируете показывать рекламу:
+Turn on the necessary classes in the file of your Activity where you are planning to view the ads:
 
 ```java
 import ru.wapstart.plus1.sdk.Plus1BannerView;
