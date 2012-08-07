@@ -31,7 +31,7 @@ The application must have the permission to access the Internet and the current 
 
 If your application used the geolocation, you can establish the current location by yourself (see more - [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md)). It is recommended to turn off the automatic location detection in the SDK (method *disableAutoDetectLocation()* in [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md)).
 
-You need to add the information about the used Activity in *<application>* block:
+You need to add the information about the used Activity to *<application>* block:
 
 ```xml
 <application android:label="Bart" android:icon="@drawable/icon">
