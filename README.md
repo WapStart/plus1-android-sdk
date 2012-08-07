@@ -48,7 +48,7 @@ You need to add the information about the used Activity to the*<application>* bl
 ## Test application setup
 For correct test app working you are needed to transfer [Plus1 WapStart](https://plus1.wapstart.ru) site ID in the method **setApplicationId()** in the *[BartActivity.java](https://github.com/WapStart/plus1-android-sdk/blob/master/examples/Bart/src/ru/wapstart/plus1/bart/BartActivity.java#L51)* file.
 
-Идентификатор площадки можно узнать на странице **Код для площадки** после регистрации в сети [Plus1 WapStart](https://plus1.wapstart.ru) и добавления площадки типа Android.
+You can find the site ID on the **Код для площадки** page after signing up for [Plus1 WapStart](https://plus1.wapstart.ru) account and adding the Android application to the account.
 
 
 # SDK using
