@@ -56,7 +56,7 @@ The application must have the permission to access the Internet and current loca
 Примеры настройки и конфигурации баннеров можно посмотреть в тестовом приложении **Bart**. В этом разделе даются краткие пояснения для быстрой настройки собственного проекта.
 
 ## Adding the banner to the application
-Добавьте [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) в layout:
+Add [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) into layout:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
