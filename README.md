@@ -20,7 +20,7 @@ Plus1 WapStart Android SDK is provided by the free BSD license (as is).
 3. Follow these steps to set up the manifest.
 
 ## Manifest configuration
-The application must have the permission to access the Internet and current location for correct SDK working:
+The application must have the permission to access the Internet and the current location for correct SDK working:
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
@@ -31,7 +31,7 @@ The application must have the permission to access the Internet and current loca
 
 If your application used the geolocation, you can establish the current location by yourself (see more - [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md)). It is recommended to turn off the automatic location detection in the SDK (method *disableAutoDetectLocation()* in [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md)).
 
-В блок *<application>* требуется добавить информацию об используемых Activity:
+You need to add the information about the used Activity in *<application>* block:
 
 ```xml
 <application android:label="Bart" android:icon="@drawable/icon">
