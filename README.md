@@ -6,7 +6,7 @@ Plus1 WapStart Android SDK распространяется под свобод�
 
 **Contents:**
 * [Setup Guide](#Setup-Guide)
-  * [Manifest configuration](#Конфигурирование-манифеста)
+  * [Manifest configuration](#manifest-configuration)
   * [Test application setup](#Настройка-тестового-приложения)
 * [Использование SDK](#Использование-SDK)
   * [Добавление баннера в приложение](#Добавление-баннера-в-приложение)
@@ -19,7 +19,7 @@ Plus1 WapStart Android SDK распространяется под свобод�
 2. Для начала работы необходимо добавить SDK к проекту в качестве библиотеки;
 3. Follow these steps to set up the manifest.
 
-## Конфигурирование манифеста
+## Manifest configuration
 Для корректной работы SDK приложение должно обладать правами на доступ к сети Интернет и на получение текущего местоположения:
 
 ```xml
@@ -148,7 +148,7 @@ public boolean onKeyDown(int keyCode, KeyEvent event) {
 }
 ```
 
-Для подробного ознакомления смотрите описания интерфейсов и классов, а также исходные коды sdk:
+You can find the detailed descriptions of the classes, interfaces and the source code below:
 * [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md) - отвечает за получение объявлений с сервера
 * [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md) - отвечает за хранение информации о пользователе и формирование запроса к серверу
 * [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) - отвечает за отображение объявления
