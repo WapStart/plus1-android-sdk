@@ -5,7 +5,7 @@ It is an open source library интеграции рекламы сети [Plus1
 Plus1 WapStart Android SDK распространяется под свободной лицензией BSD (as is).
 
 **Contents:**
-* [Setup Guide](#Setup-Guide)
+* [Setup Guide](#Setup Guide)
   * [Конфигурирование манифеста](#Конфигурирование-манифеста)
   * [Настройка тестового приложения](#Настройка-тестового-приложения)
 * [Использование SDK](#Использование-SDK)
