@@ -27,9 +27,9 @@ The application must have the permission to access the Internet and current loca
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 ```
 
-При этом **ACCESS_FINE_LOCATION** не является обязательным, но рекомендуется для подбора релевантных рекламных объявлений.
+**ACCESS_FINE_LOCATION** is optional but it is recommend for matching the relevant ads.
 
-Если ваше приложение использует геолокацию, вы можете самостоятельно устанавливать текущее местоположение (см. описание интерфейсов - [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md)). При этом рекомендуется отключать автоматическое определние местоположения в SDK (метод *disableAutoDetectLocation()* в [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md)).
+If your application used the geolocation, you can establish the current location by yourself (see more - [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md)). It is recommended to turn off the automatic location detection in the SDK (method *disableAutoDetectLocation()* in [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md)).
 
 В блок *<application>* требуется добавить информацию об используемых Activity:
 
