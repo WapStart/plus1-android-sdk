@@ -31,7 +31,7 @@ The application must have the permission to access the Internet and the current 
 
 If your application used the geolocation, you can establish the current location by yourself (see more - [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md)). It is recommended to turn off the automatic location detection in the SDK (method *disableAutoDetectLocation()* in [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md)).
 
-You need to add the information about the used Activity to *<application>* block:
+You need to add the information about the used Activity to the*<application>* block:
 
 ```xml
 <application android:label="Bart" android:icon="@drawable/icon">
@@ -43,7 +43,7 @@ You need to add the information about the used Activity to *<application>* block
 </application>
 ```
 
-*[MraidBrowser](https://github.com/WapStart/plus1-android-sdk/blob/master/sdk/src/ru/wapstart/plus1/sdk/MraidBrowser.java)* используется для перехода по ссылкам баннеров формата Rich Media внутри приложения.
+*[MraidBrowser](https://github.com/WapStart/plus1-android-sdk/blob/master/sdk/src/ru/wapstart/plus1/sdk/MraidBrowser.java)* is using for 
 
 ## Test application setup
 Для работы тестового приложения вам нужно передать идентификатор площадки [Plus1 WapStart](https://plus1.wapstart.ru) в методе **setApplicationId()** в файле *[BartActivity.java](https://github.com/WapStart/plus1-android-sdk/blob/master/examples/Bart/src/ru/wapstart/plus1/bart/BartActivity.java#L51)*.
