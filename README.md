@@ -1,6 +1,6 @@
 Plus1 WapStart Android SDK
 ==========================
-It is an open source library to use for integration with [Plus1 WapStart](https://plus1.wapstart.ru) ad network.
+It is an open source library to use for integration with the [Plus1 WapStart](https://plus1.wapstart.ru) ad network.
 
 Plus1 WapStart Android SDK is provided by the free BSD license (as is).
 
@@ -46,9 +46,9 @@ You need to add the information about the used Activity to the*<application>* bl
 *[MraidBrowser](https://github.com/WapStart/plus1-android-sdk/blob/master/sdk/src/ru/wapstart/plus1/sdk/MraidBrowser.java)* is using for 
 
 ## Test application setup
-For correct test app working you are needed to transfer [Plus1 WapStart](https://plus1.wapstart.ru) site ID in the method **setApplicationId()** in the *[BartActivity.java](https://github.com/WapStart/plus1-android-sdk/blob/master/examples/Bart/src/ru/wapstart/plus1/bart/BartActivity.java#L51)* file.
+For correct test app working you are needed to transfer a [Plus1 WapStart](https://plus1.wapstart.ru) site ID in the method **setApplicationId()** in the *[BartActivity.java](https://github.com/WapStart/plus1-android-sdk/blob/master/examples/Bart/src/ru/wapstart/plus1/bart/BartActivity.java#L51)* file.
 
-You can find the site ID on the **Код для площадки** page after signing up for [Plus1 WapStart](https://plus1.wapstart.ru) account and adding the Android application to the account.
+You can find the site ID on the **Код для площадки** page after signing up for a [Plus1 WapStart](https://plus1.wapstart.ru) account and adding the Android application to the account.
 
 
 # SDK using
