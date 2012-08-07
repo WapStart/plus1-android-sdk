@@ -9,7 +9,7 @@ Plus1 WapStart Android SDK распространяется под свобод�
   * [Manifest configuration](#manifest-configuration)
   * [Test application setup](#test-application-setup)
 * [SDK using](#sdk-using)
-  * [Добавление баннера в приложение](#Добавление-баннера-в-приложение)
+  * [Adding the banner to the application](#adding-the-banner-to-the-application)
 * [Contacts](#contacts)
 
 
@@ -55,7 +55,7 @@ Plus1 WapStart Android SDK распространяется под свобод�
 
 Примеры настройки и конфигурации баннеров можно посмотреть в тестовом приложении **Bart**. В этом разделе даются краткие пояснения для быстрой настройки собственного проекта.
 
-## Добавление баннера в приложение
+## Adding the banner to the application
 Добавьте [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) в layout:
 
 ```xml
