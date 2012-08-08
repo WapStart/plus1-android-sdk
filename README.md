@@ -110,7 +110,7 @@ protected void onCreate(Bundle savedInstanceState)
 }
 ```
 
-В методе **setApplicationId()** задайте идентификатор вашей рекламной площадки. Его можно узнать на странице **Код для площадки** после регистрации в сети [Plus1 WapStart](https://plus1.wapstart.ru) и добавления площадки типа Android.
+You need to set the ID of your site in the **setApplicationId()** method. You can find it on the **Код для площадки** page after signing up for a [Plus1 WapStart](https://plus1.wapstart.ru) account and adding the Android application to the account.
 
 Затем необходимо предусмотреть вызов обработчиков *onResume()* и *onPause()* класса [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md):
 
@@ -134,7 +134,7 @@ protected void onPause() {
 }
 ```
 
-For Rich Media bannes you need to send the button "Back" event in [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md).
+For Rich Media banners you need to send the button "Back" event in [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md).
 
 ```java
 @Override
