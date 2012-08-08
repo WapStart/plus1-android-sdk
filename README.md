@@ -134,7 +134,7 @@ protected void onPause() {
 }
 ```
 
-Для баннеров формата Rich Media в [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) необходимо передавать событие нажатия клавиши "Назад".
+For Rich Media bannes you need to send the button "Back" event in [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md).
 
 ```java
 @Override
