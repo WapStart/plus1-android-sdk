@@ -112,7 +112,7 @@ protected void onCreate(Bundle savedInstanceState)
 
 You need to set the unique identifier of your site in the **setApplicationId()** method. You can find it on the **Код для площадки** page after signing up for a [Plus1 WapStart](https://plus1.wapstart.ru) account and adding the Android application to the account.
 
-Затем необходимо предусмотреть вызов обработчиков *onResume()* и *onPause()* класса [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md):
+Then it is necessary to provide the call of the *onResume()* and *onPause()* handlers of the [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md) class:
 
 ```java
 @Override
