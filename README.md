@@ -20,7 +20,7 @@ Plus1 WapStart Android SDK is provided by the free BSD license (as is).
 3. Follow these steps to set up the manifest.
 
 ## Manifest configuration
-The application must have the permission to access the Internet and the current location for correct SDK working:
+The application must have the permissions to access the Internet and the current location for correct SDK working:
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
