@@ -46,7 +46,7 @@ You need to add the information about the used Activity to the*<application>* bl
 *[MraidBrowser](https://github.com/WapStart/plus1-android-sdk/blob/master/sdk/src/ru/wapstart/plus1/sdk/MraidBrowser.java)* is using for Rich Media.
 
 ## Test application setup
-For correct test app working you are needed to transfer a [Plus1 WapStart](https://plus1.wapstart.ru) unique site identifier in the method **setApplicationId()** in the *[BartActivity.java](https://github.com/WapStart/plus1-android-sdk/blob/master/examples/Bart/src/ru/wapstart/plus1/bart/BartActivity.java#L51)* file.
+For correct test app working you must transfer a [Plus1 WapStart](https://plus1.wapstart.ru) unique site identifier in the method **setApplicationId()** in the *[BartActivity.java](https://github.com/WapStart/plus1-android-sdk/blob/master/examples/Bart/src/ru/wapstart/plus1/bart/BartActivity.java#L51)* file.
 
 You can find the unique site identifier on the **Код для площадки** page after signing up for a [Plus1 WapStart](https://plus1.wapstart.ru) account and adding the Android application to the account.
 
