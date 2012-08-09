@@ -74,7 +74,7 @@ Add [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/
 </FrameLayout>
 
 ```
-View is adapted to the 320x50 size. We recommend to use these settings.
+View is adapted to the 320x50 size. You should use these settings.
 
 Turn on the necessary classes in the file of your Activity where you are planning to view the ads:
 
