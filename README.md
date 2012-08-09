@@ -43,12 +43,12 @@ You need to add the information about the used Activity to the*<application>* bl
 </application>
 ```
 
-*[MraidBrowser](https://github.com/WapStart/plus1-android-sdk/blob/master/sdk/src/ru/wapstart/plus1/sdk/MraidBrowser.java)* is using for 
+*[MraidBrowser](https://github.com/WapStart/plus1-android-sdk/blob/master/sdk/src/ru/wapstart/plus1/sdk/MraidBrowser.java)* is using for Rich Media.
 
 ## Test application setup
-For correct test app working you are needed to transfer a [Plus1 WapStart](https://plus1.wapstart.ru) site ID in the method **setApplicationId()** in the *[BartActivity.java](https://github.com/WapStart/plus1-android-sdk/blob/master/examples/Bart/src/ru/wapstart/plus1/bart/BartActivity.java#L51)* file.
+For correct test app working you are needed to transfer a [Plus1 WapStart](https://plus1.wapstart.ru) unique site identifier in the method **setApplicationId()** in the *[BartActivity.java](https://github.com/WapStart/plus1-android-sdk/blob/master/examples/Bart/src/ru/wapstart/plus1/bart/BartActivity.java#L51)* file.
 
-You can find the site ID on the **Код для площадки** page after signing up for a [Plus1 WapStart](https://plus1.wapstart.ru) account and adding the Android application to the account.
+You can find the unique site identifier on the **Код для площадки** page after signing up for a [Plus1 WapStart](https://plus1.wapstart.ru) account and adding the Android application to the account.
 
 
 # SDK using
@@ -110,7 +110,7 @@ protected void onCreate(Bundle savedInstanceState)
 }
 ```
 
-You need to set the ID of your site in the **setApplicationId()** method. You can find it on the **Код для площадки** page after signing up for a [Plus1 WapStart](https://plus1.wapstart.ru) account and adding the Android application to the account.
+You need to set the unique identifier of your site in the **setApplicationId()** method. You can find it on the **Код для площадки** page after signing up for a [Plus1 WapStart](https://plus1.wapstart.ru) account and adding the Android application to the account.
 
 Затем необходимо предусмотреть вызов обработчиков *onResume()* и *onPause()* класса [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md):
 
