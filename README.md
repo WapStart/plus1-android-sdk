@@ -20,7 +20,7 @@ Plus1 WapStart Android SDK is provided by the free BSD license (as is).
 3. Follow these steps to set up the manifest.
 
 ## Manifest configuration
-The application must have the permissions to access the Internet and the current location for correct SDK working:
+The application must have permissions to access the Internet and the current location for correct SDK working:
 
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
@@ -29,7 +29,7 @@ The application must have the permissions to access the Internet and the current
 
 **ACCESS_FINE_LOCATION** is optional but it is recommended for matching the relevant ads.
 
-If your application used the geolocation, you can set the current location by yourself (see more - [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md)). It is recommended to turn off the automatic location detection in the SDK (method *disableAutoDetectLocation()* in [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md)).
+If your application is using geolocation, you can set the current location by yourself (see more - [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md)). It is recommended to turn off the automatic location detection in the SDK (method *disableAutoDetectLocation()* in [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md)).
 
 You need to add the information about the used Activity to the*<application>* block:
 
@@ -53,7 +53,7 @@ You can find the unique site identifier on the **Код для площадки*
 
 # SDK using
 
-You can find the examples of the settings and the configurations of the banners in the **Bart** test application. The short explanations for a quick setup are given below.
+You can find the examples of the settings and configurations of banners in the **Bart** test application. The short explanations for a quick setup are given below.
 
 ## Adding the banner to the application
 Add [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) into layout:
@@ -134,7 +134,7 @@ protected void onPause() {
 }
 ```
 
-For Rich Media banners you need to send the button "Back" event in [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md).
+For Rich Media banners you need to send the "Back" button event in [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md).
 
 ```java
 @Override
@@ -158,7 +158,7 @@ You can find the detailed descriptions of the classes, interfaces and the source
 
 # Contacts
 
-If you have the questions, please, contact our clientsupport:  
+If you have any questions, please, contact our client support:  
 E-Mail: clientsupport@co.wapstart.ru  
 ICQ: 553425962
 
