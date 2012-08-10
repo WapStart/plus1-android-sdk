@@ -163,4 +163,4 @@ E-Mail: clientsupport@co.wapstart.ru
 ICQ: 553425962
 
 ---------------------------------------
-We are always looking to enchance our SDK to make things easier for you and all of our customers. You can help us if you have any [comments](https://github.com/Wapstart/plus1-android-sdk/pulls) or [suggestions](https://github.com/WapStart/plus1-android-sdk/issues)!
+We are always looking to improve our SDK to make things easier for you and all of our customers. You can help us if you have any [comments](https://github.com/Wapstart/plus1-android-sdk/pulls) or [suggestions](https://github.com/WapStart/plus1-android-sdk/issues)!
