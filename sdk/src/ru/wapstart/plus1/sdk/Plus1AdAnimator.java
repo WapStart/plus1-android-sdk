@@ -117,16 +117,16 @@ final public class Plus1AdAnimator extends FrameLayout {
 				}
 
 				public void onAnimationEnd(Animation anmtn) {
-					if (mFadeOutAdView != null) {
-						mFadeOutAdView.post(new Runnable() {
-							public void run() {
+					mFadeOutAdView.post(new Runnable() {
+						public void run() {
+							if (mFadeOutAdView != null) {
 								mFadeOutAdView.resumeTimers();
 								mFadeOutAdView.destroy();
 								mFadeOutAdView = null;
 								Log.d(LOGTAG, "Ad view was destroyed after fadeout animation");
 							}
-						});
-					}
+						}
+					});
 				}
 
 				public void onAnimationRepeat(Animation anmtn) {
