@@ -39,7 +39,6 @@ import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.FrameLayout;
-import android.util.Log;
 import android.webkit.WebView;
 
 import ru.wapstart.plus1.sdk.MraidView.ViewState;
