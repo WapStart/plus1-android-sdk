@@ -79,6 +79,11 @@ public class BartActivity extends Activity implements View.OnClickListener
 	protected void onPause() {
 		super.onPause();
 
+		if (mp != null) {
+			mp.release();
+			mp = null;
+		}
+
 		mAsker.onPause();
 		Log.d("BartActivity", "onPause fired");
 	}
