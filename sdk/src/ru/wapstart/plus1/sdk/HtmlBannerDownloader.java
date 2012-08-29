@@ -207,7 +207,7 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 		);
 
 		connection.setRequestProperty(
-			"Cookies",
+			"Cookie",
 			"wssid="+Plus1Helper.getClientSessionId(view.getContext())
 		);
 
