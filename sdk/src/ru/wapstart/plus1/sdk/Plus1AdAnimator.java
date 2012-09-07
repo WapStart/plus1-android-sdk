@@ -35,6 +35,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.webkit.WebView;
 
 final public class Plus1AdAnimator extends FrameLayout {
 	private static final String LOGTAG = "Plus1AdAnimator";
@@ -109,7 +110,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 
 			mBaseView.removeView(mCurrentView);
 			mCurrentView.setOnTouchListener(null);
-			mCurrentView.pauseTimers();
+			new WebView(getContext()).pauseTimers();
 
 			mCurrentView.getAnimation().setAnimationListener(new Animation.AnimationListener() {
 				public void onAnimationStart(Animation anmtn) {
@@ -117,14 +118,15 @@ final public class Plus1AdAnimator extends FrameLayout {
 				}
 
 				public void onAnimationEnd(Animation anmtn) {
-					mFadeOutAdView.post(new Runnable() {
+					getBaseView().post(new Runnable() {
 						public void run() {
 							if (mFadeOutAdView != null) {
-								mFadeOutAdView.resumeTimers();
 								mFadeOutAdView.destroy();
 								mFadeOutAdView = null;
 								Log.d(LOGTAG, "Ad view was destroyed after fadeout animation");
 							}
+
+							new WebView(getContext()).resumeTimers();
 						}
 					});
 				}
