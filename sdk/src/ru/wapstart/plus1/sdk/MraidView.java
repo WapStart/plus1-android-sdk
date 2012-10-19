@@ -66,6 +66,24 @@ public class MraidView extends BaseAdView {
 	}
 	private MraidListenerInfo mListenerInfo;
 
+	/**
+	 * NOTE: WebView workaround
+	 * @see http://code.google.com/p/android/issues/detail?id=7189
+	 */
+	private OnTouchListener mTouchListener = new OnTouchListener() {
+		public boolean onTouch(View v, MotionEvent event) {
+			switch (event.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+				case MotionEvent.ACTION_UP:
+					if (!v.hasFocus())
+						v.requestFocus();
+					break;
+			}
+
+			return false;
+		}
+	};
+
 	public static final int PLACEHOLDER_VIEW_ID = 100;
 	public static final int MODAL_CONTAINER_LAYOUT_ID = 101;
 	public static final int AD_CONTAINER_LAYOUT_ID = 102;
@@ -113,24 +131,6 @@ public class MraidView extends BaseAdView {
 		setHorizontalScrollBarEnabled(false);
 
 		getSettings().setJavaScriptEnabled(true);
-
-		/**
-		 * NOTE: WebView workaround
-		 * @see http://code.google.com/p/android/issues/detail?id=7189
-		 */
-		setOnTouchListener(new View.OnTouchListener() {
-			public boolean onTouch(View v, MotionEvent event) {
-				switch (event.getAction()) {
-					case MotionEvent.ACTION_DOWN:
-					case MotionEvent.ACTION_UP:
-						if (!v.hasFocus())
-							v.requestFocus();
-						break;
-				}
-
-				return false;
-			}
-		});
 
 		mBrowserController = new MraidBrowserController(this);
 		mDisplayController = new MraidDisplayController(this, expStyle, buttonStyle);
@@ -200,14 +200,18 @@ public class MraidView extends BaseAdView {
 		loadHtmlData(out.toString());
 	}
 
-	public void registerBroadcastReceiver() {
+	public void onPause() {
+		setOnTouchListener(null);
+
 		if (mDisplayController != null)
-			mDisplayController.registerBroadcastReceiver();
+			mDisplayController.stopTasks();
 	}
 
-	public void unregisterBroadcastReceiver() {
+	public void onResume() {
 		if (mDisplayController != null)
-			mDisplayController.unregisterBroadcastReceiver();
+			mDisplayController.startTasks();
+
+		setOnTouchListener(mTouchListener);
 	}
 
 	@Override

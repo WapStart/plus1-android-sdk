@@ -42,6 +42,12 @@ import android.view.MotionEvent;
 
 public class AdView extends BaseAdView {
 
+	private OnTouchListener mTouchListener = new OnTouchListener() {
+		public boolean onTouch(View v, MotionEvent event) {
+			return (event.getAction() == MotionEvent.ACTION_MOVE);
+		}
+	};
+
 	private OnReadyListener mOnReadyListener;
 
 	public AdView(Context context) {
@@ -62,6 +68,14 @@ public class AdView extends BaseAdView {
 		loadDataWithBaseURL(null, data, "text/html", "UTF-8", null);
 	}
 
+	public void onPause() {
+		setOnTouchListener(null);
+	}
+
+	public void onResume() {
+		setOnTouchListener(mTouchListener);
+	}
+
 	public void setOnReadyListener(OnReadyListener listener) {
 		mOnReadyListener = listener;
 	}
@@ -76,12 +90,6 @@ public class AdView extends BaseAdView {
 		setVerticalScrollBarEnabled(false);
 		setVerticalScrollbarOverlay(false);
 		getSettings().setSupportZoom(false);
-
-		setOnTouchListener(new View.OnTouchListener() {
-			public boolean onTouch(View v, MotionEvent event) {
-				return (event.getAction() == MotionEvent.ACTION_MOVE);
-			}
-		});
 	}
 
 	public interface OnReadyListener {

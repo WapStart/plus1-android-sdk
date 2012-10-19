@@ -35,7 +35,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.webkit.WebView;
 
 final public class Plus1AdAnimator extends FrameLayout {
 	private static final String LOGTAG = "Plus1AdAnimator";
@@ -85,6 +84,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 		if (mFadeOutAdView != null) {
 			try {
 				mFadeOutAdView.clearAnimation();
+				mBaseView.removeView(mFadeOutAdView);
 				mFadeOutAdView.setOnTouchListener(null);
 				mFadeOutAdView.destroy();
 				mFadeOutAdView = null;
@@ -102,15 +102,14 @@ final public class Plus1AdAnimator extends FrameLayout {
 			return;
 
 		if (mCurrentView != null) {
-			if (mCurrentView instanceof MraidView)
-				((MraidView)mCurrentView).unregisterBroadcastReceiver();
+			mCurrentView.onPause();
+
+			mCurrentView.getSettings().setJavaScriptEnabled(false);
 
 			clearAnimation();
 			mCurrentView.startAnimation(makeFadeOutAnimation());
 
 			mBaseView.removeView(mCurrentView);
-			mCurrentView.setOnTouchListener(null);
-			new WebView(getContext()).pauseTimers();
 
 			mCurrentView.getAnimation().setAnimationListener(new Animation.AnimationListener() {
 				public void onAnimationStart(Animation anmtn) {
@@ -125,8 +124,6 @@ final public class Plus1AdAnimator extends FrameLayout {
 								mFadeOutAdView = null;
 								Log.d(LOGTAG, "Ad view was destroyed after fadeout animation");
 							}
-
-							new WebView(getContext()).resumeTimers();
 						}
 					});
 				}
@@ -154,8 +151,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 		);
 		mCurrentView.startAnimation(makeFadeInAnimation());
 
-		if (mCurrentView instanceof MraidView)
-			((MraidView)mCurrentView).registerBroadcastReceiver();
+		mCurrentView.onResume();
 	}
 
 	private Animation makeFadeInAnimation() {

@@ -40,6 +40,9 @@ public abstract class BaseAdView extends WebView {
 
 	abstract public void loadHtmlData(String data);
 
+	abstract public void onPause();
+	abstract public void onResume();
+
 	/**
 	 * NOTE: NPE workaround for WebView
 	 */

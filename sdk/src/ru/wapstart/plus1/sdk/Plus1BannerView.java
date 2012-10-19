@@ -80,35 +80,28 @@ public class Plus1BannerView extends FrameLayout {
 			mAdAnimator.stopLoading();
 			mAdAnimator.clearAnimation();
 
-			if (mAdAnimator.getCurrentView() instanceof MraidView) {
-				((MraidView)mAdAnimator.getCurrentView())
-						.unregisterBroadcastReceiver();
-			}
+			if (mAdAnimator.getCurrentView() != null)
+				mAdAnimator.getCurrentView().onPause();
 		}
-
-		new WebView(getContext()).pauseTimers();
 	}
 
 	public void onResume() {
 		if (
 			mAdAnimator != null
-			&& mAdAnimator.getCurrentView() instanceof MraidView
-		) {
-			((MraidView)mAdAnimator.getCurrentView())
-					.registerBroadcastReceiver();
-		}
-
-		new WebView(getContext()).resumeTimers();
+			&& mAdAnimator.getCurrentView() != null
+		)
+			mAdAnimator.getCurrentView().onResume();
 	}
 
 	public boolean canGoBack() {
 		return
-			mAdAnimator.getCurrentView() != null
+			mAdAnimator != null
+			&& mAdAnimator.getCurrentView() != null
 			&& mAdAnimator.getCurrentView().canGoBack();
 	}
 
 	public void goBack() {
-		if (mAdAnimator.getCurrentView() != null)
+		if (mAdAnimator != null && mAdAnimator.getCurrentView() != null)
 			mAdAnimator.getCurrentView().goBack();
 	}
 

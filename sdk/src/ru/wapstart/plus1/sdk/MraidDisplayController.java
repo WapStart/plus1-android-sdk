@@ -69,6 +69,7 @@ class MraidDisplayController extends MraidAbstractController {
 	// Task that periodically checks whether this controller's view is on-screen.
 	private Runnable mCheckViewabilityTask = new Runnable() {
 		public void run() {
+			Log.d(LOGTAG, "mCheckViewabilityTask");
 			boolean currentViewable = checkViewable();
 			if (mIsViewable != currentViewable) {
 				mIsViewable = currentViewable;
@@ -137,7 +138,6 @@ class MraidDisplayController extends MraidAbstractController {
 	private void initialize() {
 		mViewState = ViewState.LOADING;
 		initializeScreenMetrics();
-		initializeViewabilityTimer();
 	}
 
 	private void initializeScreenMetrics() {
@@ -162,11 +162,6 @@ class MraidDisplayController extends MraidAbstractController {
 		int heightPixels = metrics.heightPixels - statusBarHeight - titleBarHeight;
 		mScreenWidth = (int) (widthPixels * (160.0 / metrics.densityDpi));
 		mScreenHeight = (int) (heightPixels * (160.0 / metrics.densityDpi));
-	}
-
-	private void initializeViewabilityTimer() {
-		mHandler.removeCallbacks(mCheckViewabilityTask);
-		mHandler.post(mCheckViewabilityTask);
 	}
 
 	private int getDisplayRotation() {
@@ -199,16 +194,20 @@ class MraidDisplayController extends MraidAbstractController {
 		}
 	}
 
-	public void registerBroadcastReceiver() {
-		getView().getContext().registerReceiver(mOrientationBroadcastReceiver,
-			new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED));
-
-		Log.d(LOGTAG, "Orientation broadcast receiver is registered");
-	}
-
-	public void unregisterBroadcastReceiver() {
+	public void stopTasks() {
 		getView().getContext().unregisterReceiver(mOrientationBroadcastReceiver);
 		Log.d(LOGTAG, "Orientation broadcast receiver was unregistered");
+
+		mHandler.removeCallbacks(mCheckViewabilityTask);
+	}
+
+	public void startTasks() {
+		mHandler.post(mCheckViewabilityTask);
+
+		getView().getContext().registerReceiver(mOrientationBroadcastReceiver,
+			new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED)
+		);
+		Log.d(LOGTAG, "Orientation broadcast receiver is registered");
 	}
 
 	public void showCustomView(View view) {
