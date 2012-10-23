@@ -31,8 +31,12 @@ package ru.wapstart.plus1.sdk;
 
 import android.content.Context;
 import android.webkit.WebView;
+import android.util.Log;
+
+import java.lang.reflect.InvocationTargetException;
 
 public abstract class BaseAdView extends WebView {
+	private static final String LOGTAG = "BaseAdView";
 
 	public BaseAdView(Context context) {
 		super(context);
@@ -40,8 +44,13 @@ public abstract class BaseAdView extends WebView {
 
 	abstract public void loadHtmlData(String data);
 
-	abstract public void pauseAdView();
-	abstract public void resumeAdView();
+	public void pauseAdView() {
+		callHiddenWebViewMethod("onPause");
+	}
+
+	public void resumeAdView() {
+		callHiddenWebViewMethod("onResume");
+	}
 
 	/**
 	 * NOTE: NPE workaround for WebView
@@ -61,5 +70,20 @@ public abstract class BaseAdView extends WebView {
         }
 
 		return data;
+	}
+
+	/**
+	 * @see http://stackoverflow.com/questions/3431351/how-do-i-pause-flash-content-in-an-android-webview-when-my-activity-isnt-visible
+	 */
+	private void callHiddenWebViewMethod(String name) {
+		try {
+			WebView.class.getMethod(name).invoke(this);
+		} catch (NoSuchMethodException e) {
+			Log.w(LOGTAG, "No such method: " + name, e);
+		} catch (IllegalAccessException e) {
+			Log.e(LOGTAG, "Illegal Access: " + name, e);
+		} catch (InvocationTargetException e) {
+			Log.e(LOGTAG, "Invocation Target Exception: " + name, e);
+		}
 	}
 }

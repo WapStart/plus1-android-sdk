@@ -200,18 +200,24 @@ public class MraidView extends BaseAdView {
 		loadHtmlData(out.toString());
 	}
 
+	@Override
 	public void pauseAdView() {
 		setOnTouchListener(null);
 
 		if (mDisplayController != null)
 			mDisplayController.stopTasks();
+
+		super.pauseAdView();
 	}
 
+	@Override
 	public void resumeAdView() {
 		if (mDisplayController != null)
 			mDisplayController.startTasks();
 
 		setOnTouchListener(mTouchListener);
+
+		super.resumeAdView();
 	}
 
 	@Override
