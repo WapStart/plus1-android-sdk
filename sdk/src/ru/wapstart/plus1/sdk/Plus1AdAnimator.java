@@ -102,7 +102,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 			return;
 
 		if (mCurrentView != null) {
-			mCurrentView.onPause();
+			mCurrentView.pauseAdView();
 
 			mCurrentView.getSettings().setJavaScriptEnabled(false);
 
@@ -151,7 +151,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 		);
 		mCurrentView.startAnimation(makeFadeInAnimation());
 
-		mCurrentView.onResume();
+		mCurrentView.resumeAdView();
 	}
 
 	private Animation makeFadeInAnimation() {

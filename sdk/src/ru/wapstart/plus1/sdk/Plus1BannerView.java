@@ -81,7 +81,7 @@ public class Plus1BannerView extends FrameLayout {
 			mAdAnimator.clearAnimation();
 
 			if (mAdAnimator.getCurrentView() != null)
-				mAdAnimator.getCurrentView().onPause();
+				mAdAnimator.getCurrentView().pauseAdView();
 		}
 	}
 
@@ -90,7 +90,7 @@ public class Plus1BannerView extends FrameLayout {
 			mAdAnimator != null
 			&& mAdAnimator.getCurrentView() != null
 		)
-			mAdAnimator.getCurrentView().onResume();
+			mAdAnimator.getCurrentView().resumeAdView();
 	}
 
 	public boolean canGoBack() {

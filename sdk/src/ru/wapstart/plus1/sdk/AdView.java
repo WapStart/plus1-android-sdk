@@ -68,11 +68,11 @@ public class AdView extends BaseAdView {
 		loadDataWithBaseURL(null, data, "text/html", "UTF-8", null);
 	}
 
-	public void onPause() {
+	public void pauseAdView() {
 		setOnTouchListener(null);
 	}
 
-	public void onResume() {
+	public void resumeAdView() {
 		setOnTouchListener(mTouchListener);
 	}
 
