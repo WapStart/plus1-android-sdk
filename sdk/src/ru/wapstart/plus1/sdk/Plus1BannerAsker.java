@@ -138,6 +138,16 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 		return disableWebViewCorePausing;
 	}
 
+	/**
+	 * NOTE: This method is useful when you are using WebView instances
+	 *       in another activities of your application. Please note, when
+	 *       WebView core thread is running, all banners of activity still
+	 *       working in background. The important thing is whether they are
+	 *       consuming CPU cycles. To reduce this effect, please remove all
+	 *       banners when you pausing activity. Use setRemoveBannersOnPause()
+	 *       method to remove them automatically on pausing asker.
+	 * @see setRemoveBannersOnPause() method
+	 */
 	public Plus1BannerAsker setDisabledWebViewCorePausing(boolean orly) {
 		this.disableWebViewCorePausing = orly;
 
