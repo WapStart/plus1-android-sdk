@@ -97,11 +97,7 @@ public class Plus1BannerView extends FrameLayout {
 		if (mAdAnimator != null)
 			mAdAnimator.removeAllBanners();
 
-		// FIXME: refactor hide/show methods
-		Animation hideAnimation = mHideAnimation;
-		mHideAnimation = null;
-		hide();
-		mHideAnimation = hideAnimation;
+		hide(false); // NOTE: hide without animation
 	}
 
 	public boolean canGoBack() {
@@ -327,8 +323,16 @@ public class Plus1BannerView extends FrameLayout {
 	}
 
 	private void show() {
+		show(true);
+	}
+
+	private void hide() {
+		hide(true);
+	}
+
+	private void show(boolean allowAnimation) {
 		if (getVisibility() == INVISIBLE) {
-			if (mShowAnimation != null)
+			if (allowAnimation && mShowAnimation != null)
 				startAnimation(mShowAnimation);
 
 			setVisibility(VISIBLE);
@@ -340,9 +344,9 @@ public class Plus1BannerView extends FrameLayout {
 		mAdAnimator.showAd();
 	}
 
-	private void hide() {
+	private void hide(boolean allowAnimation) {
 		if (getVisibility() == VISIBLE) {
-			if (mHideAnimation != null)
+			if (allowAnimation && mHideAnimation != null)
 				startAnimation(mHideAnimation);
 
 			setVisibility(INVISIBLE);
