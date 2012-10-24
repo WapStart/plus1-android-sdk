@@ -116,6 +116,8 @@ final public class Plus1AdAnimator extends FrameLayout {
 			mCurrentView.pauseAdView();
 
 			mCurrentView.getSettings().setJavaScriptEnabled(false);
+			mCurrentView.setWebViewClient(null);
+			mCurrentView.setWebChromeClient(null);
 
 			clearAnimation();
 			mCurrentView.startAnimation(makeFadeOutAnimation());
