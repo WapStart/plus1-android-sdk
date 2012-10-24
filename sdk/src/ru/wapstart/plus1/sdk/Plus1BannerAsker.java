@@ -33,6 +33,7 @@ import android.content.Context;
 import android.location.LocationManager;
 import android.os.Handler;
 import android.util.Log;
+import android.webkit.WebView;
 
 public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	private static final String LOGTAG = "Plus1BannerAsker";
@@ -43,10 +44,13 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	private Runnable askerStopper							= null;
 
 	private boolean disableAutoDetectLocation				= false;
+	private boolean removeBannersOnPause					= false;
+	private boolean disableWebViewCorePausing				= false;
 	private int timeout										= 10;
 	private int visibilityTimeout							= 0;
 
 	private boolean initialized								= false;
+	private boolean mWebViewCorePaused						= false;
 
 	private LocationManager locationManager					= null;
 	private Plus1LocationListener locationListener			= null;
@@ -79,7 +83,17 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	public void onPause() {
 		stop();
 
-		view.onPause();
+		if (isRemoveBannersOnPause())
+			view.removeAllBanners();
+		else
+			view.onPause();
+
+		if (!isDisabledWebViewCorePausing() && !mWebViewCorePaused) {
+			new WebView(view.getContext()).pauseTimers();
+			Log.d(LOGTAG, "WebView core thread was PAUSED");
+
+			mWebViewCorePaused = true;
+		}
 	}
 
 	public void onResume() {
@@ -91,6 +105,13 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 		}
 
 		view.onResume();
+
+		if (mWebViewCorePaused) {
+			new WebView(view.getContext()).resumeTimers();
+			Log.d(LOGTAG, "WebView core thread was RESUMED");
+
+			mWebViewCorePaused = false;
+		}
 	}
 
 	public boolean isDisabledAutoDetectLocation() {
@@ -99,6 +120,26 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 
 	public Plus1BannerAsker disableAutoDetectLocation(boolean disable) {
 		this.disableAutoDetectLocation = disable;
+
+		return this;
+	}
+
+	public boolean isRemoveBannersOnPause() {
+		return removeBannersOnPause;
+	}
+
+	public Plus1BannerAsker setRemoveBannersOnPause(boolean orly) {
+		this.removeBannersOnPause = orly;
+
+		return this;
+	}
+
+	public boolean isDisabledWebViewCorePausing() {
+		return disableWebViewCorePausing;
+	}
+
+	public Plus1BannerAsker setDisabledWebViewCorePausing(boolean orly) {
+		this.disableWebViewCorePausing = orly;
 
 		return this;
 	}
