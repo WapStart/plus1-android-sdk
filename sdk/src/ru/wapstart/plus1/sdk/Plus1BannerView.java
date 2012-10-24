@@ -93,6 +93,17 @@ public class Plus1BannerView extends FrameLayout {
 			mAdAnimator.getCurrentView().resumeAdView();
 	}
 
+	public void removeAllBanners() {
+		if (mAdAnimator != null)
+			mAdAnimator.removeAllBanners();
+
+		// FIXME: refactor hide/show methods
+		Animation hideAnimation = mHideAnimation;
+		mHideAnimation = null;
+		hide();
+		mHideAnimation = hideAnimation;
+	}
+
 	public boolean canGoBack() {
 		return
 			mAdAnimator != null

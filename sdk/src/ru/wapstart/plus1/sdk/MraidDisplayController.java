@@ -66,6 +66,9 @@ class MraidDisplayController extends MraidAbstractController {
 	// Tracks whether this controller's view is currently on-screen.
 	private boolean mIsViewable;
 
+	// Controls check viewability task and orientation broadcast logic
+	private boolean mStartedTasks = false;
+
 	// Task that periodically checks whether this controller's view is on-screen.
 	private Runnable mCheckViewabilityTask = new Runnable() {
 		public void run() {
@@ -178,7 +181,7 @@ class MraidDisplayController extends MraidAbstractController {
 	}
 
 	public void destroy() {
-		mHandler.removeCallbacks(mCheckViewabilityTask);
+		stopTasks();
 
 		if (mViewState == ViewState.EXPANDED) {
 			getView().post(new Runnable() {
@@ -189,25 +192,36 @@ class MraidDisplayController extends MraidAbstractController {
 						);
 
 					mRootView.removeView(expansionLayout);
+
+					if (getView().getOnCloseListener() != null)
+						getView().getOnCloseListener().onClose(getView(), ViewState.HIDDEN);
 				}
 			});
 		}
 	}
 
 	public void stopTasks() {
-		getView().getContext().unregisterReceiver(mOrientationBroadcastReceiver);
-		Log.d(LOGTAG, "Orientation broadcast receiver was unregistered");
+		if (mStartedTasks) {
+			getView().getContext().unregisterReceiver(mOrientationBroadcastReceiver);
+			Log.d(LOGTAG, "Orientation broadcast receiver was unregistered");
 
-		mHandler.removeCallbacks(mCheckViewabilityTask);
+			mHandler.removeCallbacks(mCheckViewabilityTask);
+
+			mStartedTasks = false;
+		}
 	}
 
 	public void startTasks() {
-		mHandler.post(mCheckViewabilityTask);
+		if (!mStartedTasks) {
+			mHandler.post(mCheckViewabilityTask);
 
-		getView().getContext().registerReceiver(mOrientationBroadcastReceiver,
-			new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED)
-		);
-		Log.d(LOGTAG, "Orientation broadcast receiver is registered");
+			getView().getContext().registerReceiver(mOrientationBroadcastReceiver,
+				new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED)
+			);
+			Log.d(LOGTAG, "Orientation broadcast receiver is registered");
+
+			mStartedTasks = true;
+		}
 	}
 
 	public void showCustomView(View view) {

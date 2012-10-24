@@ -94,6 +94,17 @@ final public class Plus1AdAnimator extends FrameLayout {
 		}
 	}
 
+	public void removeAllBanners() {
+		stopLoading();
+		clearAnimation();
+
+		if (mCurrentView != null) {
+			mBaseView.removeView(mCurrentView);
+			mCurrentView.destroy();
+			mCurrentView = null;
+		}
+	}
+
 	// NOTE: fires after success html loading
 	public void showAd() {
 		Log.d(LOGTAG, "showAd method fired");
