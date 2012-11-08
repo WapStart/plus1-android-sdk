@@ -1,3 +1,9 @@
+Plus1 WapStart Android SDK 2.1.3, 2012-11-08
+----------------------
+- Resolve WebView collisions issue (see setDisabledWebViewCorePausing() method)
+- Added setRemoveBannersOnPause() useful method
+- Improoved banner animation process
+
 Plus1 WapStart Android SDK 2.1.2, 2012-09-24
 ----------------------
 - Fixed critical typo in ad animator

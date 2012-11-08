@@ -36,7 +36,7 @@ import java.net.URLEncoder;
 import android.location.Location;
 
 public final class Plus1BannerRequest {
-	private static final String SDK_VERSION = "2.1.2";
+	private static final String SDK_VERSION = "2.1.3";
 	private static final Integer REQUEST_VERSION = 2;
 
 	public static enum Gender {Unknown, Male, Female;}
