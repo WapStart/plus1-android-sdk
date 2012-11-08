@@ -11,8 +11,12 @@ Plus1BannerAsker
 * `public void onPause()`  
   `public void onResume()`  
   Методы должны вызываться из соответствующих обработчиков в Activity вашего приложения.
-* `public Plus1BannerAsker disableAutoDetectLocation(boolean disable)`
+* `public Plus1BannerAsker disableAutoDetectLocation(boolean disable)`  
   Отключает/включает механизм автоматического определения местоположения пользователя через *LocationManager*.
+* `public Plus1BannerAsker setRemoveBannersOnPause(boolean orly)`  
+  Включает или отключает удаление баннеров в контексте события *onPause* в Activity вашего приложения.
+* `public Plus1BannerAsker setDisabledWebViewCorePausing(boolean orly)`  
+  Отвечает за логику работы с потоком *WebView* в приложении, позволяет разрешить коллизии при использовании *WebView* в разных Activity вашего приложения. Подробнее см. раздел [Разрешение коллизий работы WebView в приложении](https://github.com/WapStart/plus1-android-sdk/blob/master/README-RUS.md#Разрешение-коллизий-работы-webview-в-приложении).
 * `public Plus1BannerAsker setViewStateListener(Plus1BannerViewStateListener viewStateListener)`  
   Устанавливает наблюдателя за состоянием видимости [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md). Подробнее см. интерфейс [Plus1BannerViewStateListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerViewStateListener.md).
 * `public Plus1BannerAsker setDownloadListener(Plus1BannerDownloadListener downloadListener)`  

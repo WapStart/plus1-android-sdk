@@ -134,7 +134,7 @@ protected void onPause() {
 }
 ```
 
-For Rich Media banners you need to send the "Back" button event in [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md).
+For Rich Media banners you need to send the "Back" button event in [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md):
 
 ```java
 @Override
