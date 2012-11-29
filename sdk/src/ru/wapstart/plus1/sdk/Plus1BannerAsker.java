@@ -205,6 +205,9 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 
 		handler = new Handler();
 
+		// NOTE: useful in case when timers are paused and activity was destroyed
+		new WebView(view.getContext()).resumeTimers();
+
 		initialized = true;
 
 		return this;
