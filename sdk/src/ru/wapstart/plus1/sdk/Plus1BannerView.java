@@ -37,7 +37,6 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.FrameLayout;
 import android.webkit.WebView;
 
@@ -255,30 +254,16 @@ public class Plus1BannerView extends FrameLayout {
 		// background
 		setBackgroundResource(R.drawable.wp_banner_background);
 
-		// shild
-		ImageView shild = new ImageView(getContext());
-		shild.setImageResource(R.drawable.wp_banner_shild);
-		shild.setMaxWidth(9);
-		shild.setLayoutParams(
-			new FrameLayout.LayoutParams(
-				FrameLayout.LayoutParams.WRAP_CONTENT,
-				FrameLayout.LayoutParams.WRAP_CONTENT,
-				Gravity.LEFT | Gravity.CENTER_VERTICAL
-			)
-		);
-
 		mAdAnimator = new Plus1AdAnimator(getContext());
 
 		addView(
 			mAdAnimator.getBaseView(),
 			new FrameLayout.LayoutParams(
-				getWidth() - 8,
+				getWidth(),
 				FrameLayout.LayoutParams.FILL_PARENT,
-				Gravity.RIGHT
+				Gravity.CENTER
 			)
 		);
-
-		addView(shild);
 
 		// close button
 		if (isHaveCloseButton()) {
