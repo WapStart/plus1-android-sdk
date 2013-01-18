@@ -71,7 +71,11 @@ public class Plus1BannerView extends FrameLayout {
 		setHorizontalScrollBarEnabled(false);
 		setVerticalScrollBarEnabled(false);
 
-		mWebViewUserAgent = new WebView(context).getSettings().getUserAgentString();
+		// NOTE: workaround due to Eclipse layout viewer bug
+		if (!isInEditMode()) {
+			mWebViewUserAgent =
+				new WebView(context).getSettings().getUserAgentString();
+		}
 	}
 
 	public void onPause() {
