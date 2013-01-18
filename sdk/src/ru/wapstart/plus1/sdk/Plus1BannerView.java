@@ -249,7 +249,7 @@ public class Plus1BannerView extends FrameLayout {
 		if (mInitialized)
 			return;
 
-		setVisibility(INVISIBLE);
+		setVisibility(GONE);
 
 		// background
 		setBackgroundResource(R.drawable.wp_banner_background);
@@ -316,7 +316,7 @@ public class Plus1BannerView extends FrameLayout {
 	}
 
 	private void show(boolean allowAnimation) {
-		if (getVisibility() == INVISIBLE) {
+		if (getVisibility() == GONE) {
 			if (allowAnimation && mShowAnimation != null)
 				startAnimation(mShowAnimation);
 
@@ -334,7 +334,7 @@ public class Plus1BannerView extends FrameLayout {
 			if (allowAnimation && mHideAnimation != null)
 				startAnimation(mHideAnimation);
 
-			setVisibility(INVISIBLE);
+			setVisibility(GONE);
 
 			if (mViewStateListener != null)
 				mViewStateListener.onCloseBannerView();
