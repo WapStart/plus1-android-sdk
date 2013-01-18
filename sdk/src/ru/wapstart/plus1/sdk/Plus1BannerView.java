@@ -259,7 +259,7 @@ public class Plus1BannerView extends FrameLayout {
 		addView(
 			mAdAnimator.getBaseView(),
 			new FrameLayout.LayoutParams(
-				getWidth(),
+				FrameLayout.LayoutParams.FILL_PARENT,
 				FrameLayout.LayoutParams.FILL_PARENT,
 				Gravity.CENTER
 			)
