@@ -78,6 +78,9 @@ public class Plus1BannerView extends FrameLayout {
 		}
 	}
 
+	/**
+	 * @deprecated this method will be protected in future
+	 */
 	public void onPause() {
 		if (mAdAnimator != null) {
 			mAdAnimator.stopLoading();
@@ -88,6 +91,9 @@ public class Plus1BannerView extends FrameLayout {
 		}
 	}
 
+	/**
+	 * @deprecated this method will be protected in future
+	 */
 	public void onResume() {
 		if (
 			mAdAnimator != null
@@ -165,6 +171,9 @@ public class Plus1BannerView extends FrameLayout {
 		mAdAnimator.loadAdView(adView, html);
 	}
 
+	/**
+	 * @deprecated this method will be private in future
+	 */
 	public MraidView makeMraidView() {
 		MraidView adView = new MraidView(getContext());
 		Log.d(LOGTAG, "MraidView instance created");
@@ -194,6 +203,9 @@ public class Plus1BannerView extends FrameLayout {
 		return adView;
 	}
 
+	/**
+	 * @deprecated this method will be private in future
+	 */
 	public AdView makeAdView() {
 		AdView adView = new AdView(getContext());
 		Log.d(LOGTAG, "AdView instance created");
@@ -204,10 +216,6 @@ public class Plus1BannerView extends FrameLayout {
 		});
 
 		return adView;
-	}
-
-	public void setOnAutorefreshChangeListener(OnAutorefreshStateListener listener) {
-		mOnAutorefreshChangeListener = listener;
 	}
 
 	public Plus1BannerView setAutorefreshEnabled(boolean enabled) {
@@ -247,6 +255,13 @@ public class Plus1BannerView extends FrameLayout {
 
 	public boolean isExpanded() {
 		return mExpanded;
+	}
+
+	/**
+	 * @deprecated this method will be protected in future
+	 */
+	public void setOnAutorefreshChangeListener(OnAutorefreshStateListener listener) {
+		mOnAutorefreshChangeListener = listener;
 	}
 
 	private void init() {
@@ -345,6 +360,9 @@ public class Plus1BannerView extends FrameLayout {
 		}
 	}
 
+	/**
+	 * @deprecated this interface will be protected in future
+	 */
 	public interface OnAutorefreshStateListener {
 		public void onAutorefreshStateChanged(Plus1BannerView view);
 	}

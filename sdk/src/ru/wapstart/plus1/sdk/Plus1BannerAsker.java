@@ -166,6 +166,9 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 		return this;
 	}
 
+	/**
+	 * @deprecated use Plus1BannerView::setViewStateListener() method
+	 */
 	public Plus1BannerAsker setViewStateListener(
 		Plus1BannerViewStateListener viewStateListener
 	) {
@@ -225,11 +228,17 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 		}
 	}
 
+	/**
+	 * @deprecated this method will be protected in future
+	 */
 	public void onShowBannerView() {
 		if (askerStopper != null)
 			handler.removeCallbacks(askerStopper);
 	}
 
+	/**
+	 * @deprecated this method will be protected in future
+	 */
 	public void onHideBannerView() {
 		if (askerStopper != null)
 			return;
@@ -244,6 +253,9 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 		handler.postDelayed(askerStopper, visibilityTimeout * 1000);
 	}
 
+	/**
+	 * @deprecated this method will be protected in future
+	 */
 	public void onCloseBannerView() {
 		stop();
 	}
