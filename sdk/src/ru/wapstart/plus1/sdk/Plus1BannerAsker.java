@@ -37,26 +37,26 @@ import android.webkit.WebView;
 
 public class Plus1BannerAsker {
 	private static final String LOGTAG = "Plus1BannerAsker";
-	private Plus1BannerRequest request						= null;
-	private Plus1BannerView view							= null;
-	private Handler handler									= null;
-	private HtmlBannerDownloader downloaderTask				= null;
-	private Runnable askerStopper							= null;
+	private Plus1BannerRequest mRequest						= null;
+	private Plus1BannerView mView							= null;
+	private Handler mHandler								= null;
+	private HtmlBannerDownloader mDownloaderTask			= null;
+	private Runnable mAskerStopper							= null;
 
-	private boolean disableAutoDetectLocation				= false;
-	private boolean removeBannersOnPause					= false;
-	private boolean disableWebViewCorePausing				= false;
-	private int timeout										= 10;
-	private int visibilityTimeout							= 0;
+	private boolean mDisableAutoDetectLocation				= false;
+	private boolean mRemoveBannersOnPause					= false;
+	private boolean mDisableWebViewCorePausing				= false;
+	private int mTimeout									= 10;
+	private int mVisibilityTimeout							= 0;
 
-	private boolean initialized								= false;
+	private boolean mInitialized							= false;
 	private boolean mWebViewCorePaused						= false;
 
-	private LocationManager locationManager					= null;
-	private Plus1LocationListener locationListener			= null;
+	private LocationManager mLocationManager				= null;
+	private Plus1LocationListener mLocationListener			= null;
 
 	private Plus1BannerViewStateListener viewStateListener	= null;
-	private Plus1BannerDownloadListener downloadListener	= null;
+	private Plus1BannerDownloadListener mDownloadListener	= null;
 
 	public static Plus1BannerAsker create(
 		Plus1BannerRequest request, Plus1BannerView view
@@ -65,20 +65,20 @@ public class Plus1BannerAsker {
 	}
 
 	public Plus1BannerAsker(Plus1BannerRequest request, Plus1BannerView view) {
-		this.request = request;
-		this.view = view;
+		mRequest = request;
+		mView = view;
 	}
 
 	public void onPause() {
 		stop();
 
 		if (isRemoveBannersOnPause())
-			view.removeAllBanners();
+			mView.removeAllBanners();
 		else
-			view.onPause();
+			mView.onPause();
 
 		if (!isDisabledWebViewCorePausing() && !mWebViewCorePaused) {
-			new WebView(view.getContext()).pauseTimers();
+			new WebView(mView.getContext()).pauseTimers();
 			Log.d(LOGTAG, "WebView core thread was PAUSED");
 
 			mWebViewCorePaused = true;
@@ -86,17 +86,17 @@ public class Plus1BannerAsker {
 	}
 
 	public void onResume() {
-		if (!view.isExpanded()) {
-			if (timeout > 0)
+		if (!mView.isExpanded()) {
+			if (mTimeout > 0)
 				start();
 			else
 				startOnce();
 		}
 
-		view.onResume();
+		mView.onResume();
 
 		if (mWebViewCorePaused) {
-			new WebView(view.getContext()).resumeTimers();
+			new WebView(mView.getContext()).resumeTimers();
 			Log.d(LOGTAG, "WebView core thread was RESUMED");
 
 			mWebViewCorePaused = false;
@@ -104,27 +104,27 @@ public class Plus1BannerAsker {
 	}
 
 	public boolean isDisabledAutoDetectLocation() {
-		return disableAutoDetectLocation;
+		return mDisableAutoDetectLocation;
 	}
 
 	public Plus1BannerAsker disableAutoDetectLocation(boolean disable) {
-		this.disableAutoDetectLocation = disable;
+		mDisableAutoDetectLocation = disable;
 
 		return this;
 	}
 
 	public boolean isRemoveBannersOnPause() {
-		return removeBannersOnPause;
+		return mRemoveBannersOnPause;
 	}
 
 	public Plus1BannerAsker setRemoveBannersOnPause(boolean orly) {
-		this.removeBannersOnPause = orly;
+		mRemoveBannersOnPause = orly;
 
 		return this;
 	}
 
 	public boolean isDisabledWebViewCorePausing() {
-		return disableWebViewCorePausing;
+		return mDisableWebViewCorePausing;
 	}
 
 	/**
@@ -138,19 +138,19 @@ public class Plus1BannerAsker {
 	 * @see setRemoveBannersOnPause() method
 	 */
 	public Plus1BannerAsker setDisabledWebViewCorePausing(boolean orly) {
-		this.disableWebViewCorePausing = orly;
+		mDisableWebViewCorePausing = orly;
 
 		return this;
 	}
 
 	public Plus1BannerAsker setTimeout(int timeout) {
-		this.timeout = timeout;
+		mTimeout = timeout;
 
 		return this;
 	}
 
 	public Plus1BannerAsker setVisibilityTimeout(int visibilityTimeout) {
-		this.visibilityTimeout = visibilityTimeout;
+		mVisibilityTimeout = visibilityTimeout;
 
 		return this;
 	}
@@ -169,34 +169,34 @@ public class Plus1BannerAsker {
 	public Plus1BannerAsker setDownloadListener(
 		Plus1BannerDownloadListener downloadListener
 	) {
-		this.downloadListener = downloadListener;
+		mDownloadListener = downloadListener;
 
 		return this;
 	}
 
 	public Plus1BannerAsker init() {
-		if (initialized)
+		if (mInitialized)
 			return this;
 
 		if (!isDisabledAutoDetectLocation()) {
-			this.locationManager =
-				(LocationManager) view.getContext().getSystemService(
+			mLocationManager =
+				(LocationManager)mView.getContext().getSystemService(
 					Context.LOCATION_SERVICE
 				);
 
-			this.locationListener = new Plus1LocationListener(request);
+			mLocationListener = new Plus1LocationListener(mRequest);
 		}
 
-		view.addViewStateListener(
+		mView.addViewStateListener(
 			new Plus1BannerViewStateListener() {
 				public void onShowBannerView() {
-					if (askerStopper != null)
-						handler.removeCallbacks(askerStopper);
+					if (mAskerStopper != null)
+						mHandler.removeCallbacks(mAskerStopper);
 				}
 
 				public void onHideBannerView() {
-					if (askerStopper == null) {
-						askerStopper =
+					if (mAskerStopper == null) {
+						mAskerStopper =
 							new Runnable() {
 								public void run() {
 									stop();
@@ -204,14 +204,14 @@ public class Plus1BannerAsker {
 							};
 					}
 
-					handler.postDelayed(askerStopper, visibilityTimeout * 1000);
+					mHandler.postDelayed(mAskerStopper, mVisibilityTimeout * 1000);
 				}
 
 				public void onCloseBannerView() {
 					stop();
 
-					if (askerStopper != null)
-						handler.removeCallbacks(askerStopper);
+					if (mAskerStopper != null)
+						mHandler.removeCallbacks(mAskerStopper);
 				}
 
 				public void onExpandStateChanged(boolean expanded) {
@@ -223,28 +223,29 @@ public class Plus1BannerAsker {
 			}
 		);
 
+		// TODO: remove this in next release
 		if (viewStateListener != null)
-			view.addViewStateListener(viewStateListener);
+			mView.addViewStateListener(viewStateListener);
 
-		if (visibilityTimeout == 0)
-			visibilityTimeout = timeout * 3;
+		if (mVisibilityTimeout == 0)
+			mVisibilityTimeout = mTimeout * 3;
 
-		handler = new Handler();
+		mHandler = new Handler();
 
 		// NOTE: useful in case when timers are paused and activity was destroyed
-		new WebView(view.getContext()).resumeTimers();
+		new WebView(mView.getContext()).resumeTimers();
 
-		initialized = true;
+		mInitialized = true;
 
 		return this;
 	}
 
 	// NOTE: for manual refreshing
 	public void refreshBanner() {
-		if (!view.isExpanded()) {
+		if (!mView.isExpanded()) {
 			stop();
 
-			if (timeout > 0)
+			if (mTimeout > 0)
 				start();
 			else
 				startOnce();
@@ -255,25 +256,25 @@ public class Plus1BannerAsker {
 	 * @deprecated this method will be protected in future
 	 */
 	public void onShowBannerView() {
-		if (askerStopper != null)
-			handler.removeCallbacks(askerStopper);
+		if (mAskerStopper != null)
+			mHandler.removeCallbacks(mAskerStopper);
 	}
 
 	/**
 	 * @deprecated this method will be protected in future
 	 */
 	public void onHideBannerView() {
-		if (askerStopper != null)
+		if (mAskerStopper != null)
 			return;
 
-		askerStopper =
+		mAskerStopper =
 			new Runnable() {
 				public void run() {
 					stop();
 				}
 			};
 
-		handler.postDelayed(askerStopper, visibilityTimeout * 1000);
+		mHandler.postDelayed(mAskerStopper, mVisibilityTimeout * 1000);
 	}
 
 	/**
@@ -286,61 +287,61 @@ public class Plus1BannerAsker {
 	private void start() {
 		Log.d(LOGTAG, "start() method fired");
 
-		if (request == null || view == null || downloaderTask != null)
+		if (mRequest == null || mView == null || mDownloaderTask != null)
 			return;
 
 		init();
 
 		if (!isDisabledAutoDetectLocation()) {
-			locationManager.requestLocationUpdates(
+			mLocationManager.requestLocationUpdates(
 				LocationManager.GPS_PROVIDER,
-				timeout * 10000,
+				mTimeout * 10000,
 				500f,
-				locationListener
+				mLocationListener
 			);
 		}
 
-		downloaderTask = makeDownloaderTask();
+		mDownloaderTask = makeDownloaderTask();
 
-		downloaderTask.execute();
-	}
-
-	private void stop() {
-		Log.d(LOGTAG, "stop() method fired");
-
-		if (downloaderTask == null)
-			return;
-
-		if (!isDisabledAutoDetectLocation())
-			locationManager.removeUpdates(locationListener);
-
-		downloaderTask.cancel(true);
-		downloaderTask = null;
+		mDownloaderTask.execute();
 	}
 
 	private void startOnce() {
 		Log.d(LOGTAG, "startOnce() method fired");
 
-		if (request == null || view == null || downloaderTask != null)
+		if (mRequest == null || mView == null || mDownloaderTask != null)
 			return;
 
 		init();
 
-		downloaderTask = makeDownloaderTask();
+		mDownloaderTask = makeDownloaderTask();
 
-		downloaderTask.setRunOnce().execute();
+		mDownloaderTask.setRunOnce().execute();
+	}
+
+	private void stop() {
+		Log.d(LOGTAG, "stop() method fired");
+
+		if (mDownloaderTask == null)
+			return;
+
+		if (!isDisabledAutoDetectLocation())
+			mLocationManager.removeUpdates(mLocationListener);
+
+		mDownloaderTask.cancel(true);
+		mDownloaderTask = null;
 	}
 
 	private HtmlBannerDownloader makeDownloaderTask()
 	{
-		HtmlBannerDownloader task = new HtmlBannerDownloader(view);
+		HtmlBannerDownloader task = new HtmlBannerDownloader(mView);
 
 		task
-			.setRequest(request)
-			.setTimeout(timeout);
+			.setRequest(mRequest)
+			.setTimeout(mTimeout);
 
-		if (downloadListener != null)
-			task.setDownloadListener(downloadListener);
+		if (mDownloadListener != null)
+			task.setDownloadListener(mDownloadListener);
 
 		return task;
 	}
