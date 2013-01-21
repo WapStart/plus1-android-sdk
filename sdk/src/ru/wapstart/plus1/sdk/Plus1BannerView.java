@@ -185,8 +185,6 @@ public class Plus1BannerView extends FrameLayout {
 		adView.setOnExpandListener(new MraidView.OnExpandListener() {
 			public void onExpand(MraidView view) {
 				setExpanded(true);
-
-				//setVisibility(INVISIBLE); // hide without animation
 			}
 		});
 		adView.setOnCloseListener(new MraidView.OnCloseListener() {
@@ -218,6 +216,9 @@ public class Plus1BannerView extends FrameLayout {
 		return adView;
 	}
 
+	/**
+	 * @deprecated use start/stop methods of asker to control autorefresh
+	 */
 	public Plus1BannerView setAutorefreshEnabled(boolean enabled) {
 		if (mAutorefreshEnabled != enabled) { // NOTE: really changed
 			mAutorefreshEnabled = enabled;
@@ -237,6 +238,9 @@ public class Plus1BannerView extends FrameLayout {
 		return this;
 	}
 
+	/**
+	 * @deprecated use start/stop methods of asker to control autorefresh
+	 */
 	public boolean getAutorefreshEnabled() {
 		return mAutorefreshEnabled;
 	}
@@ -248,8 +252,8 @@ public class Plus1BannerView extends FrameLayout {
 			if (mExpanded)
 				mAdAnimator.stopLoading();
 
-			if (mOnAutorefreshChangeListener != null)
-				mOnAutorefreshChangeListener.onAutorefreshStateChanged(this);
+			if (mViewStateListener != null)
+				mViewStateListener.onExpandStateChanged(orly);
 		}
 	}
 
@@ -364,7 +368,7 @@ public class Plus1BannerView extends FrameLayout {
 	}
 
 	/**
-	 * @deprecated this interface will be protected in future
+	 * @deprecated please do not use it
 	 */
 	public interface OnAutorefreshStateListener {
 		public void onAutorefreshStateChanged(Plus1BannerView view);

@@ -32,15 +32,20 @@ public interface Plus1BannerViewStateListener {
 	/**
 	 * Raised on show banner view
 	 */
-	abstract public void onShowBannerView();
+	public void onShowBannerView();
 
 	/**
 	 * Raised if no have banner to show
 	 */
-	abstract public void onHideBannerView();
+	public void onHideBannerView();
 
 	/**
 	 * Raised on user click close button
 	 */
-	abstract public void onCloseBannerView();
+	public void onCloseBannerView();
+
+	/**
+	 * Raised when expand state of banner view was changed
+	 */
+	public void onExpandStateChanged(boolean expanded);
 }

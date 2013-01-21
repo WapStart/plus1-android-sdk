@@ -35,7 +35,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.webkit.WebView;
 
-public class Plus1BannerAsker implements Plus1BannerViewStateListener {
+public class Plus1BannerAsker {
 	private static final String LOGTAG = "Plus1BannerAsker";
 	private Plus1BannerRequest request						= null;
 	private Plus1BannerView view							= null;
@@ -67,17 +67,6 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 	public Plus1BannerAsker(Plus1BannerRequest request, Plus1BannerView view) {
 		this.request = request;
 		this.view = view;
-
-		view.setOnAutorefreshChangeListener(
-			new Plus1BannerView.OnAutorefreshStateListener() {
-				public void onAutorefreshStateChanged(Plus1BannerView view) {
-					if (view.getAutorefreshEnabled() && !view.isExpanded())
-						start();
-					else
-						stop();
-				}
-			}
-		);
 	}
 
 	public void onPause() {
@@ -198,10 +187,31 @@ public class Plus1BannerAsker implements Plus1BannerViewStateListener {
 			this.locationListener = new Plus1LocationListener(request);
 		}
 
+		view.setViewStateListener( // FIXME: change to add* method
+			new Plus1BannerViewStateListener() {
+				public void onShowBannerView() {
+					onShowBannerView();
+				}
+
+				public void onHideBannerView() {
+					onHideBannerView();
+				}
+
+				public void onCloseBannerView() {
+					onCloseBannerView();
+				}
+
+				public void onExpandStateChanged(boolean expanded) {
+					if (expanded)
+						stop();
+					else
+						start();
+				}
+			}
+		);
+
 		if (viewStateListener != null)
-			view.setViewStateListener(viewStateListener);
-		else
-			view.setViewStateListener(this);
+			view.setViewStateListener(viewStateListener); // FIXME: change to add* method
 
 		if (visibilityTimeout == 0)
 			visibilityTimeout = timeout * 3;
