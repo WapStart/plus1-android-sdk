@@ -187,18 +187,31 @@ public class Plus1BannerAsker {
 			this.locationListener = new Plus1LocationListener(request);
 		}
 
-		view.setViewStateListener( // FIXME: change to add* method
+		view.addViewStateListener(
 			new Plus1BannerViewStateListener() {
 				public void onShowBannerView() {
-					onShowBannerView();
+					if (askerStopper != null)
+						handler.removeCallbacks(askerStopper);
 				}
 
 				public void onHideBannerView() {
-					onHideBannerView();
+					if (askerStopper == null) {
+						askerStopper =
+							new Runnable() {
+								public void run() {
+									stop();
+								}
+							};
+					}
+
+					handler.postDelayed(askerStopper, visibilityTimeout * 1000);
 				}
 
 				public void onCloseBannerView() {
-					onCloseBannerView();
+					stop();
+
+					if (askerStopper != null)
+						handler.removeCallbacks(askerStopper);
 				}
 
 				public void onExpandStateChanged(boolean expanded) {
@@ -211,7 +224,7 @@ public class Plus1BannerAsker {
 		);
 
 		if (viewStateListener != null)
-			view.setViewStateListener(viewStateListener); // FIXME: change to add* method
+			view.addViewStateListener(viewStateListener);
 
 		if (visibilityTimeout == 0)
 			visibilityTimeout = timeout * 3;

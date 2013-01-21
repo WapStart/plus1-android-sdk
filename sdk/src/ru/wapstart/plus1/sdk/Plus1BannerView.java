@@ -40,6 +40,8 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.webkit.WebView;
 
+import java.util.ArrayList;
+
 import ru.wapstart.plus1.sdk.MraidView.ViewState;
 
 public class Plus1BannerView extends FrameLayout {
@@ -59,7 +61,8 @@ public class Plus1BannerView extends FrameLayout {
 	private boolean mAutorefreshEnabled = true;
 	private boolean mExpanded			= false;
 
-	private Plus1BannerViewStateListener mViewStateListener = null;
+	private ArrayList<Plus1BannerViewStateListener> mViewStateListenerList =
+		new ArrayList<Plus1BannerViewStateListener>();
 
 	public Plus1BannerView(Context context) {
 		this(context, null);
@@ -231,12 +234,21 @@ public class Plus1BannerView extends FrameLayout {
 		return this;
 	}
 
+	public Plus1BannerView addViewStateListener(
+		Plus1BannerViewStateListener viewStateListener
+	) {
+		mViewStateListenerList.add(viewStateListener);
+
+		return this;
+	}
+
+	/**
+	 * @deprecated please use addViewStateListener() method
+	 */
 	public Plus1BannerView setViewStateListener(
 		Plus1BannerViewStateListener viewStateListener
 	) {
-		mViewStateListener = viewStateListener;
-
-		return this;
+		return addViewStateListener(viewStateListener);
 	}
 
 	/**
@@ -253,8 +265,7 @@ public class Plus1BannerView extends FrameLayout {
 			if (mExpanded)
 				mAdAnimator.stopLoading();
 
-			if (mViewStateListener != null)
-				mViewStateListener.onExpandStateChanged(orly);
+			notifyOnExpandStateChanged(orly);
 		}
 	}
 
@@ -300,8 +311,7 @@ public class Plus1BannerView extends FrameLayout {
 					setAutorefreshEnabled(false);
 					hide(mHideAnimation);
 
-					if (mViewStateListener != null)
-						mViewStateListener.onCloseBannerView();
+					notifyOnCloseBannerView();
 				}
 			});
 
@@ -349,8 +359,7 @@ public class Plus1BannerView extends FrameLayout {
 
 			setVisibility(VISIBLE);
 
-			if (mViewStateListener != null)
-				mViewStateListener.onShowBannerView();
+			notifyOnShowBannerView();
 		}
 
 		mAdAnimator.showAd();
@@ -363,9 +372,32 @@ public class Plus1BannerView extends FrameLayout {
 
 			setVisibility(GONE);
 
-			if (mViewStateListener != null)
-				mViewStateListener.onHideBannerView();
+			notifyOnHideBannerView();
 		}
+	}
+
+	private void notifyOnShowBannerView()
+	{
+		for (Plus1BannerViewStateListener listener : mViewStateListenerList)
+			listener.onShowBannerView();
+	}
+
+	private void notifyOnHideBannerView()
+	{
+		for (Plus1BannerViewStateListener listener : mViewStateListenerList)
+			listener.onHideBannerView();
+	}
+
+	private void notifyOnCloseBannerView()
+	{
+		for (Plus1BannerViewStateListener listener : mViewStateListenerList)
+			listener.onCloseBannerView();
+	}
+
+	private void notifyOnExpandStateChanged(boolean expanded)
+	{
+		for (Plus1BannerViewStateListener listener : mViewStateListenerList)
+			listener.onExpandStateChanged(expanded);
 	}
 
 	/**
