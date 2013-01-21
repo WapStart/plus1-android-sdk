@@ -106,7 +106,7 @@ public class Plus1BannerView extends FrameLayout {
 		if (mAdAnimator != null)
 			mAdAnimator.removeAllBanners();
 
-		hide(false); // NOTE: hide without animation
+		hide(); // NOTE: hide without animation
 	}
 
 	public boolean canGoBack() {
@@ -179,7 +179,7 @@ public class Plus1BannerView extends FrameLayout {
 		Log.d(LOGTAG, "MraidView instance created");
 		adView.setOnReadyListener(new MraidView.OnReadyListener() {
 			public void onReady(MraidView view) {
-				show();
+				show(mShowAnimation);
 			}
 		});
 		adView.setOnExpandListener(new MraidView.OnExpandListener() {
@@ -211,7 +211,7 @@ public class Plus1BannerView extends FrameLayout {
 		Log.d(LOGTAG, "AdView instance created");
 		adView.setOnReadyListener(new AdView.OnReadyListener() {
 			public void onReady() {
-				show();
+				show(mShowAnimation);
 			}
 		});
 
@@ -293,7 +293,7 @@ public class Plus1BannerView extends FrameLayout {
 				public void onClick(View v) {
 					mClosed = true;
 					setAutorefreshEnabled(false);
-					hide();
+					hide(mHideAnimation);
 
 					if (mViewStateListener != null)
 						mViewStateListener.onCloseBannerView();
@@ -330,17 +330,17 @@ public class Plus1BannerView extends FrameLayout {
 	}
 
 	private void show() {
-		show(true);
+		show(null);
 	}
 
 	private void hide() {
-		hide(true);
+		hide(null);
 	}
 
-	private void show(boolean allowAnimation) {
+	private void show(Animation animation) {
 		if (getVisibility() == GONE) {
-			if (allowAnimation && mShowAnimation != null)
-				startAnimation(mShowAnimation);
+			if (animation != null)
+				startAnimation(animation);
 
 			setVisibility(VISIBLE);
 
@@ -351,10 +351,10 @@ public class Plus1BannerView extends FrameLayout {
 		mAdAnimator.showAd();
 	}
 
-	private void hide(boolean allowAnimation) {
+	private void hide(Animation animation) {
 		if (getVisibility() == VISIBLE) {
-			if (allowAnimation && mHideAnimation != null)
-				startAnimation(mHideAnimation);
+			if (animation != null)
+				startAnimation(animation);
 
 			setVisibility(GONE);
 
