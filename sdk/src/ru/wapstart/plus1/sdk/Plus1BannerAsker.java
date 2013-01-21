@@ -87,7 +87,7 @@ public class Plus1BannerAsker {
 
 	public void onResume() {
 		if (!view.isExpanded()) {
-			if (view.getAutorefreshEnabled())
+			if (timeout > 0)
 				start();
 			else
 				startOnce();
@@ -244,7 +244,7 @@ public class Plus1BannerAsker {
 		if (!view.isExpanded()) {
 			stop();
 
-			if (view.getAutorefreshEnabled())
+			if (timeout > 0)
 				start();
 			else
 				startOnce();
