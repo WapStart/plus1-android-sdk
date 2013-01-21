@@ -294,6 +294,9 @@ public class Plus1BannerView extends FrameLayout {
 					mClosed = true;
 					setAutorefreshEnabled(false);
 					hide();
+
+					if (mViewStateListener != null)
+						mViewStateListener.onCloseBannerView();
 				}
 			});
 
@@ -356,7 +359,7 @@ public class Plus1BannerView extends FrameLayout {
 			setVisibility(GONE);
 
 			if (mViewStateListener != null)
-				mViewStateListener.onCloseBannerView();
+				mViewStateListener.onHideBannerView();
 		}
 	}
 
