@@ -46,7 +46,7 @@ public class Plus1BannerAsker {
 	private boolean mDisableAutoDetectLocation				= false;
 	private boolean mRemoveBannersOnPause					= false;
 	private boolean mDisableWebViewCorePausing				= false;
-	private int mTimeout									= 10;
+	private int mRefreshDelay								= 10;
 	private int mVisibilityTimeout							= 0;
 
 	private boolean mInitialized							= false;
@@ -87,7 +87,7 @@ public class Plus1BannerAsker {
 
 	public void onResume() {
 		if (!mView.isExpanded()) {
-			if (mTimeout > 0)
+			if (mRefreshDelay > 0)
 				start();
 			else
 				startOnce();
@@ -143,10 +143,17 @@ public class Plus1BannerAsker {
 		return this;
 	}
 
-	public Plus1BannerAsker setTimeout(int timeout) {
-		mTimeout = timeout;
+	public Plus1BannerAsker setRefreshDelay(int delay) {
+		mRefreshDelay = delay;
 
 		return this;
+	}
+
+	/**
+	 * @deprecated please use setRefreshDelay()
+	 */
+	public Plus1BannerAsker setTimeout(int timeout) {
+		return setRefreshDelay(timeout);
 	}
 
 	public Plus1BannerAsker setVisibilityTimeout(int visibilityTimeout) {
@@ -228,7 +235,7 @@ public class Plus1BannerAsker {
 			mView.addViewStateListener(viewStateListener);
 
 		if (mVisibilityTimeout == 0)
-			mVisibilityTimeout = mTimeout * 3;
+			mVisibilityTimeout = mRefreshDelay * 3;
 
 		mHandler = new Handler();
 
@@ -245,7 +252,7 @@ public class Plus1BannerAsker {
 		if (!mView.isExpanded()) {
 			stop();
 
-			if (mTimeout > 0)
+			if (mRefreshDelay > 0)
 				start();
 			else
 				startOnce();
@@ -295,7 +302,7 @@ public class Plus1BannerAsker {
 		if (!isDisabledAutoDetectLocation()) {
 			mLocationManager.requestLocationUpdates(
 				LocationManager.GPS_PROVIDER,
-				mTimeout * 10000,
+				mRefreshDelay * 10000,
 				500f,
 				mLocationListener
 			);
@@ -338,7 +345,7 @@ public class Plus1BannerAsker {
 
 		task
 			.setRequest(mRequest)
-			.setTimeout(mTimeout);
+			.setTimeout(mRefreshDelay);
 
 		if (mDownloadListener != null)
 			task.setDownloadListener(mDownloadListener);
