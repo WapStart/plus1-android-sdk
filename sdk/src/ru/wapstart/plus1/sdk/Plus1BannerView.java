@@ -195,6 +195,7 @@ public class Plus1BannerView extends FrameLayout {
 		adView.setOnFailureListener(new MraidView.OnFailureListener() {
 			public void onFailure(MraidView view) {
 				Log.e(LOGTAG, "Mraid ad failed to load");
+				hide(mHideAnimation);
 			}
 		});
 
