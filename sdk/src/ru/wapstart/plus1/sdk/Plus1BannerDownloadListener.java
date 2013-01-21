@@ -38,10 +38,10 @@ public interface Plus1BannerDownloadListener {
 	/**
 	 * Raised on banner successfully loaded
 	 */
-	abstract public void onBannerLoaded();
+	public void onBannerLoaded();
 
 	/**
 	 * Raised if banner can't be load on some reason
 	 */
-	abstract public void onBannerLoadFailed(LoadError error);
+	public void onBannerLoadFailed(LoadError error);
 }
