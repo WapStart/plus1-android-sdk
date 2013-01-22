@@ -210,12 +210,12 @@ public class Plus1BannerView extends FrameLayout {
 		});
 		adView.setOnExpandListener(new MraidView.OnExpandListener() {
 			public void onExpand(MraidView view) {
-				setExpanded(true);
+				expand();
 			}
 		});
 		adView.setOnCloseListener(new MraidView.OnCloseListener() {
 			public void onClose(MraidView view, ViewState newViewState) {
-				setExpanded(false);
+				collapse();
 			}
 		});
 		adView.setOnFailureListener(new MraidView.OnFailureListener() {
@@ -308,20 +308,6 @@ public class Plus1BannerView extends FrameLayout {
 	 */
 	public boolean getAutorefreshEnabled() {
 		return mAutorefreshEnabled;
-	}
-
-	private void setExpanded(boolean orly) {
-		if (mExpanded != orly) { // NOTE: really changed
-			mExpanded = orly;
-
-			if (mExpanded)
-				mAdAnimator.stopLoading();
-
-			if (mExpanded)
-				notifyOnExpandListener();
-			else
-				notifyOnCollapseListener();
-		}
 	}
 
 	public boolean isExpanded() {
@@ -431,6 +417,21 @@ public class Plus1BannerView extends FrameLayout {
 			setVisibility(GONE);
 
 			notifyOnHideListener();
+		}
+	}
+
+	private void expand() {
+		if (!mExpanded) {
+			mExpanded = true;
+			mAdAnimator.stopLoading();
+			notifyOnExpandListener();
+		}
+	}
+
+	private void collapse() {
+		if (mExpanded) {
+			mExpanded = false;
+			notifyOnCollapseListener();
 		}
 	}
 
