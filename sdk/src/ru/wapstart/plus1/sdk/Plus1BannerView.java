@@ -132,7 +132,7 @@ public class Plus1BannerView extends FrameLayout {
 		if (mAdAnimator != null)
 			mAdAnimator.removeAllBanners();
 
-		hide(); // NOTE: hide without animation
+		hide(null); // NOTE: hide without animation
 	}
 
 	public boolean canGoBack() {
@@ -205,7 +205,7 @@ public class Plus1BannerView extends FrameLayout {
 		Log.d(LOGTAG, "MraidView instance created");
 		adView.setOnReadyListener(new MraidView.OnReadyListener() {
 			public void onReady(MraidView view) {
-				show(mShowAnimation);
+				show();
 			}
 		});
 		adView.setOnExpandListener(new MraidView.OnExpandListener() {
@@ -222,7 +222,7 @@ public class Plus1BannerView extends FrameLayout {
 		adView.setOnFailureListener(new MraidView.OnFailureListener() {
 			public void onFailure(MraidView view) {
 				Log.e(LOGTAG, "Mraid ad failed to load");
-				hide(mHideAnimation);
+				hide();
 			}
 		});
 
@@ -237,7 +237,7 @@ public class Plus1BannerView extends FrameLayout {
 		Log.d(LOGTAG, "AdView instance created");
 		adView.setOnReadyListener(new AdView.OnReadyListener() {
 			public void onReady(AdView view) {
-				show(mShowAnimation);
+				show();
 			}
 		});
 		adView.setOnClickListener(new AdView.OnClickListener() {
@@ -365,7 +365,7 @@ public class Plus1BannerView extends FrameLayout {
 
 					notifyOnCloseButtonListener();
 
-					hide(mHideAnimation);
+					hide();
 				}
 			});
 
@@ -399,11 +399,11 @@ public class Plus1BannerView extends FrameLayout {
 	}
 
 	private void show() {
-		show(null);
+		show(mShowAnimation);
 	}
 
 	private void hide() {
-		hide(null);
+		hide(mHideAnimation);
 	}
 
 	private void show(Animation animation) {
