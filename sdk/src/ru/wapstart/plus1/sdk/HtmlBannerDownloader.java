@@ -125,7 +125,7 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 				bannerDownloadListener.onBannerLoadFailed(
 					LoadError.UnknownAnswer
 				);
-		} else if (mBannerData.equals(NO_BANNER)) {
+		} else if (mBannerData.trim().equals(NO_BANNER)) {
 			if (bannerDownloadListener != null)
 				bannerDownloadListener.onBannerLoadFailed(
 					LoadError.NoHaveBanner
