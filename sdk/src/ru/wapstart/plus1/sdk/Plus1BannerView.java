@@ -310,6 +310,10 @@ public class Plus1BannerView extends FrameLayout {
 		return mAutorefreshEnabled;
 	}
 
+	public boolean isHidden() {
+		return getVisibility() == GONE;
+	}
+
 	public boolean isExpanded() {
 		return mExpanded;
 	}
@@ -397,7 +401,7 @@ public class Plus1BannerView extends FrameLayout {
 	}
 
 	private void show(Animation animation) {
-		if (getVisibility() == GONE) {
+		if (isHidden()) {
 			if (animation != null)
 				startAnimation(animation);
 
@@ -410,7 +414,7 @@ public class Plus1BannerView extends FrameLayout {
 	}
 
 	private void hide(Animation animation) {
-		if (getVisibility() == VISIBLE) {
+		if (!isHidden()) {
 			if (animation != null)
 				startAnimation(animation);
 
