@@ -26,8 +26,10 @@ public class BartActivity extends Activity implements View.OnClickListener
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+		Log.d("BartActivity", "onCreate fired");
+
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
 
 		ImageView imageView = (ImageView) findViewById(R.id.background);
 		Random random = new Random(new Date().getTime());
@@ -54,9 +56,34 @@ public class BartActivity extends Activity implements View.OnClickListener
 					.enableAnimationFromTop()
 					.enableCloseButton()
 			)
-			.setTimeout(10); // default value
+			.setRefreshDelay(10); // default value
 
-		Log.d("BartActivity", "onCreate fired");
+		mBannerView
+			.addListener(new Plus1BannerView.OnShowListener() {
+				public void onShow(Plus1BannerView pbv) {
+					Log.d("BartActivity", "OnShowListener was touched");
+				}
+			})
+			.addListener(new Plus1BannerView.OnHideListener() {
+				public void onHide(Plus1BannerView pbv) {
+					Log.d("BartActivity", "OnHideListener was touched");
+				}
+			})
+			.addListener(new Plus1BannerView.OnCloseButtonListener() {
+				public void onCloseButton(Plus1BannerView pbv) {
+					Log.d("BartActivity", "OnCloseButtonListener was touched");
+				}
+			})
+			.addListener(new Plus1BannerView.OnImpressionListener() {
+				public void onImpression(Plus1BannerView pbv) {
+					Log.d("BartActivity", "OnImpressionListener was touched");
+				}
+			})
+			.addListener(new Plus1BannerView.OnTrackClickListener() {
+				public void onTrackClick(Plus1BannerView pbv) {
+					Log.d("BartActivity", "OnTrackClickListener was touched");
+				}
+			});
     }
 
 	public void onClick(View view) {
@@ -69,14 +96,17 @@ public class BartActivity extends Activity implements View.OnClickListener
 
 	@Override
 	protected void onResume() {
+		Log.d("BartActivity", "onResume fired");
+
 		super.onResume();
 
 		mAsker.onResume();
-		Log.d("BartActivity", "onResume fired");
 	}
 
 	@Override
 	protected void onPause() {
+		Log.d("BartActivity", "onPause fired");
+
 		super.onPause();
 
 		if (mp != null) {
@@ -85,12 +115,12 @@ public class BartActivity extends Activity implements View.OnClickListener
 		}
 
 		mAsker.onPause();
-		Log.d("BartActivity", "onPause fired");
 	}
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		Log.d("BartActivity", "onKeyDown fired");
+
 		if ((keyCode == KeyEvent.KEYCODE_BACK) && mBannerView.canGoBack()) {
 			mBannerView.goBack();
 			return true;
