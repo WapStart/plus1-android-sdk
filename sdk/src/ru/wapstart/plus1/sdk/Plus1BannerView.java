@@ -406,11 +406,11 @@ public class Plus1BannerView extends FrameLayout {
 				startAnimation(animation);
 
 			setVisibility(VISIBLE);
-
 			notifyOnShowListener();
 		}
 
 		mAdAnimator.showAd();
+		notifyOnImpressionListener();
 	}
 
 	private void hide(Animation animation) {
@@ -419,7 +419,6 @@ public class Plus1BannerView extends FrameLayout {
 				startAnimation(animation);
 
 			setVisibility(GONE);
-
 			notifyOnHideListener();
 		}
 	}
