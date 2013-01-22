@@ -61,8 +61,7 @@ public class Plus1BannerView extends FrameLayout {
 	private boolean mAutorefreshEnabled = true;
 	private boolean mExpanded			= false;
 
-	private ArrayList<Plus1BannerViewStateListener> mViewStateListenerList =
-		new ArrayList<Plus1BannerViewStateListener>();
+	private Plus1BannerViewStateListener mViewStateListener;
 
 	static class Plus1BannerViewListenerInfo {
 		private ArrayList<OnShowListener> mOnShowListenerList;
@@ -293,21 +292,15 @@ public class Plus1BannerView extends FrameLayout {
 		return this;
 	}
 
-	public Plus1BannerView addViewStateListener(
-		Plus1BannerViewStateListener viewStateListener
-	) {
-		mViewStateListenerList.add(viewStateListener);
-
-		return this;
-	}
-
 	/**
-	 * @deprecated please use addViewStateListener() method
+	 * @deprecated please use inner listener interfaces like OnShowListener
 	 */
 	public Plus1BannerView setViewStateListener(
 		Plus1BannerViewStateListener viewStateListener
 	) {
-		return addViewStateListener(viewStateListener);
+		mViewStateListener = viewStateListener;
+
+		return this;
 	}
 
 	/**
@@ -328,9 +321,6 @@ public class Plus1BannerView extends FrameLayout {
 				notifyOnExpandListener();
 			else
 				notifyOnCollapseListener();
-
-			// FIXME: revert to complete bc
-			notifyOnExpandStateChanged(orly);
 		}
 	}
 
@@ -447,9 +437,9 @@ public class Plus1BannerView extends FrameLayout {
 		for (OnShowListener listener : mListenerInfo.mOnShowListenerList)
 			listener.onShow(this);
 
-		// FIXME: revert to complete bc
-		for (Plus1BannerViewStateListener listener : mViewStateListenerList)
-			listener.onShowBannerView();
+		// NOTE: bc
+		if (mViewStateListener != null)
+			mViewStateListener.onShowBannerView();
 	}
 
 	private void notifyOnHideListener()
@@ -457,9 +447,9 @@ public class Plus1BannerView extends FrameLayout {
 		for (OnHideListener listener : mListenerInfo.mOnHideListenerList)
 			listener.onHide(this);
 
-		// FIXME: revert to complete bc
-		for (Plus1BannerViewStateListener listener : mViewStateListenerList)
-			listener.onHideBannerView();
+		// NOTE: bc
+		if (mViewStateListener != null)
+			mViewStateListener.onHideBannerView();
 	}
 
 	private void notifyOnCloseButtonListener()
@@ -467,9 +457,9 @@ public class Plus1BannerView extends FrameLayout {
 		for (OnCloseButtonListener listener : mListenerInfo.mOnCloseButtonListenerList)
 			listener.onCloseButton(this);
 
-		// FIXME: revert to complete bc
-		for (Plus1BannerViewStateListener listener : mViewStateListenerList)
-			listener.onCloseBannerView();
+		// NOTE: bc
+		if (mViewStateListener != null)
+			mViewStateListener.onCloseBannerView();
 	}
 
 	private void notifyOnExpandListener()
@@ -494,13 +484,6 @@ public class Plus1BannerView extends FrameLayout {
 	{
 		for (OnTrackClickListener listener : mListenerInfo.mOnTrackClickListenerList)
 			listener.onTrackClick(this);
-	}
-
-	// FIXME XXX: revert this to complete bc
-	private void notifyOnExpandStateChanged(boolean expanded)
-	{
-		for (Plus1BannerViewStateListener listener : mViewStateListenerList)
-			listener.onExpandStateChanged(expanded);
 	}
 
 	/**

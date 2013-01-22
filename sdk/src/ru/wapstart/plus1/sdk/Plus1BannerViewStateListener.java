@@ -28,6 +28,9 @@
  */
 package ru.wapstart.plus1.sdk;
 
+/**
+ * @deprecated please use inner listener interfaces like Plus1BannerView::OnShowListener
+ */
 public interface Plus1BannerViewStateListener {
 	/**
 	 * Raised on show banner view
@@ -43,9 +46,4 @@ public interface Plus1BannerViewStateListener {
 	 * Raised on user click close button
 	 */
 	public void onCloseBannerView();
-
-	/**
-	 * Raised when expand state of banner view was changed
-	 */
-	public void onExpandStateChanged(boolean expanded);
 }

@@ -150,7 +150,7 @@ public class Plus1BannerAsker {
 	}
 
 	/**
-	 * @deprecated please use setRefreshDelay()
+	 * @deprecated please use setRefreshDelay() method
 	 */
 	public Plus1BannerAsker setTimeout(int timeout) {
 		return setRefreshDelay(timeout);
@@ -163,7 +163,7 @@ public class Plus1BannerAsker {
 	}
 
 	/**
-	 * @deprecated use Plus1BannerView::setViewStateListener() method
+	 * @deprecated please use inner listener interfaces like Plus1BannerView::OnShowListener
 	 */
 	public Plus1BannerAsker setViewStateListener(
 		Plus1BannerViewStateListener viewStateListener
@@ -194,45 +194,36 @@ public class Plus1BannerAsker {
 			mLocationListener = new Plus1LocationListener(mRequest);
 		}
 
-		mView.addViewStateListener(
-			new Plus1BannerViewStateListener() {
-				public void onShowBannerView() {
-					if (mAskerStopper != null)
-						mHandler.removeCallbacks(mAskerStopper);
+		mView
+			.addListener(new Plus1BannerView.OnShowListener() {
+				public void onShow(Plus1BannerView view) {
+					onShowBannerView();
 				}
-
-				public void onHideBannerView() {
-					if (mAskerStopper == null) {
-						mAskerStopper =
-							new Runnable() {
-								public void run() {
-									stop();
-								}
-							};
-					}
-
-					mHandler.postDelayed(mAskerStopper, mVisibilityTimeout * 1000);
+			})
+			.addListener(new Plus1BannerView.OnHideListener() {
+				public void onHide(Plus1BannerView view) {
+					onHideBannerView();
 				}
-
-				public void onCloseBannerView() {
+			})
+			.addListener(new Plus1BannerView.OnCloseButtonListener() {
+				public void onCloseButton(Plus1BannerView view) {
+					onCloseBannerView();
+				}
+			})
+			.addListener(new Plus1BannerView.OnExpandListener() {
+				public void onExpand(Plus1BannerView view) {
 					stop();
-
-					if (mAskerStopper != null)
-						mHandler.removeCallbacks(mAskerStopper);
 				}
-
-				public void onExpandStateChanged(boolean expanded) {
-					if (expanded)
-						stop();
-					else
-						start();
+			})
+			.addListener(new Plus1BannerView.OnCollapseListener() {
+				public void onCollapse(Plus1BannerView view) {
+					start();
 				}
-			}
-		);
+			});
 
-		// TODO: remove this in next release
+		// NOTE: bc
 		if (viewStateListener != null)
-			mView.addViewStateListener(viewStateListener);
+			mView.setViewStateListener(viewStateListener);
 
 		if (mVisibilityTimeout == 0)
 			mVisibilityTimeout = mRefreshDelay * 3;
@@ -289,6 +280,9 @@ public class Plus1BannerAsker {
 	 */
 	public void onCloseBannerView() {
 		stop();
+
+		if (mAskerStopper != null)
+			mHandler.removeCallbacks(mAskerStopper);
 	}
 
 	private void start() {
