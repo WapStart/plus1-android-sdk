@@ -309,9 +309,10 @@ public class Plus1BannerView extends FrameLayout {
 				public void onClick(View v) {
 					mClosed = true;
 					setAutorefreshEnabled(false);
-					hide(mHideAnimation);
 
 					notifyOnCloseBannerView();
+
+					hide(mHideAnimation);
 				}
 			});
 
