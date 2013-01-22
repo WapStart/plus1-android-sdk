@@ -36,6 +36,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Locale;
+import java.util.ArrayList;
 
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 
@@ -57,10 +58,12 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 	protected String mBannerData			= null;
 	protected String mBannerAdType			= null;
 
-	protected Plus1BannerDownloadListener bannerDownloadListener = null;
+	protected ArrayList<Plus1BannerDownloadListener> mListenerList;
 
 	public HtmlBannerDownloader(Plus1BannerView view) {
 		this.view = view;
+
+		mListenerList = new ArrayList<Plus1BannerDownloadListener>();
 	}
 
 	public HtmlBannerDownloader setRequest(Plus1BannerRequest request) {
@@ -85,12 +88,21 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 		return this;
 	}
 
+	public HtmlBannerDownloader addDownloadListener(
+		Plus1BannerDownloadListener bannerDownloadListener
+	) {
+		mListenerList.add(bannerDownloadListener);
+
+		return this;
+	}
+
+	/**
+	 * @deprecated please use addDownloadListener method
+	 */
 	public HtmlBannerDownloader setDownloadListener(
 		Plus1BannerDownloadListener bannerDownloadListener
 	) {
-		this.bannerDownloadListener = bannerDownloadListener;
-
-		return this;
+		return addDownloadListener(bannerDownloadListener);
 	}
 
 	@Override
@@ -117,30 +129,25 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 
 	protected void updateBanner()
 	{
-		if (!fetchBanner())
-			return;
+		fetchBanner();
 
-		if (mBannerData.equals("")) {
-			if (bannerDownloadListener != null)
-				bannerDownloadListener.onBannerLoadFailed(
-					LoadError.UnknownAnswer
-				);
-		} else if (mBannerData.trim().equals(NO_BANNER)) {
-			if (bannerDownloadListener != null)
-				bannerDownloadListener.onBannerLoadFailed(
-					LoadError.NoHaveBanner
-				);
-		} else {
-			view.post(new Runnable() {
-				public void run() {
+		view.post(new Runnable() {
+			public void run() {
+				if (mBannerData == null) {
+					notifyOnBannerLoadFailed(LoadError.DownloadFailed);
+				} else if (mBannerData.equals(NO_BANNER)) {
+					notifyOnBannerLoadFailed(LoadError.NoHaveBanner);
+				} else if (!mBannerData.endsWith(NO_BANNER)) {
+					// TODO: use another logic to detect plus1 banner
+					notifyOnBannerLoadFailed(LoadError.UnknownAnswer);
+				} else {
+					notifyOnBannerLoaded();
+
 					if (!isCancelled())
 						view.loadAd(mBannerData, mBannerAdType);
 				}
-			});
-
-			if (bannerDownloadListener != null)
-				bannerDownloadListener.onBannerLoaded();
-		}
+			}
+		});
 	}
 
 	protected boolean fetchBanner()
@@ -152,6 +159,9 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 
 		String result = "";
 		boolean fetched = false;
+
+		mBannerData = null;
+		mBannerAdType = null;
 
 		try {
 			InputStream stream = connection.getInputStream();
@@ -182,17 +192,12 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 
 			fetched = true;
 		} catch (IOException e) {
-			Log.d(getClass().getName(), "URL " + request.getRequestUri() + " doesn't exist");
+			Log.w(getClass().getName(), "URL " + request.getRequestUri() + " doesn't exist");
 		} catch (Exception e) {
 			Log.e(
 				getClass().getName(),
 				"Exception while downloading banner: " + e.getMessage()
 			);
-
-			if (bannerDownloadListener != null)
-				bannerDownloadListener.onBannerLoadFailed(
-					LoadError.DownloadFailed
-				);
 		} finally {
 			connection.disconnect();
 		}
@@ -273,5 +278,15 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 		}
 
 		return connection;
+	}
+
+	private void notifyOnBannerLoaded() {
+		for (Plus1BannerDownloadListener listener : mListenerList)
+			listener.onBannerLoaded();
+	}
+
+	private void notifyOnBannerLoadFailed(LoadError loadError) {
+		for (Plus1BannerDownloadListener listener : mListenerList)
+			listener.onBannerLoadFailed(loadError);
 	}
 }

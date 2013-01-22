@@ -34,6 +34,7 @@ import android.location.LocationManager;
 import android.os.Handler;
 import android.util.Log;
 import android.webkit.WebView;
+import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 
 public class Plus1BannerAsker {
 	private static final String LOGTAG = "Plus1BannerAsker";
@@ -47,6 +48,8 @@ public class Plus1BannerAsker {
 	private boolean mRemoveBannersOnPause					= false;
 	private boolean mDisableWebViewCorePausing				= false;
 	private int mRefreshDelay								= 10;
+	private int mRefreshRetryNum							= 3;
+	private int mRefreshRetryCount							= 0;
 	private int mVisibilityTimeout							= 0;
 
 	private boolean mInitialized							= false;
@@ -157,6 +160,12 @@ public class Plus1BannerAsker {
 		return this;
 	}
 
+	public Plus1BannerAsker setRefreshRetryNum(int refreshRetryNum) {
+		mRefreshRetryNum = refreshRetryNum;
+
+		return this;
+	}
+
 	/**
 	 * @deprecated please use setRefreshDelay() method
 	 */
@@ -164,6 +173,9 @@ public class Plus1BannerAsker {
 		return setRefreshDelay(timeout);
 	}
 
+	/**
+	 * @deprecated please use setRefreshRetryNum() method instead
+	 */
 	public Plus1BannerAsker setVisibilityTimeout(int visibilityTimeout) {
 		mVisibilityTimeout = visibilityTimeout;
 
@@ -233,6 +245,7 @@ public class Plus1BannerAsker {
 		if (viewStateListener != null)
 			mView.setViewStateListener(viewStateListener);
 
+		// NOTE: bc
 		if (mVisibilityTimeout == 0)
 			mVisibilityTimeout = mRefreshDelay * 3;
 
@@ -333,10 +346,22 @@ public class Plus1BannerAsker {
 
 		task
 			.setRequest(mRequest)
-			.setTimeout(mRefreshDelay);
+			.setTimeout(mRefreshDelay)
+			.addDownloadListener(new Plus1BannerDownloadListener() {
+				public void onBannerLoaded() {
+					mRefreshRetryCount = 0;
+				}
+
+				public void onBannerLoadFailed(LoadError error) {
+					if (++mRefreshRetryCount >= mRefreshRetryNum) {
+						stop();
+						mRefreshRetryCount = 0;
+					}
+				}
+			});
 
 		if (mDownloadListener != null)
-			task.setDownloadListener(mDownloadListener);
+			task.addDownloadListener(mDownloadListener);
 
 		return task;
 	}
