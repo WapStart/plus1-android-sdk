@@ -211,6 +211,7 @@ public class Plus1BannerView extends FrameLayout {
 		adView.setOnExpandListener(new MraidView.OnExpandListener() {
 			public void onExpand(MraidView view) {
 				expand();
+				notifyOnTrackClickListener();
 			}
 		});
 		adView.setOnCloseListener(new MraidView.OnCloseListener() {
@@ -235,8 +236,13 @@ public class Plus1BannerView extends FrameLayout {
 		AdView adView = new AdView(getContext());
 		Log.d(LOGTAG, "AdView instance created");
 		adView.setOnReadyListener(new AdView.OnReadyListener() {
-			public void onReady() {
+			public void onReady(AdView view) {
 				show(mShowAnimation);
+			}
+		});
+		adView.setOnClickListener(new AdView.OnClickListener() {
+			public void onClick(AdView view) {
+				notifyOnTrackClickListener();
 			}
 		});
 

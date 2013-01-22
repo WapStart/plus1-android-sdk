@@ -49,6 +49,7 @@ public class AdView extends BaseAdView {
 	};
 
 	private OnReadyListener mOnReadyListener;
+	private OnClickListener mOnClickListener;
 
 	public AdView(Context context) {
 		// Important: don't allow any WebView subclass to be instantiated using
@@ -90,16 +91,20 @@ public class AdView extends BaseAdView {
 		return mOnReadyListener;
 	}
 
+	public void setOnClickListener(OnClickListener listener) {
+		mOnClickListener = listener;
+	}
+
+	public OnClickListener getOnClickListener() {
+		return mOnClickListener;
+	}
+
 	private void disableScrollingAndZoom() {
 		setHorizontalScrollBarEnabled(false);
 		setHorizontalScrollbarOverlay(false);
 		setVerticalScrollBarEnabled(false);
 		setVerticalScrollbarOverlay(false);
 		getSettings().setSupportZoom(false);
-	}
-
-	public interface OnReadyListener {
-		public void onReady();
 	}
 
 	private class AdWebViewClient extends WebViewClient {
@@ -135,13 +140,24 @@ public class AdView extends BaseAdView {
 				}
 			}
 
+			if (getOnClickListener() != null)
+				getOnClickListener().onClick((AdView)view);
+
 			return true;
 		}
 
 		@Override
 		public void onPageFinished(WebView view, String url) {
 			if (getOnReadyListener() != null)
-				getOnReadyListener().onReady();
+				getOnReadyListener().onReady((AdView)view);
 		}
+	}
+
+	public interface OnReadyListener {
+		public void onReady(AdView view);
+	}
+
+	public interface OnClickListener {
+		public void onClick(AdView view);
 	}
 }
