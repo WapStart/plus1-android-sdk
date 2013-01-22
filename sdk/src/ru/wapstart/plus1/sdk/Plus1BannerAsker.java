@@ -98,12 +98,8 @@ public class Plus1BannerAsker {
 	}
 
 	public void onResume() {
-		if (!mView.isExpanded()) {
-			if (mRefreshDelay > 0)
-				start();
-			else
-				startOnce();
-		}
+		if (!mView.isExpanded())
+			start();
 
 		mView.onResume();
 
@@ -254,11 +250,7 @@ public class Plus1BannerAsker {
 	public void refreshBanner() {
 		if (!mView.isExpanded()) {
 			stop();
-
-			if (mRefreshDelay > 0)
-				start();
-			else
-				startOnce();
+			start();
 		}
 	}
 
@@ -305,31 +297,21 @@ public class Plus1BannerAsker {
 
 		init();
 
-		if (!isDisabledAutoDetectLocation()) {
-			mLocationManager.requestLocationUpdates(
-				LocationManager.GPS_PROVIDER,
-				mRefreshDelay * 10000,
-				500f,
-				mLocationListener
-			);
-		}
-
 		mDownloaderTask = makeDownloaderTask();
+
+		if (mRefreshDelay > 0) {
+			if (!isDisabledAutoDetectLocation()) {
+				mLocationManager.requestLocationUpdates(
+					LocationManager.GPS_PROVIDER,
+					mRefreshDelay * 10000,
+					500f,
+					mLocationListener
+				);
+			}
+		} else
+			mDownloaderTask.setRunOnce();
 
 		mDownloaderTask.execute();
-	}
-
-	private void startOnce() {
-		Log.d(LOGTAG, "startOnce() method fired");
-
-		if (mRequest == null || mView == null || mDownloaderTask != null)
-			return;
-
-		init();
-
-		mDownloaderTask = makeDownloaderTask();
-
-		mDownloaderTask.setRunOnce().execute();
 	}
 
 	private void stop() {
