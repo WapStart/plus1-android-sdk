@@ -64,6 +64,28 @@ public class Plus1BannerView extends FrameLayout {
 	private ArrayList<Plus1BannerViewStateListener> mViewStateListenerList =
 		new ArrayList<Plus1BannerViewStateListener>();
 
+	static class Plus1BannerViewListenerInfo {
+		private ArrayList<OnShowListener> mOnShowListenerList;
+		private ArrayList<OnHideListener> mOnHideListenerList;
+		private ArrayList<OnCloseButtonListener> mOnCloseButtonListenerList;
+		private ArrayList<OnExpandListener> mOnExpandListenerList;
+		private ArrayList<OnCollapseListener> mOnCollapseListenerList;
+		private ArrayList<OnImpressionListener> mOnImpressionListenerList;
+		private ArrayList<OnTrackClickListener> mOnTrackClickListenerList;
+
+		public Plus1BannerViewListenerInfo() {
+			mOnShowListenerList = new ArrayList<OnShowListener>();
+			mOnHideListenerList = new ArrayList<OnHideListener>();
+			mOnCloseButtonListenerList = new ArrayList<OnCloseButtonListener>();
+			mOnExpandListenerList = new ArrayList<OnExpandListener>();
+			mOnCollapseListenerList = new ArrayList<OnCollapseListener>();
+			mOnImpressionListenerList = new ArrayList<OnImpressionListener>();
+			mOnTrackClickListenerList = new ArrayList<OnTrackClickListener>();
+		}
+	}
+
+	private Plus1BannerViewListenerInfo mListenerInfo;
+
 	public Plus1BannerView(Context context) {
 		this(context, null);
 	}
@@ -79,6 +101,8 @@ public class Plus1BannerView extends FrameLayout {
 			mWebViewUserAgent =
 				new WebView(context).getSettings().getUserAgentString();
 		}
+
+		mListenerInfo = new Plus1BannerViewListenerInfo();
 	}
 
 	/**
@@ -234,6 +258,41 @@ public class Plus1BannerView extends FrameLayout {
 		return this;
 	}
 
+	public Plus1BannerView addListener(OnShowListener listener) {
+		mListenerInfo.mOnShowListenerList.add(listener);
+		return this;
+	}
+
+	public Plus1BannerView addListener(OnHideListener listener) {
+		mListenerInfo.mOnHideListenerList.add(listener);
+		return this;
+	}
+
+	public Plus1BannerView addListener(OnCloseButtonListener listener) {
+		mListenerInfo.mOnCloseButtonListenerList.add(listener);
+		return this;
+	}
+
+	public Plus1BannerView addListener(OnExpandListener listener) {
+		mListenerInfo.mOnExpandListenerList.add(listener);
+		return this;
+	}
+
+	public Plus1BannerView addListener(OnCollapseListener listener) {
+		mListenerInfo.mOnCollapseListenerList.add(listener);
+		return this;
+	}
+
+	public Plus1BannerView addListener(OnImpressionListener listener) {
+		mListenerInfo.mOnImpressionListenerList.add(listener);
+		return this;
+	}
+
+	public Plus1BannerView addListener(OnTrackClickListener listener) {
+		mListenerInfo.mOnTrackClickListenerList.add(listener);
+		return this;
+	}
+
 	public Plus1BannerView addViewStateListener(
 		Plus1BannerViewStateListener viewStateListener
 	) {
@@ -265,6 +324,12 @@ public class Plus1BannerView extends FrameLayout {
 			if (mExpanded)
 				mAdAnimator.stopLoading();
 
+			if (mExpanded)
+				notifyOnExpandListener();
+			else
+				notifyOnCollapseListener();
+
+			// FIXME: revert to complete bc
 			notifyOnExpandStateChanged(orly);
 		}
 	}
@@ -310,7 +375,7 @@ public class Plus1BannerView extends FrameLayout {
 					mClosed = true;
 					setAutorefreshEnabled(false);
 
-					notifyOnCloseBannerView();
+					notifyOnCloseButtonListener();
 
 					hide(mHideAnimation);
 				}
@@ -360,7 +425,7 @@ public class Plus1BannerView extends FrameLayout {
 
 			setVisibility(VISIBLE);
 
-			notifyOnShowBannerView();
+			notifyOnShowListener();
 		}
 
 		mAdAnimator.showAd();
@@ -373,28 +438,65 @@ public class Plus1BannerView extends FrameLayout {
 
 			setVisibility(GONE);
 
-			notifyOnHideBannerView();
+			notifyOnHideListener();
 		}
 	}
 
-	private void notifyOnShowBannerView()
+	private void notifyOnShowListener()
 	{
+		for (OnShowListener listener : mListenerInfo.mOnShowListenerList)
+			listener.onShow(this);
+
+		// FIXME: revert to complete bc
 		for (Plus1BannerViewStateListener listener : mViewStateListenerList)
 			listener.onShowBannerView();
 	}
 
-	private void notifyOnHideBannerView()
+	private void notifyOnHideListener()
 	{
+		for (OnHideListener listener : mListenerInfo.mOnHideListenerList)
+			listener.onHide(this);
+
+		// FIXME: revert to complete bc
 		for (Plus1BannerViewStateListener listener : mViewStateListenerList)
 			listener.onHideBannerView();
 	}
 
-	private void notifyOnCloseBannerView()
+	private void notifyOnCloseButtonListener()
 	{
+		for (OnCloseButtonListener listener : mListenerInfo.mOnCloseButtonListenerList)
+			listener.onCloseButton(this);
+
+		// FIXME: revert to complete bc
 		for (Plus1BannerViewStateListener listener : mViewStateListenerList)
 			listener.onCloseBannerView();
 	}
 
+	private void notifyOnExpandListener()
+	{
+		for (OnExpandListener listener : mListenerInfo.mOnExpandListenerList)
+			listener.onExpand(this);
+	}
+
+	private void notifyOnCollapseListener()
+	{
+		for (OnCollapseListener listener : mListenerInfo.mOnCollapseListenerList)
+			listener.onCollapse(this);
+	}
+
+	private void notifyOnImpressionListener()
+	{
+		for (OnImpressionListener listener : mListenerInfo.mOnImpressionListenerList)
+			listener.onImpression(this);
+	}
+
+	private void notifyOnTrackClickListener()
+	{
+		for (OnTrackClickListener listener : mListenerInfo.mOnTrackClickListenerList)
+			listener.onTrackClick(this);
+	}
+
+	// FIXME XXX: revert this to complete bc
 	private void notifyOnExpandStateChanged(boolean expanded)
 	{
 		for (Plus1BannerViewStateListener listener : mViewStateListenerList)
@@ -406,5 +508,33 @@ public class Plus1BannerView extends FrameLayout {
 	 */
 	public interface OnAutorefreshStateListener {
 		public void onAutorefreshStateChanged(Plus1BannerView view);
+	}
+
+	public interface OnShowListener {
+		public void onShow(Plus1BannerView view);
+	}
+
+	public interface OnHideListener {
+		public void onHide(Plus1BannerView view);
+	}
+
+	public interface OnCloseButtonListener {
+		public void onCloseButton(Plus1BannerView view);
+	}
+
+	public interface OnExpandListener {
+		public void onExpand(Plus1BannerView view);
+	}
+
+	public interface OnCollapseListener {
+		public void onCollapse(Plus1BannerView view);
+	}
+
+	public interface OnImpressionListener {
+		public void onImpression(Plus1BannerView view);
+	}
+
+	public interface OnTrackClickListener {
+		public void onTrackClick(Plus1BannerView view);
 	}
 }
