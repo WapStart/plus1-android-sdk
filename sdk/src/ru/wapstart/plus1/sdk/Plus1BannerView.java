@@ -329,7 +329,7 @@ public class Plus1BannerView extends FrameLayout {
 	}
 
 	/**
-	 * @deprecated this method will be protected in future
+	 * @deprecated this method will be removed in future
 	 */
 	public void setOnAutorefreshChangeListener(OnAutorefreshStateListener listener) {
 		mOnAutorefreshChangeListener = listener;
@@ -363,6 +363,8 @@ public class Plus1BannerView extends FrameLayout {
 			closeButton.setOnClickListener(new OnClickListener() {
 				public void onClick(View v) {
 					mClosed = true;
+
+					// NOTE: bc
 					setAutorefreshEnabled(false);
 
 					notifyOnCloseButtonListener();

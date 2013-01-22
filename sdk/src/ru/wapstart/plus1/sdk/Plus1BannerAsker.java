@@ -67,6 +67,18 @@ public class Plus1BannerAsker {
 	public Plus1BannerAsker(Plus1BannerRequest request, Plus1BannerView view) {
 		mRequest = request;
 		mView = view;
+
+		// NOTE: bc
+		view.setOnAutorefreshChangeListener(
+			new Plus1BannerView.OnAutorefreshStateListener() {
+				public void onAutorefreshStateChanged(Plus1BannerView view) {
+					if (view.getAutorefreshEnabled() && !view.isExpanded())
+						start();
+					else
+						stop();
+				}
+			}
+		);
 	}
 
 	public void onPause() {
