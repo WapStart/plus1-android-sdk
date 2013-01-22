@@ -243,20 +243,6 @@ public class Plus1BannerView extends FrameLayout {
 		return adView;
 	}
 
-	/**
-	 * @deprecated use start/stop methods of asker to control autorefresh
-	 */
-	public Plus1BannerView setAutorefreshEnabled(boolean enabled) {
-		if (mAutorefreshEnabled != enabled) { // NOTE: really changed
-			mAutorefreshEnabled = enabled;
-
-			if (mOnAutorefreshChangeListener != null)
-				mOnAutorefreshChangeListener.onAutorefreshStateChanged(this);
-		}
-
-		return this;
-	}
-
 	public Plus1BannerView addListener(OnShowListener listener) {
 		mListenerInfo.mOnShowListenerList.add(listener);
 		return this;
@@ -289,6 +275,20 @@ public class Plus1BannerView extends FrameLayout {
 
 	public Plus1BannerView addListener(OnTrackClickListener listener) {
 		mListenerInfo.mOnTrackClickListenerList.add(listener);
+		return this;
+	}
+
+	/**
+	 * @deprecated use start/stop methods of asker to control autorefresh
+	 */
+	public Plus1BannerView setAutorefreshEnabled(boolean enabled) {
+		if (mAutorefreshEnabled != enabled) { // NOTE: really changed
+			mAutorefreshEnabled = enabled;
+
+			if (mOnAutorefreshChangeListener != null)
+				mOnAutorefreshChangeListener.onAutorefreshStateChanged(this);
+		}
+
 		return this;
 	}
 
