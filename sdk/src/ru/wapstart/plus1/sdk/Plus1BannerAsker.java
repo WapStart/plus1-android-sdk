@@ -329,6 +329,10 @@ public class Plus1BannerAsker {
 				String provider = getBestLocationProvider();
 
 				if (provider != null) {
+					mRequest.setLocation(
+						mLocationManager.getLastKnownLocation(provider)
+					);
+
 					mLocationManager.requestLocationUpdates(
 						provider,
 						mRefreshDelay * 10000,
@@ -337,6 +341,11 @@ public class Plus1BannerAsker {
 					);
 
 					mLocationUpdates = true;
+
+					Log.d(
+						LOGTAG,
+						"Location provider '"+provider+"' was choosen for updates"
+					);
 				} else {
 					Log.i(
 						LOGTAG,
