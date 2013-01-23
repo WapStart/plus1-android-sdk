@@ -264,7 +264,8 @@ public class Plus1BannerAsker {
 		if (!mView.isExpanded()) {
 			stop();
 			start();
-		}
+		} else
+			Log.w(LOGTAG, "Banner view is expanded, so refresh was prevented");
 	}
 
 	/**
