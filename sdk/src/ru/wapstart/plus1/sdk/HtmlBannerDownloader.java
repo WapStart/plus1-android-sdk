@@ -184,7 +184,7 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 
 			bufStream.close();
 
-			mBannerData = result.toString();
+			mBannerData = result.toString().trim();
 			mBannerAdType = connection.getHeaderField("X-Adtype");
 
 			Log.d(LOGTAG, "Answer: " + mBannerData);
