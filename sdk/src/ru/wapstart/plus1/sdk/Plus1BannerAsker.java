@@ -345,9 +345,7 @@ public class Plus1BannerAsker {
 	{
 		mRefreshRetryCount = 0;
 
-		HtmlBannerDownloader task = new HtmlBannerDownloader(mView);
-
-		task
+		HtmlBannerDownloader task = new HtmlBannerDownloader(mView)
 			.setRequest(mRequest)
 			.setTimeout(mRefreshDelay)
 			.addDownloadListener(new Plus1BannerDownloadListener() {
