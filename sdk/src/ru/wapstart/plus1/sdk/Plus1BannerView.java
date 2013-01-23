@@ -46,6 +46,7 @@ import ru.wapstart.plus1.sdk.MraidView.ViewState;
 
 public class Plus1BannerView extends FrameLayout {
     private static final String LOGTAG = "Plus1BannerView";
+    private static final int CLOSE_BUTTON_MARGIN = 5;
 
 	private OnAutorefreshStateListener mOnAutorefreshChangeListener;
 
@@ -369,14 +370,17 @@ public class Plus1BannerView extends FrameLayout {
 				}
 			});
 
-			addView(
-				closeButton,
+			FrameLayout.LayoutParams layoutParams =
 				new FrameLayout.LayoutParams(
-					18,
-					17,
-					Gravity.RIGHT
-				)
-			);
+					closeButton.getBackground().getMinimumWidth(),
+					closeButton.getBackground().getMinimumHeight(),
+					Gravity.TOP | Gravity.RIGHT
+				);
+
+			layoutParams.topMargin = CLOSE_BUTTON_MARGIN;
+			layoutParams.rightMargin = CLOSE_BUTTON_MARGIN;
+
+			addView(closeButton, layoutParams);
 		}
 
 		mInitialized = true;
