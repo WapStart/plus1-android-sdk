@@ -44,7 +44,7 @@ public class Plus1BannerAsker {
 	private HtmlBannerDownloader mDownloaderTask			= null;
 	private Runnable mAskerStopper							= null;
 
-	private boolean mDisableAutoDetectLocation				= false;
+	private boolean mDisabledAutoDetectLocation				= false;
 	private boolean mRemoveBannersOnPause					= false;
 	private boolean mDisableWebViewCorePausing				= false;
 	private int mRefreshDelay								= 10;
@@ -115,12 +115,21 @@ public class Plus1BannerAsker {
 	}
 
 	public boolean isDisabledAutoDetectLocation() {
-		return mDisableAutoDetectLocation;
+		return mDisabledAutoDetectLocation;
 	}
 
-	public Plus1BannerAsker disableAutoDetectLocation(boolean disable) {
-		mDisableAutoDetectLocation = disable;
+	public Plus1BannerAsker disableAutoDetectLocation() {
+		mDisabledAutoDetectLocation = true;
 
+		return this;
+	}
+
+	/**
+	 * @deprecated please use disableAutoDetectLocation() without argument
+	 */
+	public Plus1BannerAsker disableAutoDetectLocation(boolean disable) {
+		mDisabledAutoDetectLocation = disable;
+		
 		return this;
 	}
 
