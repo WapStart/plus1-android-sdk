@@ -343,6 +343,8 @@ public class Plus1BannerAsker {
 
 	private HtmlBannerDownloader makeDownloaderTask()
 	{
+		mRefreshRetryCount = 0;
+
 		HtmlBannerDownloader task = new HtmlBannerDownloader(mView);
 
 		task
@@ -354,10 +356,8 @@ public class Plus1BannerAsker {
 				}
 
 				public void onBannerLoadFailed(LoadError error) {
-					if (++mRefreshRetryCount >= mRefreshRetryNum) {
+					if (++mRefreshRetryCount >= mRefreshRetryNum)
 						stop();
-						mRefreshRetryCount = 0;
-					}
 				}
 			});
 
