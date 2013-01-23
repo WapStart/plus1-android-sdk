@@ -46,7 +46,7 @@ public class Plus1BannerAsker {
 
 	private boolean mDisabledAutoDetectLocation				= false;
 	private boolean mRemoveBannersOnPause					= false;
-	private boolean mDisableWebViewCorePausing				= false;
+	private boolean mDisabledWebViewCorePausing				= false;
 	private int mRefreshDelay								= 10;
 	private int mRefreshRetryNum							= 3;
 	private int mRefreshRetryCount							= 0;
@@ -144,7 +144,7 @@ public class Plus1BannerAsker {
 	}
 
 	public boolean isDisabledWebViewCorePausing() {
-		return mDisableWebViewCorePausing;
+		return mDisabledWebViewCorePausing;
 	}
 
 	/**
@@ -158,7 +158,7 @@ public class Plus1BannerAsker {
 	 * @see setRemoveBannersOnPause() method
 	 */
 	public Plus1BannerAsker setDisabledWebViewCorePausing(boolean orly) {
-		mDisableWebViewCorePausing = orly;
+		mDisabledWebViewCorePausing = orly;
 
 		return this;
 	}
