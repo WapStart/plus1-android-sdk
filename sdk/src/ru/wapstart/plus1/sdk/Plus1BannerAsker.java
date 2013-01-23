@@ -31,6 +31,7 @@ package ru.wapstart.plus1.sdk;
 
 import android.content.Context;
 import android.location.LocationManager;
+import android.location.Criteria;
 import android.os.Handler;
 import android.util.Log;
 import android.webkit.WebView;
@@ -49,11 +50,12 @@ public class Plus1BannerAsker {
 	private boolean mDisabledWebViewCorePausing				= false;
 	private int mRefreshDelay								= 10;
 	private int mRefreshRetryNum							= 3;
-	private int mRefreshRetryCount							= 0;
 	private int mVisibilityTimeout							= 0;
 
 	private boolean mInitialized							= false;
 	private boolean mWebViewCorePaused						= false;
+	private boolean mLocationUpdates						= false;
+	private int mRefreshRetryCount							= 0;
 
 	private LocationManager mLocationManager				= null;
 	private Plus1LocationListener mLocationListener			= null;
@@ -323,13 +325,25 @@ public class Plus1BannerAsker {
 		mDownloaderTask = makeDownloaderTask();
 
 		if (mRefreshDelay > 0) {
-			if (!isDisabledAutoDetectLocation()) {
-				mLocationManager.requestLocationUpdates(
-					LocationManager.GPS_PROVIDER,
-					mRefreshDelay * 10000,
-					500f,
-					mLocationListener
-				);
+			if (!isDisabledAutoDetectLocation() && !mLocationUpdates) {
+				String provider = getBestLocationProvider();
+
+				if (provider != null) {
+					mLocationManager.requestLocationUpdates(
+						provider,
+						mRefreshDelay * 10000,
+						500f,
+						mLocationListener
+					);
+
+					mLocationUpdates = true;
+				} else {
+					Log.i(
+						LOGTAG,
+						"Can't detect any location provider, "
+						+ "location updates is turning off"
+					);
+				}
 			}
 		} else
 			mDownloaderTask.setRunOnce();
@@ -343,8 +357,10 @@ public class Plus1BannerAsker {
 		if (mDownloaderTask == null)
 			return;
 
-		if (!isDisabledAutoDetectLocation())
+		if (mLocationUpdates) {
 			mLocationManager.removeUpdates(mLocationListener);
+			mLocationUpdates = false;
+		}
 
 		mDownloaderTask.cancel(true);
 		mDownloaderTask = null;
@@ -372,5 +388,14 @@ public class Plus1BannerAsker {
 			task.addDownloadListener(mDownloadListener);
 
 		return task;
+	}
+
+	private String getBestLocationProvider() {
+		Criteria criteria = new Criteria();
+
+		criteria.setAccuracy(Criteria.ACCURACY_FINE);
+		criteria.setCostAllowed(false);
+
+		return mLocationManager.getBestProvider(criteria, true);
 	}
 }
