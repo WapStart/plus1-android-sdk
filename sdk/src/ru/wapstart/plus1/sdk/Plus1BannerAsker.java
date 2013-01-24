@@ -30,8 +30,12 @@
 package ru.wapstart.plus1.sdk;
 
 import android.content.Context;
+import android.location.Location;
 import android.location.LocationManager;
 import android.location.Criteria;
+import android.location.LocationListener;
+import android.location.LocationProvider;
+import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.webkit.WebView;
@@ -49,16 +53,17 @@ public class Plus1BannerAsker {
 	private boolean mRemoveBannersOnPause					= false;
 	private boolean mDisabledWebViewCorePausing				= false;
 	private int mRefreshDelay								= 10;
+	private int mLocationRefreshDelay						= 300;
 	private int mRefreshRetryNum							= 3;
 	private int mVisibilityTimeout							= 0;
 
 	private boolean mInitialized							= false;
 	private boolean mWebViewCorePaused						= false;
-	private boolean mLocationUpdates						= false;
 	private int mRefreshRetryCount							= 0;
 
 	private LocationManager mLocationManager				= null;
-	private Plus1LocationListener mLocationListener			= null;
+	private LocationListener mLocationListener				= null;
+	private String mActiveLocationProvider					= null;
 
 	private Plus1BannerViewStateListener viewStateListener	= null;
 	private Plus1BannerDownloadListener mDownloadListener	= null;
@@ -89,6 +94,8 @@ public class Plus1BannerAsker {
 	public void onPause() {
 		stop();
 
+		removeLocationUpdates();
+
 		if (isRemoveBannersOnPause())
 			mView.removeAllBanners();
 		else
@@ -105,6 +112,9 @@ public class Plus1BannerAsker {
 	public void onResume() {
 		if (!mView.isExpanded())
 			start();
+
+		if (!isDisabledAutoDetectLocation())
+			requestLocationUpdates(false); // NOTE: include disabled providers
 
 		mView.onResume();
 
@@ -165,8 +175,8 @@ public class Plus1BannerAsker {
 		return this;
 	}
 
-	public Plus1BannerAsker setRefreshDelay(int delay) {
-		mRefreshDelay = delay;
+	public Plus1BannerAsker setRefreshDelay(int delayInSeconds) {
+		mRefreshDelay = delayInSeconds;
 
 		return this;
 	}
@@ -175,6 +185,20 @@ public class Plus1BannerAsker {
 		mRefreshRetryNum = refreshRetryNum;
 
 		return this;
+	}
+
+	public Plus1BannerAsker setLocationRefreshDelay(int delayInSeconds) {
+		mLocationRefreshDelay = delayInSeconds;
+
+		return this;
+	}
+
+	public boolean isAutoRefreshEnabled() {
+		return mRefreshDelay > 0;
+	}
+
+	public boolean isLocationAutoRefreshEnabled() {
+		return mLocationRefreshDelay > 0;
 	}
 
 	/**
@@ -222,7 +246,46 @@ public class Plus1BannerAsker {
 					Context.LOCATION_SERVICE
 				);
 
-			mLocationListener = new Plus1LocationListener(mRequest);
+			mLocationListener = new LocationListener() {
+				public void onLocationChanged(Location location) {
+					mRequest.setLocation(location);
+
+					if (!isLocationAutoRefreshEnabled())
+						removeLocationUpdates();
+				}
+
+				public void onProviderDisabled(String provider) {
+					Log.d(LOGTAG, "Location provider '"+provider+"' is disabled");
+					requestLocationUpdates();
+				}
+
+				public void onProviderEnabled(String provider) {
+					Log.d(LOGTAG, "Location provider '"+provider+"' is enabled");
+					// NOTE: discard another providers, detect new best provider
+					removeLocationUpdates();
+					requestLocationUpdates();
+				}
+
+				public void onStatusChanged(String provider, int status, Bundle extras) {
+					Log.d(LOGTAG, "Location provider '"+provider+"' new status: "+status);
+
+					switch (status) {
+						case LocationProvider.AVAILABLE:
+							removeLocationUpdates();
+						case LocationProvider.OUT_OF_SERVICE:
+							requestLocationUpdates();
+							break;
+						case LocationProvider.TEMPORARILY_UNAVAILABLE:
+							break;
+						default:
+							Log.w(
+								LOGTAG,
+								"Illegal status value of location provider '"
+								+provider+"' was found: "+status
+							);
+					}
+				}
+			};
 		}
 
 		mView
@@ -323,56 +386,67 @@ public class Plus1BannerAsker {
 		init();
 
 		mDownloaderTask = makeDownloaderTask();
-
-		if (mRefreshDelay > 0) {
-			if (!isDisabledAutoDetectLocation() && !mLocationUpdates) {
-				String provider = getBestLocationProvider();
-
-				if (provider != null) {
-					mRequest.setLocation(
-						mLocationManager.getLastKnownLocation(provider)
-					);
-
-					mLocationManager.requestLocationUpdates(
-						provider,
-						mRefreshDelay * 10000,
-						500f,
-						mLocationListener
-					);
-
-					mLocationUpdates = true;
-
-					Log.d(
-						LOGTAG,
-						"Location provider '"+provider+"' was choosen for updates"
-					);
-				} else {
-					Log.i(
-						LOGTAG,
-						"Can't detect any location provider, "
-						+ "location updates is turning off"
-					);
-				}
-			}
-		} else
-			mDownloaderTask.setRunOnce();
-
 		mDownloaderTask.execute();
 	}
 
 	private void stop() {
 		Log.d(LOGTAG, "stop() method fired");
 
-		if (mDownloaderTask == null)
-			return;
-
-		if (mLocationUpdates) {
-			mLocationManager.removeUpdates(mLocationListener);
-			mLocationUpdates = false;
+		if (mDownloaderTask != null) {
+			mDownloaderTask.cancel(true);
+			mDownloaderTask = null;
 		}
+	}
 
-		mDownloaderTask.cancel(true);
-		mDownloaderTask = null;
+	private void requestLocationUpdates() {
+		requestLocationUpdates(true);
+	}
+
+	private void requestLocationUpdates(boolean enabledProviderOnly) {
+		Criteria criteria = new Criteria();
+
+		criteria.setAccuracy(Criteria.ACCURACY_FINE);
+		criteria.setCostAllowed(false);
+
+		String provider =
+			mLocationManager.getBestProvider(criteria, enabledProviderOnly);
+
+		if (provider == null) {
+			Log.i(LOGTAG, "Location provider is not found, updates turned off");
+		} else if (!provider.equals(mActiveLocationProvider)) {
+
+			if (mRequest.getLocation() == null) {
+				mRequest.setLocation(
+					mLocationManager.getLastKnownLocation(provider)
+				);
+			}
+
+			mLocationManager.requestLocationUpdates(
+				provider,
+				mLocationRefreshDelay * 1000,
+				500f,
+				mLocationListener
+			);
+
+			mActiveLocationProvider = provider;
+
+			Log.d(
+				LOGTAG,
+				"Location provider '"+provider+"' was choosen for updates"
+			);
+		} else {
+			Log.d(
+				LOGTAG,
+				"Location provider '"+provider+"' already in use"
+			);
+		}
+	}
+
+	private void removeLocationUpdates() {
+		if (mActiveLocationProvider != null) {
+			mLocationManager.removeUpdates(mLocationListener);
+			mActiveLocationProvider = null;
+		}
 	}
 
 	private HtmlBannerDownloader makeDownloaderTask()
@@ -381,7 +455,6 @@ public class Plus1BannerAsker {
 
 		HtmlBannerDownloader task = new HtmlBannerDownloader(mView)
 			.setRequest(mRequest)
-			.setTimeout(mRefreshDelay)
 			.addDownloadListener(new Plus1BannerDownloadListener() {
 				public void onBannerLoaded() {
 					mRefreshRetryCount = 0;
@@ -393,18 +466,14 @@ public class Plus1BannerAsker {
 				}
 			});
 
+		if (isAutoRefreshEnabled())
+			task.setTimeout(mRefreshDelay);
+		else
+			task.setRunOnce();
+
 		if (mDownloadListener != null)
 			task.addDownloadListener(mDownloadListener);
 
 		return task;
-	}
-
-	private String getBestLocationProvider() {
-		Criteria criteria = new Criteria();
-
-		criteria.setAccuracy(Criteria.ACCURACY_FINE);
-		criteria.setCostAllowed(false);
-
-		return mLocationManager.getBestProvider(criteria, true);
 	}
 }
