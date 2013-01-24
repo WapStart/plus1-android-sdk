@@ -109,6 +109,8 @@ public class Plus1BannerAsker {
 	}
 
 	public void onResume() {
+		init();
+
 		if (!mView.isExpanded())
 			start();
 
@@ -381,8 +383,6 @@ public class Plus1BannerAsker {
 
 		if (mRequest == null || mView == null || mDownloaderTask != null)
 			return;
-
-		init();
 
 		mDownloaderTask = makeDownloaderTask();
 		mDownloaderTask.execute();
