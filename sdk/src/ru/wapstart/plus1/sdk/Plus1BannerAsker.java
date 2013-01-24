@@ -63,7 +63,6 @@ public class Plus1BannerAsker {
 
 	private LocationManager mLocationManager				= null;
 	private LocationListener mLocationListener				= null;
-	private String mActiveLocationProvider					= null;
 
 	private Plus1BannerViewStateListener viewStateListener	= null;
 	private Plus1BannerDownloadListener mDownloadListener	= null;
@@ -413,40 +412,30 @@ public class Plus1BannerAsker {
 
 		if (provider == null) {
 			Log.i(LOGTAG, "Location provider is not found, updates turned off");
-		} else if (!provider.equals(mActiveLocationProvider)) {
+			return;
+		}
 
-			if (mRequest.getLocation() == null) {
-				mRequest.setLocation(
-					mLocationManager.getLastKnownLocation(provider)
-				);
-			}
-
-			mLocationManager.requestLocationUpdates(
-				provider,
-				mLocationRefreshDelay * 1000,
-				500f,
-				mLocationListener
-			);
-
-			mActiveLocationProvider = provider;
-
-			Log.d(
-				LOGTAG,
-				"Location provider '"+provider+"' was choosen for updates"
-			);
-		} else {
-			Log.d(
-				LOGTAG,
-				"Location provider '"+provider+"' already in use"
+		if (mRequest.getLocation() == null) {
+			mRequest.setLocation(
+				mLocationManager.getLastKnownLocation(provider)
 			);
 		}
+
+		mLocationManager.requestLocationUpdates(
+			provider,
+			mLocationRefreshDelay * 1000,
+			500f,
+			mLocationListener
+		);
+
+		Log.d(
+			LOGTAG,
+			"Location provider '"+provider+"' was choosen for updates"
+		);
 	}
 
 	private void removeLocationUpdates() {
-		if (mActiveLocationProvider != null) {
-			mLocationManager.removeUpdates(mLocationListener);
-			mActiveLocationProvider = null;
-		}
+		mLocationManager.removeUpdates(mLocationListener);
 	}
 
 	private HtmlBannerDownloader makeDownloaderTask()
