@@ -135,11 +135,11 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 			public void run() {
 				if (mBannerData == null) {
 					notifyOnBannerLoadFailed(LoadError.DownloadFailed);
-				} else if (mBannerData.equals(NO_BANNER)) {
+				} else if (NO_BANNER.equals(mBannerData)) {
 					notifyOnBannerLoadFailed(LoadError.NoHaveBanner);
 				} else if (
-					!mBannerAdType.equals("plus1")
-					&& !mBannerAdType.equals("mraid")
+					!"plus1".equals(mBannerAdType)
+					&& !"mraid".equals(mBannerAdType)
 				) {
 					notifyOnBannerLoadFailed(LoadError.UnknownAnswer);
 				} else {
