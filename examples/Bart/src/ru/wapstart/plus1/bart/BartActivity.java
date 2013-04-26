@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import java.util.Random;
 import java.util.Date;
 
+import ru.wapstart.plus1.conversion.helloconversion.HelloConversionActivity;
+import ru.wapstart.plus1.conversion.sdk.Plus1ConversionTracker;
 import ru.wapstart.plus1.sdk.Plus1BannerView;
 import ru.wapstart.plus1.sdk.Plus1BannerRequest;
 import ru.wapstart.plus1.sdk.Plus1BannerAsker;
@@ -99,6 +101,26 @@ public class BartActivity extends Activity implements View.OnClickListener
 		Log.d("BartActivity", "onResume fired");
 
 		super.onResume();
+
+		// Uncomment the block bellow if you want to use Plus1 WapStart Conversion SDK
+		/**
+		try {
+			new Plus1ConversionTracker(this)
+				.setTrackId(Place your WapStart Plus1 conversion track id here)
+				.setCallbackUrl("wsp1hc://ru.wapstart.plus1.bart")
+				.run();
+		} catch (Plus1ConversionTracker.TrackIdNotDefinedException e) {
+			Log.e(
+				HelloConversionActivity.class.getSimpleName(),
+				"You must define conversion track id"
+			);
+		} catch (Plus1ConversionTracker.CallbackUrlNotDefinedException e) {
+			Log.e(
+				HelloConversionActivity.class.getSimpleName(),
+				"You must define callback url"
+			);
+		}
+		*/
 
 		mAsker.onResume();
 	}
