@@ -260,9 +260,20 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 
 	protected String getContainerMetrics()
 	{
+		float density =
+			((Activity)view.getContext())
+				.getResources()
+				.getDisplayMetrics()
+				.density;
+
 		return
-			String.valueOf(view.getWidth()) + "x"
-			+ String.valueOf(view.getHeight());
+			String.valueOf(
+				(int) (view.getWidth() / density + 0.5f)
+			)
+			+ "x"
+			+ String.valueOf(
+				(int) (view.getHeight() / density + 0.5f)
+			);
 	}
 
 	protected HttpURLConnection makeConnection(String url)
