@@ -11,9 +11,9 @@ public interface Plus1BannerDownloadListener {
 	}
 
 	// Вызывается в случае, когда объявление успешно загружено
-	abstract public void onBannerLoaded();
+	public void onBannerLoaded();
 
 	// Вызывается в случае проблем с загрузкой объявления
-	abstract public void onBannerLoadFailed(LoadError error);
+	public void onBannerLoadFailed(LoadError error);
 }
 ```
