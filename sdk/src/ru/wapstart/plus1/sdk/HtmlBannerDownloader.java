@@ -268,11 +268,11 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 
 		return
 			String.valueOf(
-				(int) (view.getWidth() / density + 0.5f)
+				(int) (view.getLayoutParams().width / density + 0.5f)
 			)
 			+ "x"
 			+ String.valueOf(
-				(int) (view.getHeight() / density + 0.5f)
+				(int) (view.getLayoutParams().height / density + 0.5f)
 			);
 	}
 
