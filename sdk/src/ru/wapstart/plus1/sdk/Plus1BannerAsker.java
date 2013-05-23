@@ -415,23 +415,31 @@ public class Plus1BannerAsker {
 			return;
 		}
 
-		if (mRequest.getLocation() == null) {
-			mRequest.setLocation(
-				mLocationManager.getLastKnownLocation(provider)
+		try {
+			mLocationManager.requestLocationUpdates(
+				provider,
+				mLocationRefreshDelay * 1000,
+				500f,
+				mLocationListener
 			);
+
+			if (mRequest.getLocation() == null) {
+				mRequest.setLocation(
+					mLocationManager.getLastKnownLocation(provider)
+				);
+			}
+
+			Log.d(
+				LOGTAG,
+				"Location provider '"+provider+"' was choosen for updates"
+			);
+		} catch (IllegalArgumentException e) {
+			if (!enabledProviderOnly) {
+				Log.d(LOGTAG, "Location provider '"+provider+"' doesn't exist - request enabled only providers");
+				requestLocationUpdates(true);
+			} else
+				Log.i(LOGTAG, "Location provider '"+provider+"' doesn't exist on this device, updates turned off");
 		}
-
-		mLocationManager.requestLocationUpdates(
-			provider,
-			mLocationRefreshDelay * 1000,
-			500f,
-			mLocationListener
-		);
-
-		Log.d(
-			LOGTAG,
-			"Location provider '"+provider+"' was choosen for updates"
-		);
 	}
 
 	private void removeLocationUpdates() {
