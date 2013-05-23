@@ -10,6 +10,8 @@ Plus1 WapStart Android SDK is under the terms of the BSD license (as is).
   * [Test application setup](#test-application-setup)
 * [SDK using](#sdk-using)
   * [Adding the banner to the application](#adding-the-banner-to-the-application)
+  * [SDK events processing by application](#sdk-events-processing-by-application)
+  * [WebViews collision resolving in application](#webviews-collision-resolving-in-application)
 * [Contacts](#contacts)
 
 
@@ -156,6 +158,46 @@ You can find the detailed descriptions of the classes, interfaces and the source
 * [Plus1BannerViewStateListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerViewStateListener.md) - the interface of the observer of the visiability status [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md)  
   // **deprecated since 2.2.0**: use new listeners - Plus1BannerView.OnShowListener(), Plus1BannerView.OnHideListener(), Plus1BannerView.OnCloseButtonListener() and so on
 
+## SDK events processing by application
+There are often situations when the application requires reaction to event associated with a banner. There are observers in [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) for this case:
+
+```java
+public Plus1BannerView addListener(OnShowListener listener);
+public Plus1BannerView addListener(OnHideListener listener);
+public Plus1BannerView addListener(OnCloseButtonListener listener);
+public Plus1BannerView addListener(OnExpandListener listener);
+public Plus1BannerView addListener(OnCollapseListener listener);
+public Plus1BannerView addListener(OnImpressionListener listener);
+public Plus1BannerView addListener(OnTrackClickListener listener);
+```
+
+To handle the events in the application you need to add observer for [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md). For example:
+
+```java
+mBannerView
+        .addListener(new Plus1BannerView.OnShowListener() {
+                public void onShow(Plus1BannerView pbv) {
+                        Log.d(LOGTAG, "Advertising block appeared on the screen");
+                }
+        })
+        .addListener(new Plus1BannerView.OnHideListener() {
+                public void onHide(Plus1BannerView pbv) {
+                        Log.d(LOGTAG, "SDK hid the ad unit");
+                }
+        })
+        .addListener(new Plus1BannerView.OnTrackClickListener() {
+                public void onTrackClick(Plus1BannerView pbv) {
+                        Log.d(LOGTAG, "There was a click event on the banner");
+                }
+        });
+```
+
+A description of all observers you can find in [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md#Наблюдатели).
+
+## WebViews collision resolving in application
+When you use *WebView* in several Activity of your application, the logic of this component will be violated. The causes of collision that the sdk by default call handlers [pauseTimers()](http://developer.android.com/reference/android/webkit/WebView.html#pauseTimers%28%29) and [resumeTimers()](http://developer.android.com/reference/android/webkit/WebView.html#resumeTimers%28%29) of class *WebView* in appropriate *onPause* and *onResume* event contexts in Activity of your application. Calls of these methods affect all *WebView* instances and allow to exclude *WebView* processing at a time when your application (Activity) is not shown to the user.
+
+To resolve this collision you may use the method **setDisabledWebViewCorePausing()** of class [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md). It is important to understand that *WebView* continues processing at a time when Activity with a banner suspended. To conserve CPU cycles recommended to remove *WebView* in Activity using the method **setRemoveBannersOnPause()** of class [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md).
 
 # Contacts
 

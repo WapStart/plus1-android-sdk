@@ -10,6 +10,7 @@ Plus1 WapStart Android SDK распространяется под свобод�
   * [Настройка тестового приложения](#Настройка-тестового-приложения)
 * [Использование SDK](#Использование-SDK)
   * [Добавление баннера в приложение](#Добавление-баннера-в-приложение)
+  * [Обработка событий от SDK в приложении](#Обработка-событий-от-SDK-в-приложении)
   * [Разрешение коллизий работы WebView в приложении](#Разрешение-коллизий-работы-webview-в-приложении)
 * [Контактная информация](#Контактная-информация)
 
@@ -156,6 +157,42 @@ public boolean onKeyDown(int keyCode, KeyEvent event) {
 * [Plus1BannerDownloadListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerDownloadListener.md) - интерфейс наблюдателя загрузки баннера
 * [Plus1BannerViewStateListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerViewStateListener.md) - интерфейс наблюдателя за состоянием видимости [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md)  
   // **устарело с версии 2.2.0**: используйте новые наблюдатели - Plus1BannerView.OnShowListener(), Plus1BannerView.OnHideListener(), Plus1BannerView.OnCloseButtonListener() и прочие
+
+## Обработка событий от SDK в приложении
+Часто возникают ситуации, когда в приложении необходима реакция на какое-то событие, связанное с баннером. Для этого в [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) предусмотрены *наблюдатели*:
+
+```java
+public Plus1BannerView addListener(OnShowListener listener);
+public Plus1BannerView addListener(OnHideListener listener);
+public Plus1BannerView addListener(OnCloseButtonListener listener);
+public Plus1BannerView addListener(OnExpandListener listener);
+public Plus1BannerView addListener(OnCollapseListener listener);
+public Plus1BannerView addListener(OnImpressionListener listener);
+public Plus1BannerView addListener(OnTrackClickListener listener);
+```
+
+Для обработки событий в приложении необходимо добавить нужный *наблюдатель* для [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md). Например:
+
+```java
+mBannerView
+	.addListener(new Plus1BannerView.OnShowListener() {
+		public void onShow(Plus1BannerView pbv) {
+			Log.d(LOGTAG, "Рекламный блок появился на экране");
+		}
+	})
+	.addListener(new Plus1BannerView.OnHideListener() {
+		public void onHide(Plus1BannerView pbv) {
+			Log.d(LOGTAG, "SDK скрыл рекламный блок");
+		}
+	})
+	.addListener(new Plus1BannerView.OnTrackClickListener() {
+		public void onTrackClick(Plus1BannerView pbv) {
+			Log.d(LOGTAG, "Произошло событие нажатия на баннер");
+		}
+	});
+```
+
+Описание всех *наблюдателей* смотрите в [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md#Наблюдатели).
 
 ## Разрешение коллизий работы WebView в приложении
 Если вы используете *WebView* в разных Activity вашего приложения, то логика работы этого компонента будет нарушаться. Причины коллизии в том, что по умолчанию sdk вызывает обработчики [pauseTimers()](http://developer.android.com/reference/android/webkit/WebView.html#pauseTimers%28%29) и [resumeTimers()](http://developer.android.com/reference/android/webkit/WebView.html#resumeTimers%28%29) класса *WebView* в соответствующих контекстах событий *onPause* и *onResume* в Activity вашего приложения. Вызовы этих методов влияют на все экземпляры *WebView* и позволяют исключить обработку *WebView* в то время, когда ваше приложение (Activity) не показывается пользователю.
