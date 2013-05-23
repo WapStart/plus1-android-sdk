@@ -1,3 +1,16 @@
+Plus1 WapStart Android SDK 2.2.0, 2013-05-23
+----------------------
+- New banner shield in WebView layout
+- Added new methods, some interface methods marked as deprecated
+- New listeners for Plus1BannerView (OnShow, OnHide, OnCloseButton, OnExpand,
+  OnCollapse, OnImpression, OnTrackClick listeners)
+- SDK listener logic fixes
+- Smart location provider logic, fixes
+- Send virtual pixels (dp) for container metrics
+- Added conversion submodule to SDK
+- Added workaround due to Eclipse layout viewer bug
+- Small bug fixes
+
 Plus1 WapStart Android SDK 2.1.4, 2012-12-25
 ----------------------
 - Fix bug for case when timers are paused and activity was destroyed
