@@ -93,7 +93,8 @@ public class Plus1BannerAsker {
 	public void onPause() {
 		stop();
 
-		removeLocationUpdates();
+		if (!isDisabledAutoDetectLocation())
+			removeLocationUpdates();
 
 		if (isRemoveBannersOnPause())
 			mView.removeAllBanners();
