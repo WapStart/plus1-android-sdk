@@ -287,7 +287,7 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 		} catch (MalformedURLException e) {
 			Log.e(getClass().getName(), "URL parsing failed: " + url);
 		} catch (Exception e) {
-			Log.d(getClass().getName(), "Unexpected exception: " + e.getMessage());
+			Log.e(getClass().getName(), "Unexpected exception", e);
 		}
 
 		return connection;
