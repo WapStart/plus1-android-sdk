@@ -1,3 +1,6 @@
+Plus1 WapStart Android SDK 2.2.2, 2013-08-08
+- Fixed WebView's crash issue for hardwareAccelerated=true case
+
 Plus1 WapStart Android SDK 2.2.1, 2013-05-30
 - Fixed onPause NPE crash when using disableAutoDetectLocation() method
 
