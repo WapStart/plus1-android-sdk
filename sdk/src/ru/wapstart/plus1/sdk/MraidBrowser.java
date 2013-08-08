@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -37,23 +38,34 @@ public class MraidBrowser extends Activity {
 	private void initializeWebView(Intent intent) {
 		WebView webView = (WebView) findViewById(R.id.webView);
 		webView.getSettings().setJavaScriptEnabled(true);
-		webView.loadUrl(intent.getStringExtra(URL_EXTRA));
+		
+		/* Pinch to zoom is apparently not enabled by default on all devices, so
+		 * declare zoom support explicitly.
+		 * http://stackoverflow.com/questions/5125851/enable-disable-zoom-in-android-webview
+		 */
+        webView.getSettings().setSupportZoom(true);
+        webView.getSettings().setBuiltInZoomControls(true);
+        webView.getSettings().setUseWideViewPort(true);
+
 		webView.setWebViewClient(new WebViewClient() {
 			@Override
 			public void onReceivedError(WebView view, int errorCode, String description,
 					String failingUrl) {
+				Log.d("mdamda", failingUrl);
 				Activity a = (Activity) view.getContext();
 				Toast.makeText(a, "MRAID error: " + description, Toast.LENGTH_SHORT).show();
 			}
 
 			@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
+				Log.d("mdamdashouldOverrideUrlLoading", url);
 				view.loadUrl(url);
 				return true;
 			}
 
 			@Override
 			public void onPageStarted(WebView view, String url, Bitmap favicon) {
+				Log.d("mdamdaonPageStarted", url);
 				super.onPageStarted(view, url, favicon);
 				ImageButton forwardButton = (ImageButton) findViewById(R.id.browserForwardButton);
 				forwardButton.setImageResource(R.drawable.unrightarrow);
@@ -61,6 +73,7 @@ public class MraidBrowser extends Activity {
 
 			@Override
 			public void onPageFinished(WebView view, String url) {
+				Log.d("mdamdaonPageFinished", url);
 				super.onPageFinished(view, url);
 
 				ImageButton backButton = (ImageButton) findViewById(R.id.browserBackButton);
@@ -76,13 +89,17 @@ public class MraidBrowser extends Activity {
 		});
 
 		webView.setWebChromeClient(new WebChromeClient() {
+			@Override
 			public void onProgressChanged(WebView view, int progress) {
 				Activity a = (Activity) view.getContext();
 				a.setTitle("Loading...");
+				Log.d("mdamda", String.valueOf(progress * 100));
 				a.setProgress(progress * 100);
 				if (progress == 100) a.setTitle(view.getUrl());
 			}
 		});
+
+		webView.loadUrl(intent.getStringExtra(URL_EXTRA));
 	}
 
 	private void initializeButtons(Intent intent) {

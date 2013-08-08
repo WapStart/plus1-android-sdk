@@ -1,6 +1,8 @@
 package ru.wapstart.plus1.bart;
 
 import android.app.Activity;
+import android.view.View.OnClickListener;
+import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -53,7 +55,8 @@ public class BartActivity extends Activity implements View.OnClickListener
 		mAsker =
 			new Plus1BannerAsker(
 				new Plus1BannerRequest()
-					.setApplicationId(/* Place your WapStart Plus1 application id here */),
+					.setApplicationId(8948)
+					.setRotatorUrl("http://ro.master.plus1.oemtest.test"),
 				mBannerView
 					.enableAnimationFromTop()
 					.enableCloseButton()
@@ -86,7 +89,17 @@ public class BartActivity extends Activity implements View.OnClickListener
 					Log.d("BartActivity", "OnTrackClickListener was touched");
 				}
 			});
+
+		findViewById(R.id.button1).setOnClickListener(click);
     }
+
+	private OnClickListener click = new OnClickListener(){
+
+		public void onClick(View arg0) {
+			startActivity(new Intent(BartActivity.this, TestActivity.class));
+		}
+    	
+    };
 
 	public void onClick(View view) {
 		if (mp == null)

@@ -412,8 +412,10 @@ public class MraidView extends BaseAdView {
 
 			try {
 				getContext().startActivity(i);
+				Log.d(LOGTAG, "Activity found");
 				return true;
 			} catch (ActivityNotFoundException e) {
+				Log.d(LOGTAG, "Activity is not found");
 				return false;
 			}
 		}

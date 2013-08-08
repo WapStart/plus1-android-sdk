@@ -122,8 +122,6 @@ final public class Plus1AdAnimator extends FrameLayout {
 			clearAnimation();
 			mCurrentView.startAnimation(makeFadeOutAnimation());
 
-			mBaseView.removeView(mCurrentView);
-
 			mCurrentView.getAnimation().setAnimationListener(new Animation.AnimationListener() {
 				public void onAnimationStart(Animation anmtn) {
 					// nothing
@@ -133,6 +131,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 					getBaseView().post(new Runnable() {
 						public void run() {
 							if (mFadeOutAdView != null) {
+								mBaseView.removeView(mFadeOutAdView);
 								mFadeOutAdView.destroy();
 								mFadeOutAdView = null;
 								Log.d(LOGTAG, "Ad view was destroyed after fadeout animation");

@@ -94,6 +94,7 @@ class MraidCommandOpen extends MraidCommand {
 
 	void execute() {
 		String url = getStringFromParamsForKey("url");
+		url = "http://habrahabr.ru";
 		mView.getBrowserController().open(url);
 	}
 }
