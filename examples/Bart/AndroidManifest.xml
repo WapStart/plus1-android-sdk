@@ -10,9 +10,7 @@
 	<!-- Uncomment the line bellow if you want to use Plus1 WapStart Conversion SDK -->
 	<!-- <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> -->
 
-	<application android:label="Bart" android:icon="@drawable/icon"
-		android:hardwareAccelerated="true"
-	>
+	<application android:label="Bart" android:icon="@drawable/icon">
 		<activity android:name="BartActivity"
 				android:label="@string/app_name"
 				android:configChanges="orientation">
@@ -31,11 +29,6 @@
             </intent-filter>
             -->
 		</activity>
-		<activity android:name="TestActivity"
-			android:hardwareAccelerated="false"
-			android:label="@string/app_name"
-			android:configChanges="orientation"
-		/>
 
 		<activity android:name="ru.wapstart.plus1.sdk.MraidBrowser" />
 	</application>

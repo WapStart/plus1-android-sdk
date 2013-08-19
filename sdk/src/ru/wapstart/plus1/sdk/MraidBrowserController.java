@@ -2,7 +2,6 @@ package ru.wapstart.plus1.sdk;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.util.Log;
 
 class MraidBrowserController extends MraidAbstractController {
@@ -20,9 +19,7 @@ class MraidBrowserController extends MraidAbstractController {
 			view.getOnOpenListener().onOpen(view);
 		}
 
-		//url = "http://content.toyota.ru/catalogues/venza_catalog.pdf";
 		Context context = getView().getContext();
-		//Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 		Intent i = new Intent(context, MraidBrowser.class);
 		i.putExtra(MraidBrowser.URL_EXTRA, url);
 		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

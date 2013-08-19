@@ -16,11 +16,5 @@
 			android:layout_height="50dp"
 			android:layout_gravity="top|center"
 		/>
-	<Button
-	    android:id="@+id/button1"
-	    android:layout_width="320dp"
-		android:layout_height="50dp"
-		android:text="Click me"
-	/>
 		
 </FrameLayout>
