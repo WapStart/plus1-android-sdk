@@ -1,3 +1,6 @@
+Plus1 WapStart Android SDK 2.2.3, 2013-08-19
+- Update debug settings in Bart project to default
+
 Plus1 WapStart Android SDK 2.2.2, 2013-08-08
 - Fixed WebView's crash issue for hardwareAccelerated=true case
 
