@@ -35,34 +35,37 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import android.location.Location;
 
-public final class Plus1BannerRequest {
-	private static final String SDK_VERSION = "2.2.3";
-	private static final Integer REQUEST_VERSION = 2;
+public final class Plus1Request {
+	// FIXME: move constant to somewhere
+	private static final String SDK_VERSION = "2.3.0";
+	private static final Integer REQUEST_VERSION = 3;
 
-	public static enum Gender {Unknown, Male, Female;}
+	public static enum Gender {Unknown, Male, Female};
 	public static enum BannerType {Undefined, Mixed, Text, Graphic, RichMedia};
+	public static enum RequestType {xml, json, html, js, init};
 
-	private String rotatorUrl		= "http://ro.plus1.wapstart.ru/";
+	private String serverHost		= "ro.plus1.wapstart.ru";
 	private int age					= 0;
 	private int applicationId		= 0;
+	private String uid				= null;
+	private RequestType requestType	= RequestType.html;
 	private Gender gender			= Gender.Unknown;
 	private String login			= null;
 	private Set<BannerType> types	= null;
 
-	private String pageId			= null;
 	private Location location		= null;
 
-	public static Plus1BannerRequest create() {
-		return new Plus1BannerRequest();
+	public static Plus1Request create() {
+		return new Plus1Request();
 	}
 
-	public Plus1BannerRequest() {}
+	public Plus1Request() {}
 
 	public int getAge() {
 		return age;
 	}
 
-	public Plus1BannerRequest setAge(int age) {
+	public Plus1Request setAge(int age) {
 		this.age = age;
 
 		return this;
@@ -72,8 +75,28 @@ public final class Plus1BannerRequest {
 		return applicationId;
 	}
 
-	public Plus1BannerRequest setApplicationId(int applicationId) {
+	public Plus1Request setApplicationId(int applicationId) {
 		this.applicationId = applicationId;
+
+		return this;
+	}
+
+	public String getUID() {
+		return uid;
+	}
+
+	public Plus1Request setUid(String uid) {
+		this.uid = uid;
+
+		return this;
+	}
+
+	public RequestType getRequestType() {
+		return requestType;
+	}
+
+	public Plus1Request setRequestType(RequestType requestType) {
+		this.requestType = requestType;
 
 		return this;
 	}
@@ -82,7 +105,7 @@ public final class Plus1BannerRequest {
 		return gender;
 	}
 
-	public Plus1BannerRequest setGender(Gender sex) {
+	public Plus1Request setGender(Gender sex) {
 		this.gender = sex;
 
 		return this;
@@ -92,13 +115,13 @@ public final class Plus1BannerRequest {
 		return login;
 	}
 
-	public Plus1BannerRequest setLogin(String login) {
+	public Plus1Request setLogin(String login) {
 		this.login = login;
 
 		return this;
 	}
 
-	public Plus1BannerRequest addType(BannerType type) {
+	public Plus1Request addType(BannerType type) {
 		if (types == null)
 			this.types = new HashSet<BannerType>();
 
@@ -108,19 +131,19 @@ public final class Plus1BannerRequest {
 		return this;
 	}
 
-	public Plus1BannerRequest clearTypes() {
+	public Plus1Request clearTypes() {
 		if (types != null)
 			types.clear();
 
 		return this;
 	}
 
-	public String getRotatorUrl() {
-		return rotatorUrl;
+	public String getServerHost() {
+		return serverHost;
 	}
 
-	public Plus1BannerRequest setRotatorUrl(String rotatorUrl) {
-		this.rotatorUrl = rotatorUrl;
+	public Plus1Request setServerHost(String hostname) {
+		this.serverHost = hostname;
 
 		return this;
 	}
@@ -129,7 +152,7 @@ public final class Plus1BannerRequest {
 		return location;
 	}
 
-	public Plus1BannerRequest setLocation(Location location) {
+	public Plus1Request setLocation(Location location) {
 		this.location = location;
 
 		return this;
@@ -138,12 +161,15 @@ public final class Plus1BannerRequest {
 	public String getRequestUri() {
 
 		String url =
-			getRotatorUrl()
-			+ "?area=applicationWebView"
-			+ "&version=" + REQUEST_VERSION
-			+ "&sdkver=" + SDK_VERSION
-			+ "&id=" + getApplicationId()
-			+ "&pageId=" + getPageId();
+			String.format(
+				"http://%s/v%d/%d.%s?uid=%s&sdkver=%s",
+				getServerHost(),
+				REQUEST_VERSION,
+				getApplicationId(),
+				getRequestType().toString(),
+				getUID(),
+				SDK_VERSION
+			);
 
 		if (!getGender().equals(Gender.Unknown))
 			url += "&sex=" + getGender().ordinal();
@@ -166,7 +192,7 @@ public final class Plus1BannerRequest {
 		} catch (UnsupportedEncodingException e) {
 			if (getLogin() != null)
 				url += "&login=" + getLogin();					
-						
+
 			if (getLocation() != null)
 				url += 
 					"&location=" + getLocation().getLatitude() 
@@ -174,12 +200,5 @@ public final class Plus1BannerRequest {
 		}
 
 		return url;
-	}
-
-	private String getPageId() {
-		if (pageId == null)
-			pageId = Plus1Helper.getUniqueHash();
-
-		return pageId;
 	}
 }
