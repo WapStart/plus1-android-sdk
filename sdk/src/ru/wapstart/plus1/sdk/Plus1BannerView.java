@@ -49,8 +49,6 @@ public class Plus1BannerView extends FrameLayout {
     private static final String LOGTAG = "Plus1BannerView";
     private static final int CLOSE_BUTTON_MARGIN = 5;
 
-	private OnAutorefreshStateListener mOnAutorefreshChangeListener;
-
 	private Plus1AdAnimator mAdAnimator	= null;
 
 	private Animation mHideAnimation	= null;
@@ -60,10 +58,7 @@ public class Plus1BannerView extends FrameLayout {
 	private boolean mHaveCloseButton	= false;
 	private boolean mClosed				= false;
 	private boolean mInitialized		= false;
-	private boolean mAutorefreshEnabled = true;
 	private boolean mExpanded			= false;
-
-	private Plus1BannerViewStateListener mViewStateListener;
 
 	static class Plus1BannerViewListenerInfo {
 		private ArrayList<OnShowListener> mOnShowListenerList;
@@ -104,30 +99,6 @@ public class Plus1BannerView extends FrameLayout {
 		}
 
 		mListenerInfo = new Plus1BannerViewListenerInfo();
-	}
-
-	/**
-	 * @deprecated this method will be protected in future
-	 */
-	public void onPause() {
-		if (mAdAnimator != null) {
-			mAdAnimator.stopLoading();
-			mAdAnimator.clearAnimation();
-
-			if (mAdAnimator.getCurrentView() != null)
-				mAdAnimator.getCurrentView().pauseAdView();
-		}
-	}
-
-	/**
-	 * @deprecated this method will be protected in future
-	 */
-	public void onResume() {
-		if (
-			mAdAnimator != null
-			&& mAdAnimator.getCurrentView() != null
-		)
-			mAdAnimator.getCurrentView().resumeAdView();
 	}
 
 	public void removeAllBanners() {
@@ -208,58 +179,6 @@ public class Plus1BannerView extends FrameLayout {
 		mAdAnimator.loadAdView(adView, bannerContent);
 	}
 
-	/**
-	 * @deprecated this method will be private in future
-	 */
-	public MraidView makeMraidView() {
-		MraidView adView = new MraidView(getContext());
-		Log.d(LOGTAG, "MraidView instance created");
-		adView.setOnReadyListener(new MraidView.OnReadyListener() {
-			public void onReady(MraidView view) {
-				show();
-			}
-		});
-		adView.setOnExpandListener(new MraidView.OnExpandListener() {
-			public void onExpand(MraidView view) {
-				expand();
-				notifyOnTrackClickListener();
-			}
-		});
-		adView.setOnCloseListener(new MraidView.OnCloseListener() {
-			public void onClose(MraidView view, ViewState newViewState) {
-				collapse();
-			}
-		});
-		adView.setOnFailureListener(new MraidView.OnFailureListener() {
-			public void onFailure(MraidView view) {
-				Log.e(LOGTAG, "Mraid ad failed to load");
-				hide();
-			}
-		});
-
-		return adView;
-	}
-
-	/**
-	 * @deprecated this method will be private in future
-	 */
-	public AdView makeAdView() {
-		AdView adView = new AdView(getContext());
-		Log.d(LOGTAG, "AdView instance created");
-		adView.setOnReadyListener(new AdView.OnReadyListener() {
-			public void onReady(AdView view) {
-				show();
-			}
-		});
-		adView.setOnClickListener(new AdView.OnClickListener() {
-			public void onClick(AdView view) {
-				notifyOnTrackClickListener();
-			}
-		});
-
-		return adView;
-	}
-
 	public Plus1BannerView addListener(OnShowListener listener) {
 		mListenerInfo.mOnShowListenerList.add(listener);
 		return this;
@@ -295,38 +214,6 @@ public class Plus1BannerView extends FrameLayout {
 		return this;
 	}
 
-	/**
-	 * @deprecated use start/stop methods of asker to control autorefresh
-	 */
-	public Plus1BannerView setAutorefreshEnabled(boolean enabled) {
-		if (mAutorefreshEnabled != enabled) { // NOTE: really changed
-			mAutorefreshEnabled = enabled;
-
-			if (mOnAutorefreshChangeListener != null)
-				mOnAutorefreshChangeListener.onAutorefreshStateChanged(this);
-		}
-
-		return this;
-	}
-
-	/**
-	 * @deprecated please use inner listener interfaces like OnShowListener
-	 */
-	public Plus1BannerView setViewStateListener(
-		Plus1BannerViewStateListener viewStateListener
-	) {
-		mViewStateListener = viewStateListener;
-
-		return this;
-	}
-
-	/**
-	 * @deprecated use start/stop methods of asker to control autorefresh
-	 */
-	public boolean getAutorefreshEnabled() {
-		return mAutorefreshEnabled;
-	}
-
 	public boolean isHidden() {
 		return getVisibility() == GONE;
 	}
@@ -335,11 +222,68 @@ public class Plus1BannerView extends FrameLayout {
 		return mExpanded;
 	}
 
-	/**
-	 * @deprecated this method will be removed in future
-	 */
-	public void setOnAutorefreshChangeListener(OnAutorefreshStateListener listener) {
-		mOnAutorefreshChangeListener = listener;
+	protected void onPause() {
+		if (mAdAnimator != null) {
+			mAdAnimator.stopLoading();
+			mAdAnimator.clearAnimation();
+
+			if (mAdAnimator.getCurrentView() != null)
+				mAdAnimator.getCurrentView().pauseAdView();
+		}
+	}
+
+	protected void onResume() {
+		if (
+			mAdAnimator != null
+			&& mAdAnimator.getCurrentView() != null
+		)
+			mAdAnimator.getCurrentView().resumeAdView();
+	}
+
+	private MraidView makeMraidView() {
+		MraidView adView = new MraidView(getContext());
+		Log.d(LOGTAG, "MraidView instance created");
+		adView.setOnReadyListener(new MraidView.OnReadyListener() {
+			public void onReady(MraidView view) {
+				show();
+			}
+		});
+		adView.setOnExpandListener(new MraidView.OnExpandListener() {
+			public void onExpand(MraidView view) {
+				expand();
+				notifyOnTrackClickListener();
+			}
+		});
+		adView.setOnCloseListener(new MraidView.OnCloseListener() {
+			public void onClose(MraidView view, ViewState newViewState) {
+				collapse();
+			}
+		});
+		adView.setOnFailureListener(new MraidView.OnFailureListener() {
+			public void onFailure(MraidView view) {
+				Log.e(LOGTAG, "Mraid ad failed to load");
+				hide();
+			}
+		});
+
+		return adView;
+	}
+
+	private AdView makeAdView() {
+		AdView adView = new AdView(getContext());
+		Log.d(LOGTAG, "AdView instance created");
+		adView.setOnReadyListener(new AdView.OnReadyListener() {
+			public void onReady(AdView view) {
+				show();
+			}
+		});
+		adView.setOnClickListener(new AdView.OnClickListener() {
+			public void onClick(AdView view) {
+				notifyOnTrackClickListener();
+			}
+		});
+
+		return adView;
 	}
 
 	private void init() {
@@ -370,9 +314,6 @@ public class Plus1BannerView extends FrameLayout {
 			closeButton.setOnClickListener(new OnClickListener() {
 				public void onClick(View v) {
 					mClosed = true;
-
-					// NOTE: bc
-					setAutorefreshEnabled(false);
 
 					notifyOnCloseButtonListener();
 
@@ -462,30 +403,18 @@ public class Plus1BannerView extends FrameLayout {
 	{
 		for (OnShowListener listener : mListenerInfo.mOnShowListenerList)
 			listener.onShow(this);
-
-		// NOTE: bc
-		if (mViewStateListener != null)
-			mViewStateListener.onShowBannerView();
 	}
 
 	private void notifyOnHideListener()
 	{
 		for (OnHideListener listener : mListenerInfo.mOnHideListenerList)
 			listener.onHide(this);
-
-		// NOTE: bc
-		if (mViewStateListener != null)
-			mViewStateListener.onHideBannerView();
 	}
 
 	private void notifyOnCloseButtonListener()
 	{
 		for (OnCloseButtonListener listener : mListenerInfo.mOnCloseButtonListenerList)
 			listener.onCloseButton(this);
-
-		// NOTE: bc
-		if (mViewStateListener != null)
-			mViewStateListener.onCloseBannerView();
 	}
 
 	private void notifyOnExpandListener()
@@ -510,13 +439,6 @@ public class Plus1BannerView extends FrameLayout {
 	{
 		for (OnTrackClickListener listener : mListenerInfo.mOnTrackClickListenerList)
 			listener.onTrackClick(this);
-	}
-
-	/**
-	 * @deprecated please do not use it
-	 */
-	public interface OnAutorefreshStateListener {
-		public void onAutorefreshStateChanged(Plus1BannerView view);
 	}
 
 	public interface OnShowListener {

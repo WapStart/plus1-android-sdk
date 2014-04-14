@@ -48,10 +48,8 @@ public class Plus1BannerAsker {
 	private static final String LOGTAG = "Plus1BannerAsker";
 	private Plus1Request mRequest							= null;
 	private Plus1BannerView mView							= null;
-	private Handler mHandler								= null;
 	private Timer mDownloaderTimer							= null;
 	private HtmlBannerDownloader mDownloaderTask			= null;
-	private Runnable mAskerStopper							= null;
 
 	private boolean mDisabledAutoDetectLocation				= false;
 	private boolean mRemoveBannersOnPause					= false;
@@ -59,7 +57,6 @@ public class Plus1BannerAsker {
 	private int mRefreshDelay								= 10;
 	private int mLocationRefreshDelay						= 300;
 	private int mRefreshRetryNum							= 3;
-	private int mVisibilityTimeout							= 0;
 
 	private boolean mInitialized							= false;
 	private boolean mWebViewCorePaused						= false;
@@ -68,7 +65,6 @@ public class Plus1BannerAsker {
 	private LocationManager mLocationManager				= null;
 	private LocationListener mLocationListener				= null;
 
-	private Plus1BannerViewStateListener viewStateListener	= null;
 	private Plus1BannerDownloadListener mDownloadListener	= null;
 
 	public static Plus1BannerAsker create(
@@ -80,18 +76,6 @@ public class Plus1BannerAsker {
 	public Plus1BannerAsker(Plus1Request request, Plus1BannerView view) {
 		mRequest = request;
 		mView = view;
-
-		// NOTE: bc
-		view.setOnAutorefreshChangeListener(
-			new Plus1BannerView.OnAutorefreshStateListener() {
-				public void onAutorefreshStateChanged(Plus1BannerView view) {
-					if (view.getAutorefreshEnabled() && !view.isExpanded())
-						start();
-					else
-						stop();
-				}
-			}
-		);
 	}
 
 	public void onPause() {
@@ -139,15 +123,6 @@ public class Plus1BannerAsker {
 	public Plus1BannerAsker disableAutoDetectLocation() {
 		mDisabledAutoDetectLocation = true;
 
-		return this;
-	}
-
-	/**
-	 * @deprecated please use disableAutoDetectLocation() without argument
-	 */
-	public Plus1BannerAsker disableAutoDetectLocation(boolean disable) {
-		mDisabledAutoDetectLocation = disable;
-		
 		return this;
 	}
 
@@ -205,33 +180,6 @@ public class Plus1BannerAsker {
 
 	public boolean isLocationAutoRefreshEnabled() {
 		return mLocationRefreshDelay > 0;
-	}
-
-	/**
-	 * @deprecated please use setRefreshDelay() method
-	 */
-	public Plus1BannerAsker setTimeout(int timeout) {
-		return setRefreshDelay(timeout);
-	}
-
-	/**
-	 * @deprecated please use setRefreshRetryNum() method instead
-	 */
-	public Plus1BannerAsker setVisibilityTimeout(int visibilityTimeout) {
-		mVisibilityTimeout = visibilityTimeout;
-
-		return this;
-	}
-
-	/**
-	 * @deprecated please use inner listener interfaces like Plus1BannerView::OnShowListener
-	 */
-	public Plus1BannerAsker setViewStateListener(
-		Plus1BannerViewStateListener viewStateListener
-	) {
-		this.viewStateListener = viewStateListener;
-
-		return this;
 	}
 
 	public Plus1BannerAsker setDownloadListener(
@@ -297,19 +245,9 @@ public class Plus1BannerAsker {
 		}
 
 		mView
-			.addListener(new Plus1BannerView.OnShowListener() {
-				public void onShow(Plus1BannerView view) {
-					onShowBannerView();
-				}
-			})
-			.addListener(new Plus1BannerView.OnHideListener() {
-				public void onHide(Plus1BannerView view) {
-					onHideBannerView();
-				}
-			})
 			.addListener(new Plus1BannerView.OnCloseButtonListener() {
 				public void onCloseButton(Plus1BannerView view) {
-					onCloseBannerView();
+					stop();
 				}
 			})
 			.addListener(new Plus1BannerView.OnExpandListener() {
@@ -322,16 +260,6 @@ public class Plus1BannerAsker {
 					start();
 				}
 			});
-
-		// NOTE: bc
-		if (viewStateListener != null)
-			mView.setViewStateListener(viewStateListener);
-
-		// NOTE: bc
-		if (mVisibilityTimeout == 0)
-			mVisibilityTimeout = mRefreshDelay * 3;
-
-		mHandler = new Handler();
 
 		// NOTE: useful in case when timers are paused and activity was destroyed
 		new WebView(mView.getContext()).resumeTimers();
@@ -348,41 +276,6 @@ public class Plus1BannerAsker {
 			start();
 		} else
 			Log.w(LOGTAG, "Banner view is expanded, so refresh was prevented");
-	}
-
-	/**
-	 * @deprecated this method will be protected in future
-	 */
-	public void onShowBannerView() {
-		if (mAskerStopper != null)
-			mHandler.removeCallbacks(mAskerStopper);
-	}
-
-	/**
-	 * @deprecated this method will be protected in future
-	 */
-	public void onHideBannerView() {
-		if (mAskerStopper != null)
-			return;
-
-		mAskerStopper =
-			new Runnable() {
-				public void run() {
-					stop();
-				}
-			};
-
-		mHandler.postDelayed(mAskerStopper, mVisibilityTimeout * 1000);
-	}
-
-	/**
-	 * @deprecated this method will be protected in future
-	 */
-	public void onCloseBannerView() {
-		stop();
-
-		if (mAskerStopper != null)
-			mHandler.removeCallbacks(mAskerStopper);
 	}
 
 	private void start() {
