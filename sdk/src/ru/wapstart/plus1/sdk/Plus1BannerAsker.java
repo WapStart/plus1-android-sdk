@@ -29,6 +29,8 @@
 
 package ru.wapstart.plus1.sdk;
 
+import java.util.Timer;
+
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
@@ -39,13 +41,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.webkit.WebView;
+import java.util.TimerTask;
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 
 public class Plus1BannerAsker {
 	private static final String LOGTAG = "Plus1BannerAsker";
-	private Plus1BannerRequest mRequest						= null;
+	private Plus1Request mRequest							= null;
 	private Plus1BannerView mView							= null;
 	private Handler mHandler								= null;
+	private Timer mDownloaderTimer							= null;
 	private HtmlBannerDownloader mDownloaderTask			= null;
 	private Runnable mAskerStopper							= null;
 
@@ -68,12 +72,12 @@ public class Plus1BannerAsker {
 	private Plus1BannerDownloadListener mDownloadListener	= null;
 
 	public static Plus1BannerAsker create(
-		Plus1BannerRequest request, Plus1BannerView view
+		Plus1Request request, Plus1BannerView view
 	) {
 		return new Plus1BannerAsker(request, view);
 	}
 
-	public Plus1BannerAsker(Plus1BannerRequest request, Plus1BannerView view) {
+	public Plus1BannerAsker(Plus1Request request, Plus1BannerView view) {
 		mRequest = request;
 		mView = view;
 
@@ -242,6 +246,8 @@ public class Plus1BannerAsker {
 		if (mInitialized)
 			return this;
 
+		mDownloaderTimer = new Timer();
+
 		if (!isDisabledAutoDetectLocation()) {
 			mLocationManager =
 				(LocationManager)mView.getContext().getSystemService(
@@ -385,8 +391,21 @@ public class Plus1BannerAsker {
 		if (mRequest == null || mView == null || mDownloaderTask != null)
 			return;
 
-		mDownloaderTask = makeDownloaderTask();
-		mDownloaderTask.execute();
+		TimerTask task =
+			new TimerTask() {
+				public void run() {
+					if (!(mView.isClosed() || mView.isExpanded())) {
+						mDownloaderTask = makeDownloaderTask();
+						mDownloaderTask.execute(mRequest);
+					}
+				}
+			};
+
+		if (isAutoRefreshEnabled()) {
+			mDownloaderTimer.schedule(task, 0, mRefreshDelay);
+		} else {
+			mDownloaderTimer.schedule(task, 0);
+		}
 	}
 
 	private void stop() {
@@ -396,6 +415,8 @@ public class Plus1BannerAsker {
 			mDownloaderTask.cancel(true);
 			mDownloaderTask = null;
 		}
+
+		mDownloaderTimer.cancel();
 	}
 
 	private void requestLocationUpdates() {
@@ -452,7 +473,6 @@ public class Plus1BannerAsker {
 		mRefreshRetryCount = 0;
 
 		HtmlBannerDownloader task = new HtmlBannerDownloader(mView)
-			.setRequest(mRequest)
 			.addDownloadListener(new Plus1BannerDownloadListener() {
 				public void onBannerLoaded() {
 					mRefreshRetryCount = 0;
@@ -463,11 +483,6 @@ public class Plus1BannerAsker {
 						stop();
 				}
 			});
-
-		if (isAutoRefreshEnabled())
-			task.setTimeout(mRefreshDelay);
-		else
-			task.setRunOnce();
 
 		if (mDownloadListener != null)
 			task.addDownloadListener(mDownloadListener);

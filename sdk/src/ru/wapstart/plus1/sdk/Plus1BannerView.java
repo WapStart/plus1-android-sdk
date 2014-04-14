@@ -43,6 +43,7 @@ import android.webkit.WebView;
 import java.util.ArrayList;
 
 import ru.wapstart.plus1.sdk.MraidView.ViewState;
+import ru.wapstart.plus1.sdk.HtmlBannerDownloader.BannerAdType;
 
 public class Plus1BannerView extends FrameLayout {
     private static final String LOGTAG = "Plus1BannerView";
@@ -196,15 +197,15 @@ public class Plus1BannerView extends FrameLayout {
 		return this;
 	}
 
-	public void loadAd(String html, String adType) {
+	public void loadAd(String bannerContent, BannerAdType adType) {
 		init();
 
 		BaseAdView adView =
-			"mraid".equals(adType)
+			adType.equals(BannerAdType.mraid)
 				? makeMraidView()
 				: makeAdView();
 
-		mAdAnimator.loadAdView(adView, html);
+		mAdAnimator.loadAdView(adView, bannerContent);
 	}
 
 	/**

@@ -45,47 +45,25 @@ import android.os.AsyncTask;
 import android.util.DisplayMetrics;
 import android.util.Log;
 
-final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
+final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, Boolean> {
 	private static final String LOGTAG = "HtmlBannerDownloader";
 	private static final Integer BUFFER_SIZE = 8192;
-	private static final String NO_BANNER = "<!-- i4jgij4pfd4ssd -->";
+	private static final Integer RESPONSE_CODE_NO_CONTENT = 204;
 
-	protected Plus1BannerView view			= null;
-	protected Plus1BannerRequest request	= null;
-	protected int timeout					= 0;
-	protected boolean runOnce               = false;
+	public static enum BannerAdType {plus1, mraid};
 
-	protected String mBannerData			= null;
-	protected String mBannerAdType			= null;
+	protected Plus1BannerView mView;
+
+	protected Integer mResponseCode;
+	protected String mBannerContent;
+	protected String mBannerAdType;
 
 	protected ArrayList<Plus1BannerDownloadListener> mListenerList;
 
 	public HtmlBannerDownloader(Plus1BannerView view) {
-		this.view = view;
+		mView = view;
 
 		mListenerList = new ArrayList<Plus1BannerDownloadListener>();
-	}
-
-	public HtmlBannerDownloader setRequest(Plus1BannerRequest request) {
-		this.request = request;
-
-		return this;
-	}
-
-	public HtmlBannerDownloader setTimeout(int timeout) {
-		this.timeout = timeout;
-
-		return this;
-	}
-
-	public HtmlBannerDownloader setRunOnce() {
-		return setRunOnce(true);
-	}
-
-	public HtmlBannerDownloader setRunOnce(boolean runOnce) {
-		this.runOnce = runOnce;
-
-		return this;
 	}
 
 	public HtmlBannerDownloader addDownloadListener(
@@ -96,64 +74,11 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 		return this;
 	}
 
-	/**
-	 * @deprecated please use addDownloadListener method
-	 */
-	public HtmlBannerDownloader setDownloadListener(
-		Plus1BannerDownloadListener bannerDownloadListener
-	) {
-		return addDownloadListener(bannerDownloadListener);
-	}
-
 	@Override
-	protected Void doInBackground(Void... voids)
+	protected Boolean doInBackground(Plus1Request... requests)
 	{
-		while (!isCancelled()) {
-			if (view.isClosed() || view.isExpanded())
-				return null;
+		Plus1Request request = requests[0];
 
-			updateBanner();
-
-			if (runOnce)
-				return null;
-
-			try {
-				Thread.sleep(1000 * timeout);
-			} catch (InterruptedException e) {
-				return null;
-			}
-		}
-
-		return null;
-	}
-
-	protected void updateBanner()
-	{
-		fetchBanner();
-
-		view.post(new Runnable() {
-			public void run() {
-				if (mBannerData == null) {
-					notifyOnBannerLoadFailed(LoadError.DownloadFailed);
-				} else if (NO_BANNER.equals(mBannerData)) {
-					notifyOnBannerLoadFailed(LoadError.NoHaveBanner);
-				} else if (
-					!"plus1".equals(mBannerAdType)
-					&& !"mraid".equals(mBannerAdType)
-				) {
-					notifyOnBannerLoadFailed(LoadError.UnknownAnswer);
-				} else {
-					notifyOnBannerLoaded();
-
-					if (!isCancelled())
-						view.loadAd(mBannerData, mBannerAdType);
-				}
-			}
-		});
-	}
-
-	protected boolean fetchBanner()
-	{
 		HttpURLConnection connection = makeConnection(request.getRequestUri());
 
 		if (connection == null)
@@ -161,9 +86,6 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 
 		String result = "";
 		boolean fetched = false;
-
-		mBannerData = null;
-		mBannerAdType = null;
 
 		try {
 			InputStream stream = connection.getInputStream();
@@ -186,20 +108,19 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 
 			bufStream.close();
 
-			mBannerData = result.toString().trim();
+			mResponseCode = connection.getResponseCode();
+			mBannerContent = result.toString();
 			mBannerAdType = connection.getHeaderField("X-Adtype");
 
-			Log.d(LOGTAG, "Answer: " + mBannerData);
+			Log.d(LOGTAG, "Response code: " + mResponseCode);
+			Log.d(LOGTAG, "Banner content: " + mBannerContent);
 			Log.d(LOGTAG, "X-Adtype: " + mBannerAdType);
 
 			fetched = true;
 		} catch (IOException e) {
-			Log.w(getClass().getName(), "URL " + request.getRequestUri() + " doesn't exist");
+			Log.w(LOGTAG, "URL " + request.getRequestUri() + " doesn't exist");
 		} catch (Exception e) {
-			Log.e(
-				getClass().getName(),
-				"Exception while downloading banner: " + e.getMessage()
-			);
+			Log.e(LOGTAG, "Exception while downloading banner: " + e.getMessage());
 		} finally {
 			connection.disconnect();
 		}
@@ -207,6 +128,27 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 		return fetched;
 	}
 
+	@Override
+	protected void onPostExecute(Boolean fetched) {
+		if (!fetched) {
+			notifyOnBannerLoadFailed(LoadError.DownloadFailed);
+		} else if (mResponseCode.equals(RESPONSE_CODE_NO_CONTENT)) {
+			notifyOnBannerLoadFailed(LoadError.NoHaveBanner);
+		} else {
+			try {
+				mView.loadAd(
+					mBannerContent,
+					BannerAdType.valueOf(mBannerAdType)
+				);
+
+				notifyOnBannerLoaded();
+			} catch (IllegalArgumentException e) {
+				notifyOnBannerLoadFailed(LoadError.UnknownAnswer);
+			}
+		}
+	}
+
+	// FIXME: move data to post
 	protected void modifyConnection(HttpURLConnection connection) {
 		connection.setRequestProperty(
 			"User-Agent",
@@ -215,12 +157,12 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 
 		connection.setRequestProperty(
 			"Cookie",
-			"wssid="+Plus1Helper.getClientSessionId(view.getContext())
+			"wssid="+Plus1Helper.getClientSessionId(mView.getContext())
 		);
 
 		connection.setRequestProperty(
 			"x-original-user-agent",
-			view.getWebViewUserAgent()
+			mView.getWebViewUserAgent()
 		);
 
 		connection.setRequestProperty(
@@ -248,7 +190,7 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 	{
 		DisplayMetrics metrics = new DisplayMetrics();
 
-		((Activity)view.getContext()).
+		((Activity)mView.getContext()).
 			getWindowManager().
 			getDefaultDisplay().
 			getMetrics(metrics);
@@ -261,18 +203,18 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 	protected String getContainerMetrics()
 	{
 		float density =
-			((Activity)view.getContext())
+			((Activity)mView.getContext())
 				.getResources()
 				.getDisplayMetrics()
 				.density;
 
 		return
 			String.valueOf(
-				(int) (view.getLayoutParams().width / density + 0.5f)
+				(int) (mView.getLayoutParams().width / density + 0.5f)
 			)
 			+ "x"
 			+ String.valueOf(
-				(int) (view.getLayoutParams().height / density + 0.5f)
+				(int) (mView.getLayoutParams().height / density + 0.5f)
 			);
 	}
 
@@ -285,9 +227,9 @@ final class HtmlBannerDownloader extends AsyncTask<Void, Void, Void> {
 			modifyConnection(connection);
 			connection.connect();
 		} catch (MalformedURLException e) {
-			Log.e(getClass().getName(), "URL parsing failed: " + url);
+			Log.e(LOGTAG, "URL parsing failed: " + url);
 		} catch (Exception e) {
-			Log.e(getClass().getName(), "Unexpected exception", e);
+			Log.e(LOGTAG, "Unexpected exception", e);
 		}
 
 		return connection;
