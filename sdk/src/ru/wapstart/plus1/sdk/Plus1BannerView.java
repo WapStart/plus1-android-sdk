@@ -243,6 +243,7 @@ public class Plus1BannerView extends FrameLayout {
 	private MraidView makeMraidView() {
 		MraidView adView = new MraidView(getContext());
 		Log.d(LOGTAG, "MraidView instance created");
+
 		adView.setOnReadyListener(new MraidView.OnReadyListener() {
 			public void onReady(MraidView view) {
 				show();
@@ -272,6 +273,7 @@ public class Plus1BannerView extends FrameLayout {
 	private AdView makeAdView() {
 		AdView adView = new AdView(getContext());
 		Log.d(LOGTAG, "AdView instance created");
+
 		adView.setOnReadyListener(new AdView.OnReadyListener() {
 			public void onReady(AdView view) {
 				show();

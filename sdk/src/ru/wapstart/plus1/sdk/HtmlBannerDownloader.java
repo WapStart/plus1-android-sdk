@@ -94,10 +94,7 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, Boolean> 
 			int count = 0;
 
 			BufferedInputStream bufStream =
-				new BufferedInputStream (
-					stream,
-					BUFFER_SIZE
-				);
+				new BufferedInputStream(stream, BUFFER_SIZE);
 
 			while ((count = bufStream.read(buffer)) != -1) {
 				if (isCancelled())
@@ -143,6 +140,8 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, Boolean> 
 
 				notifyOnBannerLoaded();
 			} catch (IllegalArgumentException e) {
+				Log.e(LOGTAG, "Unsupported ad type: " + mBannerAdType, e);
+
 				notifyOnBannerLoadFailed(LoadError.UnknownAnswer);
 			}
 		}
@@ -227,7 +226,7 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, Boolean> 
 			modifyConnection(connection);
 			connection.connect();
 		} catch (MalformedURLException e) {
-			Log.e(LOGTAG, "URL parsing failed: " + url);
+			Log.e(LOGTAG, "URL parsing failed: " + url, e);
 		} catch (Exception e) {
 			Log.e(LOGTAG, "Unexpected exception", e);
 		}
