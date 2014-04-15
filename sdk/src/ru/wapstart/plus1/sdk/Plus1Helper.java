@@ -34,10 +34,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Calendar;
 import java.util.Random;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.util.DisplayMetrics;
 import android.provider.Settings.Secure;
+import android.view.Display;
 
 final class Plus1Helper {
 
@@ -107,6 +110,35 @@ final class Plus1Helper {
 		}
 
 		return clientSessionId;
+	}
+
+	public static String getDisplayMetrics(Display display)
+	{
+		DisplayMetrics metrics = new DisplayMetrics();
+		display.getMetrics(metrics);
+
+		return
+			String.format(
+				"%ux%u",
+				metrics.widthPixels,
+				metrics.heightPixels
+			);
+	}
+
+	public static String getContainerMetrics(Plus1BannerView view)
+	{
+		float density =
+			((Activity)view.getContext())
+				.getResources()
+				.getDisplayMetrics()
+				.density;
+
+		return
+			String.format(
+				"%ux%u",
+				view.getLayoutParams().width / density + 0.5f,
+				view.getLayoutParams().height / density + 0.5f
+			);
 	}
 
 	private static String SHA1(String text) throws NoSuchAlgorithmException

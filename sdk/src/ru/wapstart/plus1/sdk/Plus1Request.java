@@ -33,8 +33,16 @@ import java.util.HashSet;
 import java.util.Set;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.protocol.HTTP;
 
 import android.location.Location;
+import android.os.Build;
+import java.util.Locale;
 
 public final class Plus1Request {
 	// FIXME: move constant to somewhere
@@ -53,7 +61,8 @@ public final class Plus1Request {
 	private Gender gender			= Gender.Unknown;
 	private String login			= null;
 	private Set<BannerType> types	= null;
-
+	private String displayMetrics	= null;
+	private String containerMetrics	= null;
 	private Location location		= null;
 
 	public static Plus1Request create() {
@@ -88,6 +97,26 @@ public final class Plus1Request {
 
 	public Plus1Request setUid(String uid) {
 		this.uid = uid;
+
+		return this;
+	}
+
+	public String getDisplayMetrics() {
+		return displayMetrics;
+	}
+
+	public Plus1Request setDisplayMetrics(String metrics) {
+		this.displayMetrics = metrics;
+
+		return this;
+	}
+
+	public String getContainerMetrics() {
+		return containerMetrics;
+	}
+
+	public Plus1Request setContainerMetrics(String metrics) {
+		this.containerMetrics = metrics;
 
 		return this;
 	}
@@ -161,45 +190,102 @@ public final class Plus1Request {
 
 	public String getRequestUri() {
 
-		String url =
+		return
 			String.format(
-				"http://%s/v%d/%d.%s?uid=%s&sdkver=%s",
+				"http://%s/v%d/%d.%s?uid=%s",
 				getServerHost(),
 				REQUEST_VERSION,
 				getApplicationId(),
 				getRequestType().toString(),
-				getUID(),
-				SDK_VERSION
+				getUID()
 			);
+	}
 
-		if (!getGender().equals(Gender.Unknown))
-			url += "&sex=" + getGender().ordinal();
+	public UrlEncodedFormEntity getUrlEncodedFormEntity()
+		throws UnsupportedEncodingException
+	{
+		List<NameValuePair> list = new ArrayList<NameValuePair>();
 
-		if (getAge() != 0)
-			url += "&age=" + getAge();
+		list.add(new BasicNameValuePair("platform", "Android"));
+		list.add(new BasicNameValuePair("version", Build.VERSION.RELEASE));
+		list.add(new BasicNameValuePair("sdkver", SDK_VERSION));
 
-		if ((types != null) && !types.isEmpty())
-			for (BannerType bt : types)
-				url += "&type[]=" + bt.ordinal();
-
-		try {
-			if (getLogin() != null)
-				url += "&login=" + URLEncoder.encode(getLogin(), "UTF-8");					
-						
-			if (getLocation() != null)
-				url += 
-					"&location=" + URLEncoder.encode(getLocation().getLatitude() 
-					+ ";" + getLocation().getLongitude(), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			if (getLogin() != null)
-				url += "&login=" + getLogin();					
-
-			if (getLocation() != null)
-				url += 
-					"&location=" + getLocation().getLatitude() 
-					+ ";" + getLocation().getLongitude();			
+		if (!getGender().equals(Gender.Unknown)) {
+			list.add(
+				new BasicNameValuePair(
+					"sex",
+					String.valueOf(getGender().ordinal())
+				)
+			);
 		}
 
-		return url;
+		if (getAge() != 0) {
+			list.add(
+				new BasicNameValuePair(
+					"age",
+					String.valueOf(getAge())
+				)
+			);
+		}
+
+		if ((types != null) && !types.isEmpty()) {
+			for (BannerType bannerType : types) {
+				list.add(
+					new BasicNameValuePair(
+						"type[]",
+						String.valueOf(bannerType.ordinal())
+					)
+				);
+			}
+		}
+
+		if (getLocation() != null) {
+			list.add(
+				new BasicNameValuePair(
+					"location",
+					String.format(
+						"%s;%s",
+						getLocation().getLatitude(),
+						getLocation().getLongitude()
+					)
+				)
+			);
+		}
+
+		if (getLogin() != null) {
+			try {
+				list.add(
+					new BasicNameValuePair(
+						"login",
+						URLEncoder.encode(getLogin(), HTTP.UTF_8)
+					)
+				);
+			} catch (UnsupportedEncodingException e) {
+				list.add(new BasicNameValuePair("login", getLogin()));
+			}
+		}
+
+		list.add(
+			new BasicNameValuePair(
+				"display-metrics",
+				getDisplayMetrics()
+			)
+		);
+
+		list.add(
+			new BasicNameValuePair(
+				"container-metrics",
+				getContainerMetrics()
+			)
+		);
+
+		list.add(
+			new BasicNameValuePair(
+				"preferred-locale",
+				Locale.getDefault().getDisplayName(Locale.US)
+			)
+		);
+
+		return new UrlEncodedFormEntity(list);
 	}
 }

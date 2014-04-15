@@ -35,8 +35,9 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Locale;
 import java.util.ArrayList;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 
@@ -48,7 +49,6 @@ import android.util.Log;
 final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, Boolean> {
 	private static final String LOGTAG = "HtmlBannerDownloader";
 	private static final Integer BUFFER_SIZE = 8192;
-	private static final Integer RESPONSE_CODE_NO_CONTENT = 204;
 
 	public static enum BannerAdType {plus1, mraid};
 
@@ -88,6 +88,19 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, Boolean> 
 		boolean fetched = false;
 
 		try {
+			UrlEncodedFormEntity postEntity = request.getUrlEncodedFormEntity();
+
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty(
+				"Content-Type",
+				"application/x-www-form-urlencoded"
+			);
+			connection.setRequestProperty(
+				"Content-Length",
+				Integer.toString((int)postEntity.getContentLength())
+			);
+			postEntity.writeTo(connection.getOutputStream());
+
 			InputStream stream = connection.getInputStream();
 
 			byte[] buffer = new byte[BUFFER_SIZE];
@@ -115,9 +128,9 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, Boolean> 
 
 			fetched = true;
 		} catch (IOException e) {
-			Log.w(LOGTAG, "URL " + request.getRequestUri() + " doesn't exist");
+			Log.e(LOGTAG, "URL " + request.getRequestUri() + " doesn't exist", e);
 		} catch (Exception e) {
-			Log.e(LOGTAG, "Exception while downloading banner: " + e.getMessage());
+			Log.e(LOGTAG, "Exception while downloading banner: " + e.getMessage(), e);
 		} finally {
 			connection.disconnect();
 		}
@@ -129,7 +142,7 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, Boolean> 
 	protected void onPostExecute(Boolean fetched) {
 		if (!fetched) {
 			notifyOnBannerLoadFailed(LoadError.DownloadFailed);
-		} else if (mResponseCode.equals(RESPONSE_CODE_NO_CONTENT)) {
+		} else if (mResponseCode.equals(HttpStatus.SC_NO_CONTENT)) {
 			notifyOnBannerLoadFailed(LoadError.NoHaveBanner);
 		} else {
 			try {
@@ -147,7 +160,6 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, Boolean> 
 		}
 	}
 
-	// FIXME: move data to post
 	protected void modifyConnection(HttpURLConnection connection) {
 		connection.setRequestProperty(
 			"User-Agent",
@@ -155,66 +167,9 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, Boolean> 
 		);
 
 		connection.setRequestProperty(
-			"Cookie",
-			"wssid="+Plus1Helper.getClientSessionId(mView.getContext())
-		);
-
-		connection.setRequestProperty(
 			"x-original-user-agent",
 			mView.getWebViewUserAgent()
 		);
-
-		connection.setRequestProperty(
-			"x-display-metrics",
-			getDisplayMetrics()
-		);
-
-		connection.setRequestProperty(
-			"x-container-metrics",
-			getContainerMetrics()
-		);
-
-		connection.setRequestProperty(
-			"x-application-type",
-			"android"
-		);
-
-		connection.setRequestProperty(
-			"x-preferred-locale",
-			Locale.getDefault().getDisplayName(Locale.US)
-		);
-	}
-
-	protected String getDisplayMetrics()
-	{
-		DisplayMetrics metrics = new DisplayMetrics();
-
-		((Activity)mView.getContext()).
-			getWindowManager().
-			getDefaultDisplay().
-			getMetrics(metrics);
-
-		return
-			String.valueOf(metrics.widthPixels) + "x"
-			+ String.valueOf(metrics.heightPixels);
-	}
-
-	protected String getContainerMetrics()
-	{
-		float density =
-			((Activity)mView.getContext())
-				.getResources()
-				.getDisplayMetrics()
-				.density;
-
-		return
-			String.valueOf(
-				(int) (mView.getLayoutParams().width / density + 0.5f)
-			)
-			+ "x"
-			+ String.valueOf(
-				(int) (mView.getLayoutParams().height / density + 0.5f)
-			);
 	}
 
 	protected HttpURLConnection makeConnection(String url)

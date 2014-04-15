@@ -30,7 +30,11 @@
 package ru.wapstart.plus1.sdk;
 
 import java.util.Timer;
+import java.util.TimerTask;
 
+import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
+
+import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
 import android.location.LocationManager;
@@ -38,11 +42,9 @@ import android.location.Criteria;
 import android.location.LocationListener;
 import android.location.LocationProvider;
 import android.os.Bundle;
-import android.os.Handler;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.webkit.WebView;
-import java.util.TimerTask;
-import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 
 public class Plus1BannerAsker {
 	private static final String LOGTAG = "Plus1BannerAsker";
@@ -288,6 +290,8 @@ public class Plus1BannerAsker {
 			new TimerTask() {
 				public void run() {
 					if (!(mView.isClosed() || mView.isExpanded())) {
+						modifyRequest(mRequest);
+
 						mDownloaderTask = makeDownloaderTask();
 						mDownloaderTask.execute(mRequest);
 					}
@@ -381,5 +385,21 @@ public class Plus1BannerAsker {
 			task.addDownloadListener(mDownloadListener);
 
 		return task;
+	}
+
+	private void modifyRequest(Plus1Request request) {
+		// FIXME: setup actual uid
+		request.setUid(Plus1Helper.getClientSessionId(mView.getContext()));
+
+		request.setDisplayMetrics(
+			Plus1Helper.getDisplayMetrics(
+				((Activity)mView.getContext())
+					.getWindowManager().getDefaultDisplay()
+			)
+		);
+
+		request.setContainerMetrics(
+			Plus1Helper.getContainerMetrics(mView)
+		);
 	}
 }
