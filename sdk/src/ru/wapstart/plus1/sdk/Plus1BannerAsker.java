@@ -42,7 +42,6 @@ import android.location.Criteria;
 import android.location.LocationListener;
 import android.location.LocationProvider;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.webkit.WebView;
 

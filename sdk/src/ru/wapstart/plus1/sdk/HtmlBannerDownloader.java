@@ -41,9 +41,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 
-import android.app.Activity;
 import android.os.AsyncTask;
-import android.util.DisplayMetrics;
 import android.util.Log;
 
 final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, Boolean> {
