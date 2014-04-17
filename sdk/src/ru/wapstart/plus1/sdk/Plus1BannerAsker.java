@@ -377,34 +377,35 @@ public class Plus1BannerAsker {
 	{
 		mRefreshRetryCount = 0;
 
-		HtmlBannerDownloader task = new HtmlBannerDownloader()
-			.addDownloadListener(new Plus1BannerDownloadListener() {
-				public void onBannerLoaded(String content, BannerAdType adType) {
-					mRefreshRetryCount = 0;
+		HtmlBannerDownloader task = new HtmlBannerDownloader();
+		task.addLoadListener(new Plus1BannerDownloadListener() {
+			public void onBannerLoaded(String content, BannerAdType adType) {
+				mRefreshRetryCount = 0;
 
-					mView.loadAd(content, adType);
-				}
+				mView.loadAd(content, adType);
+			}
 
-				public void onBannerLoadFailed(LoadError error) {
-					if (++mRefreshRetryCount >= mRefreshRetryNum)
-						stop();
-				}
-			})
-			.addRequestProperty("User-Agent", Plus1Helper.getUserAgent())
-			.addRequestProperty("x-original-user-agent", mView.getWebViewUserAgent());
+			public void onBannerLoadFailed(LoadError error) {
+				if (++mRefreshRetryCount >= mRefreshRetryNum)
+					stop();
+			}
+		});
+		task.addRequestProperty("User-Agent", Plus1Helper.getUserAgent());
+		task.addRequestProperty("x-original-user-agent", mView.getWebViewUserAgent());
 
 		if (mDownloadListener != null)
-			task.addDownloadListener(mDownloadListener);
+			task.addLoadListener(mDownloadListener);
 
 		return task;
 	}
 
 	private InitRequestLoader makeInitRequestTask()
 	{
-		return
-			new InitRequestLoader()
-			.addRequestProperty("User-Agent", Plus1Helper.getUserAgent())
-			.addRequestProperty("x-original-user-agent", mView.getWebViewUserAgent());
+		InitRequestLoader task = new InitRequestLoader();
+		task.addRequestProperty("User-Agent", Plus1Helper.getUserAgent());
+		task.addRequestProperty("x-original-user-agent", mView.getWebViewUserAgent());
+
+		return task;
 	}
 
 	private void modifyRequest(Plus1Request request) {

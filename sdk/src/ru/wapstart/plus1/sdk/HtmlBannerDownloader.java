@@ -33,11 +33,6 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map.Entry;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 
@@ -45,10 +40,9 @@ import ru.wapstart.plus1.sdk.HtmlBannerDownloader.HtmlBannerInfo;
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.BannerAdType;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
-final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, HtmlBannerInfo> {
+final class HtmlBannerDownloader extends BaseRequestLoader<HtmlBannerInfo> {
 	private static final String LOGTAG = "HtmlBannerDownloader";
 	private static final Integer BUFFER_SIZE = 8192;
 
@@ -58,26 +52,12 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, HtmlBanne
 		private String mBannerAdType;
 	}
 
-	protected ArrayList<Plus1BannerDownloadListener> mListenerList;
-	protected HashMap<String, String> mRequestPropertyList;
-
 	public HtmlBannerDownloader() {
-		mListenerList = new ArrayList<Plus1BannerDownloadListener>();
-		mRequestPropertyList = new HashMap<String, String>();
+		super();
 	}
 
-	public HtmlBannerDownloader addDownloadListener(
-		Plus1BannerDownloadListener bannerDownloadListener
-	) {
-		mListenerList.add(bannerDownloadListener);
-
-		return this;
-	}
-
-	public HtmlBannerDownloader addRequestProperty(String key, String value) {
-		mRequestPropertyList.put(key, value);
-
-		return this;
+	public void addLoadListener(Plus1BannerDownloadListener bannerDownloadListener) {
+		super.addLoadListener(bannerDownloadListener);
 	}
 
 	@Override
@@ -164,35 +144,13 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, HtmlBanne
 		}
 	}
 
-	protected void modifyConnection(HttpURLConnection connection) {
-		for (Entry<String, String> entry : mRequestPropertyList.entrySet())
-			connection.setRequestProperty(entry.getKey(), entry.getValue());
-	}
-
-	protected HttpURLConnection makeConnection(String url)
-	{
-		HttpURLConnection connection = null;
-
-		try {
-			connection = (HttpURLConnection) new URL(url).openConnection();
-			modifyConnection(connection);
-			connection.connect();
-		} catch (MalformedURLException e) {
-			Log.e(LOGTAG, "URL parsing failed: " + url, e);
-		} catch (Exception e) {
-			Log.e(LOGTAG, "Unexpected exception", e);
-		}
-
-		return connection;
-	}
-
 	private void notifyOnBannerLoaded(String content, BannerAdType adType) {
-		for (Plus1BannerDownloadListener listener : mListenerList)
-			listener.onBannerLoaded(content, adType);
+		for (BaseRequestLoadListener listener : mListenerList)
+			((Plus1BannerDownloadListener)listener).onBannerLoaded(content, adType);
 	}
 
 	private void notifyOnBannerLoadFailed(LoadError loadError) {
-		for (Plus1BannerDownloadListener listener : mListenerList)
-			listener.onBannerLoadFailed(loadError);
+		for (BaseRequestLoadListener listener : mListenerList)
+			((Plus1BannerDownloadListener)listener).onBannerLoadFailed(loadError);
 	}
 }

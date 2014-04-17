@@ -33,38 +33,22 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map.Entry;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 
-import android.os.AsyncTask;
+import ru.wapstart.plus1.sdk.BaseRequestLoader.BaseRequestLoadListener;
+
 import android.util.Log;
 
-final class InitRequestLoader extends AsyncTask<Plus1Request, Void, String> {
+final class InitRequestLoader extends BaseRequestLoader<String> {
 	private static final String LOGTAG = "InitRequestLoader";
 	private static final Integer BUFFER_SIZE = 8192;
 
-	protected ArrayList<InitRequestLoadListener> mListenerList;
-	protected HashMap<String, String> mRequestPropertyList;
-
 	public InitRequestLoader() {
-		mListenerList = new ArrayList<InitRequestLoadListener>();
-		mRequestPropertyList = new HashMap<String, String>();
+		super();
 	}
 
-	public InitRequestLoader addLoadListener(InitRequestLoadListener listener) {
-		mListenerList.add(listener);
-
-		return this;
-	}
-
-	public InitRequestLoader addRequestProperty(String key, String value) {
-		mRequestPropertyList.put(key, value);
-
-		return this;
+	public void addLoadListener(InitRequestLoadListener listener) {
+		super.addLoadListener(listener);
 	}
 
 	@Override
@@ -135,39 +119,17 @@ final class InitRequestLoader extends AsyncTask<Plus1Request, Void, String> {
 		notifyOnUniqueIdLoaded(uid);
 	}
 
-	protected void modifyConnection(HttpURLConnection connection) {
-		for (Entry<String, String> entry : mRequestPropertyList.entrySet())
-			connection.setRequestProperty(entry.getKey(), entry.getValue());
-	}
-
-	protected HttpURLConnection makeConnection(String url)
-	{
-		HttpURLConnection connection = null;
-
-		try {
-			connection = (HttpURLConnection) new URL(url).openConnection();
-			modifyConnection(connection);
-			connection.connect();
-		} catch (MalformedURLException e) {
-			Log.e(LOGTAG, "URL parsing failed: " + url, e);
-		} catch (Exception e) {
-			Log.e(LOGTAG, "Unexpected exception", e);
-		}
-
-		return connection;
-	}
-
 	private void notifyOnUniqueIdLoaded(String uid) {
-		for (InitRequestLoadListener listener : mListenerList)
-			listener.onUniqueIdLoaded(uid);
+		for (BaseRequestLoadListener listener : mListenerList)
+			((InitRequestLoadListener)listener).onUniqueIdLoaded(uid);
 	}
 
 	private void notifyOnUniqueIdLoadFailed() {
-		for (InitRequestLoadListener listener : mListenerList)
-			listener.onUniqueIdLoadFailed();
+		for (BaseRequestLoadListener listener : mListenerList)
+			((InitRequestLoadListener)listener).onUniqueIdLoadFailed();
 	}
 
-	public interface InitRequestLoadListener {
+	public interface InitRequestLoadListener extends BaseRequestLoadListener {
 		public void onUniqueIdLoaded(String uid);
 		public void onUniqueIdLoadFailed();
 	}
