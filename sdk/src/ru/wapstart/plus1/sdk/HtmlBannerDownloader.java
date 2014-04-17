@@ -39,12 +39,13 @@ import java.util.ArrayList;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 
+import ru.wapstart.plus1.sdk.HtmlBannerDownloader.HtmlBannerInfo;
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
-final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, Boolean> {
+final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, HtmlBannerInfo> {
 	private static final String LOGTAG = "HtmlBannerDownloader";
 	private static final Integer BUFFER_SIZE = 8192;
 
@@ -52,9 +53,11 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, Boolean> 
 
 	protected Plus1BannerView mView;
 
-	protected Integer mResponseCode;
-	protected String mBannerContent;
-	protected String mBannerAdType;
+	protected class HtmlBannerInfo {
+		private Integer mResponseCode;
+		private String mBannerContent;
+		private String mBannerAdType;
+	}
 
 	protected ArrayList<Plus1BannerDownloadListener> mListenerList;
 
@@ -73,17 +76,17 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, Boolean> 
 	}
 
 	@Override
-	protected Boolean doInBackground(Plus1Request... requests)
+	protected HtmlBannerInfo doInBackground(Plus1Request... requests)
 	{
 		Plus1Request request = requests[0];
 
 		HttpURLConnection connection = makeConnection(request.getRequestUri());
 
 		if (connection == null)
-			return false;
+			return null;
 
+		HtmlBannerInfo bannerInfo = null;
 		String result = "";
-		boolean fetched = false;
 
 		try {
 			UrlEncodedFormEntity postEntity = request.getUrlEncodedFormEntity();
@@ -109,22 +112,21 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, Boolean> 
 
 			while ((count = bufStream.read(buffer)) != -1) {
 				if (isCancelled())
-					return false;
+					return null;
 
 				result += new String(buffer, 0, count);
 			}
 
 			bufStream.close();
 
-			mResponseCode = connection.getResponseCode();
-			mBannerContent = result.toString();
-			mBannerAdType = connection.getHeaderField("X-Adtype");
+			bannerInfo = new HtmlBannerInfo();
+			bannerInfo.mResponseCode = connection.getResponseCode();
+			bannerInfo.mBannerContent = result.toString();
+			bannerInfo.mBannerAdType = connection.getHeaderField("X-Adtype");
 
-			Log.d(LOGTAG, "Response code: " + mResponseCode);
-			Log.d(LOGTAG, "Banner content: " + mBannerContent);
-			Log.d(LOGTAG, "X-Adtype: " + mBannerAdType);
-
-			fetched = true;
+			Log.d(LOGTAG, "Response code: "		+ bannerInfo.mResponseCode);
+			Log.d(LOGTAG, "X-Adtype: "			+ bannerInfo.mBannerAdType);
+			Log.d(LOGTAG, "Banner content: "	+ bannerInfo.mBannerContent);
 		} catch (IOException e) {
 			Log.e(LOGTAG, "URL " + request.getRequestUri() + " doesn't exist", e);
 		} catch (Exception e) {
@@ -133,25 +135,25 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, Boolean> 
 			connection.disconnect();
 		}
 
-		return fetched;
+		return bannerInfo;
 	}
 
 	@Override
-	protected void onPostExecute(Boolean fetched) {
-		if (!fetched) {
+	protected void onPostExecute(HtmlBannerInfo bannerInfo) {
+		if (bannerInfo == null) {
 			notifyOnBannerLoadFailed(LoadError.DownloadFailed);
-		} else if (mResponseCode.equals(HttpStatus.SC_NO_CONTENT)) {
+		} else if (bannerInfo.mResponseCode.equals(HttpStatus.SC_NO_CONTENT)) {
 			notifyOnBannerLoadFailed(LoadError.NoHaveBanner);
 		} else {
 			try {
 				mView.loadAd(
-					mBannerContent,
-					BannerAdType.valueOf(mBannerAdType)
+					bannerInfo.mBannerContent,
+					BannerAdType.valueOf(bannerInfo.mBannerAdType)
 				);
 
 				notifyOnBannerLoaded();
 			} catch (IllegalArgumentException e) {
-				Log.e(LOGTAG, "Unsupported ad type: " + mBannerAdType, e);
+				Log.e(LOGTAG, "Unsupported ad type: " + bannerInfo.mBannerAdType, e);
 
 				notifyOnBannerLoadFailed(LoadError.UnknownAnswer);
 			}
