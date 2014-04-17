@@ -165,12 +165,8 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, HtmlBanne
 	}
 
 	protected void modifyConnection(HttpURLConnection connection) {
-		for (Entry<String, String> entry : mRequestPropertyList.entrySet()) {
-			connection.setRequestProperty(
-				entry.getKey(),
-				entry.getValue()
-			);
-		}
+		for (Entry<String, String> entry : mRequestPropertyList.entrySet())
+			connection.setRequestProperty(entry.getKey(), entry.getValue());
 	}
 
 	protected HttpURLConnection makeConnection(String url)
