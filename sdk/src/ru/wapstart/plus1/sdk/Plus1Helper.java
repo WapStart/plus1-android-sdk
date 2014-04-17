@@ -69,7 +69,7 @@ final class Plus1Helper {
 		try {
 			return SHA1(text);
 		} catch (NoSuchAlgorithmException e) {
-			Log.e(LOGTAG, "NoSuchAlgorithmException: " + e.toString());
+			Log.e(LOGTAG, "NoSuchAlgorithmException: " + e.toString(), e);
 
 			return null; // FIXME: add other hash logic
 		}

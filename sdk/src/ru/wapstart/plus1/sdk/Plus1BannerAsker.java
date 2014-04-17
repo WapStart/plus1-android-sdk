@@ -58,6 +58,7 @@ public class Plus1BannerAsker {
 	private int mRefreshDelay								= 10;
 	private int mLocationRefreshDelay						= 300;
 	private int mRefreshRetryNum							= 3;
+	private int mReInitDelay								= 60;
 
 	private boolean mInitialized							= false;
 	private boolean mWebViewCorePaused						= false;
@@ -169,6 +170,12 @@ public class Plus1BannerAsker {
 		return this;
 	}
 
+	public Plus1BannerAsker setReInitDelay(int delayInSeconds) {
+		mReInitDelay = delayInSeconds;
+
+		return this;
+	}
+
 	public Plus1BannerAsker setLocationRefreshDelay(int delayInSeconds) {
 		mLocationRefreshDelay = delayInSeconds;
 
@@ -265,6 +272,7 @@ public class Plus1BannerAsker {
 		// NOTE: useful in case when timers are paused and activity was destroyed
 		new WebView(mView.getContext()).resumeTimers();
 
+		makeInitRequestTask().execute();
 		mInitialized = true;
 
 		return this;
@@ -384,6 +392,11 @@ public class Plus1BannerAsker {
 			task.addDownloadListener(mDownloadListener);
 
 		return task;
+	}
+
+	private InitRequestTask makeInitRequestTask()
+	{
+		return new InitRequestTask(mView);
 	}
 
 	private void modifyRequest(Plus1Request request) {

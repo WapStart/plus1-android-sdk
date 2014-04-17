@@ -55,6 +55,7 @@ public class Plus1BannerView extends FrameLayout {
 	private Animation mShowAnimation	= null;
 	private String mWebViewUserAgent	= null;
 
+	private boolean mOpenInApplication	= false;
 	private boolean mHaveCloseButton	= false;
 	private boolean mClosed				= false;
 	private boolean mInitialized		= false;
@@ -142,6 +143,12 @@ public class Plus1BannerView extends FrameLayout {
 	 */
 	public Plus1BannerView setCloseButtonEnabled(boolean closeButtonEnabled) {
 		mHaveCloseButton = closeButtonEnabled;
+
+		return this;
+	}
+
+	public Plus1BannerView setOpenInApplication(boolean orly) {
+		mOpenInApplication = orly;
 
 		return this;
 	}
