@@ -29,9 +29,7 @@
 
 package ru.wapstart.plus1.sdk;
 
-import ru.wapstart.plus1.sdk.BaseRequestLoader.BaseRequestLoadListener;
-
-public interface Plus1BannerDownloadListener extends BaseRequestLoadListener {
+public interface Plus1BannerDownloadListener {
 	public static enum LoadError {
 		UnknownAnswer,
 		DownloadFailed,

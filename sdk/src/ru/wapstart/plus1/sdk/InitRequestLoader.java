@@ -33,9 +33,8 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-
-import ru.wapstart.plus1.sdk.BaseRequestLoader.BaseRequestLoadListener;
 
 import android.util.Log;
 
@@ -43,12 +42,11 @@ final class InitRequestLoader extends BaseRequestLoader<String> {
 	private static final String LOGTAG = "InitRequestLoader";
 	private static final Integer BUFFER_SIZE = 8192;
 
-	public InitRequestLoader() {
-		super();
-	}
+	private ArrayList<InitRequestLoadListener> mInitRequestLoadListenerList =
+			new ArrayList<InitRequestLoadListener>();
 
-	public void addLoadListener(InitRequestLoadListener listener) {
-		super.addLoadListener(listener);
+	public void addInitRequestLoadListener(InitRequestLoadListener listener) {
+		mInitRequestLoadListenerList.add(listener);
 	}
 
 	@Override
@@ -120,16 +118,16 @@ final class InitRequestLoader extends BaseRequestLoader<String> {
 	}
 
 	private void notifyOnUniqueIdLoaded(String uid) {
-		for (BaseRequestLoadListener listener : mListenerList)
-			((InitRequestLoadListener)listener).onUniqueIdLoaded(uid);
+		for (InitRequestLoadListener listener : mInitRequestLoadListenerList)
+			listener.onUniqueIdLoaded(uid);
 	}
 
 	private void notifyOnUniqueIdLoadFailed() {
-		for (BaseRequestLoadListener listener : mListenerList)
-			((InitRequestLoadListener)listener).onUniqueIdLoadFailed();
+		for (InitRequestLoadListener listener : mInitRequestLoadListenerList)
+			listener.onUniqueIdLoadFailed();
 	}
 
-	public interface InitRequestLoadListener extends BaseRequestLoadListener {
+	public interface InitRequestLoadListener {
 		public void onUniqueIdLoaded(String uid);
 		public void onUniqueIdLoadFailed();
 	}

@@ -33,6 +33,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 
@@ -52,12 +53,11 @@ final class HtmlBannerDownloader extends BaseRequestLoader<HtmlBannerInfo> {
 		private String mBannerAdType;
 	}
 
-	public HtmlBannerDownloader() {
-		super();
-	}
+	private ArrayList<Plus1BannerDownloadListener> mDownloadListenerList =
+			new ArrayList<Plus1BannerDownloadListener>();
 
-	public void addLoadListener(Plus1BannerDownloadListener bannerDownloadListener) {
-		super.addLoadListener(bannerDownloadListener);
+	public void addDownloadListener(Plus1BannerDownloadListener bannerDownloadListener) {
+		mDownloadListenerList.add(bannerDownloadListener);
 	}
 
 	@Override
@@ -145,12 +145,12 @@ final class HtmlBannerDownloader extends BaseRequestLoader<HtmlBannerInfo> {
 	}
 
 	private void notifyOnBannerLoaded(String content, BannerAdType adType) {
-		for (BaseRequestLoadListener listener : mListenerList)
-			((Plus1BannerDownloadListener)listener).onBannerLoaded(content, adType);
+		for (Plus1BannerDownloadListener listener : mDownloadListenerList)
+			listener.onBannerLoaded(content, adType);
 	}
 
 	private void notifyOnBannerLoadFailed(LoadError loadError) {
-		for (BaseRequestLoadListener listener : mListenerList)
-			((Plus1BannerDownloadListener)listener).onBannerLoadFailed(loadError);
+		for (Plus1BannerDownloadListener listener : mDownloadListenerList)
+			listener.onBannerLoadFailed(loadError);
 	}
 }

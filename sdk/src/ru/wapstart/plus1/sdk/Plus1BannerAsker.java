@@ -29,12 +29,14 @@
 
 package ru.wapstart.plus1.sdk;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.BannerAdType;
 import ru.wapstart.plus1.sdk.InitRequestLoader.InitRequestLoadListener;
+import ru.wapstart.plus1.sdk.BaseRequestLoader.ChangeSdkPropertiesListener;
 
 import android.app.Activity;
 import android.content.Context;
@@ -396,7 +398,7 @@ public class Plus1BannerAsker {
 		mRefreshRetryCount = 0;
 
 		HtmlBannerDownloader task = new HtmlBannerDownloader();
-		task.addLoadListener(new Plus1BannerDownloadListener() {
+		task.addDownloadListener(new Plus1BannerDownloadListener() {
 			public void onBannerLoaded(String content, BannerAdType adType) {
 				mRefreshRetryCount = 0;
 
@@ -408,11 +410,11 @@ public class Plus1BannerAsker {
 					stop();
 			}
 		});
-		task.addRequestProperty("User-Agent", Plus1Helper.getUserAgent());
-		task.addRequestProperty("x-original-user-agent", mView.getWebViewUserAgent());
 
 		if (mDownloadListener != null)
-			task.addLoadListener(mDownloadListener);
+			task.addDownloadListener(mDownloadListener);
+
+		modifyRequestLoaderTask(task);
 
 		return task;
 	}
@@ -420,7 +422,7 @@ public class Plus1BannerAsker {
 	private InitRequestLoader makeInitRequestTask()
 	{
 		InitRequestLoader task = new InitRequestLoader();
-		task.addLoadListener(new InitRequestLoadListener() {
+		task.addInitRequestLoadListener(new InitRequestLoadListener() {
 			public void onUniqueIdLoaded(String uid) {
 				mRequest.setUid(uid);
 
@@ -431,10 +433,25 @@ public class Plus1BannerAsker {
 				Log.w(LOGTAG, "Failed to load init request");
 			}
 		});
-		task.addRequestProperty("User-Agent", Plus1Helper.getUserAgent());
-		task.addRequestProperty("x-original-user-agent", mView.getWebViewUserAgent());
+
+		modifyRequestLoaderTask(task);
 
 		return task;
+	}
+
+	private void modifyRequestLoaderTask(BaseRequestLoader task) {
+		task.addChangeSdkPropertiesListener(new ChangeSdkPropertiesListener() {
+			public void onSdkParametersLoaded(HashMap<String, String> parameters) {
+				throw new UnsupportedOperationException("Not supported yet.");
+			}
+
+			public void onSdkActionsLoaded(HashMap<String, String> actions) {
+				throw new UnsupportedOperationException("Not supported yet.");
+			}
+		});
+
+		task.addRequestProperty("User-Agent", Plus1Helper.getUserAgent());
+		task.addRequestProperty("x-original-user-agent", mView.getWebViewUserAgent());
 	}
 
 	// FIXME: think about another request-update logic

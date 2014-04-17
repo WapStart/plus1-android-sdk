@@ -42,25 +42,17 @@ import android.util.Log;
 public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void, T> {
 	private static final String LOGTAG = "BaseRequestLoader";
 
-	protected ArrayList<BaseRequestLoadListener> mListenerList;
-	protected HashMap<String, String> mRequestPropertyList;
+	private ArrayList<ChangeSdkPropertiesListener> mChangeSdkPropertiesListenerList =
+			new ArrayList<ChangeSdkPropertiesListener>();
+	private HashMap<String, String> mRequestPropertyList =
+			new HashMap<String, String>();
 
-	public BaseRequestLoader() {
-		mListenerList = new ArrayList<BaseRequestLoadListener>();
-		mRequestPropertyList = new HashMap<String, String>();
-	}
-
-	public void addLoadListener(BaseRequestLoadListener listener) {
-		mListenerList.add(listener);
+	public void addChangeSdkPropertiesListener(ChangeSdkPropertiesListener listener) {
+		mChangeSdkPropertiesListenerList.add(listener);
 	}
 
 	public void addRequestProperty(String key, String value) {
 		mRequestPropertyList.put(key, value);
-	}
-
-	protected void modifyConnection(HttpURLConnection connection) {
-		for (Entry<String, String> entry : mRequestPropertyList.entrySet())
-			connection.setRequestProperty(entry.getKey(), entry.getValue());
 	}
 
 	protected HttpURLConnection makeConnection(String url)
@@ -69,7 +61,10 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 
 		try {
 			connection = (HttpURLConnection) new URL(url).openConnection();
-			modifyConnection(connection);
+
+			for (Entry<String, String> entry : mRequestPropertyList.entrySet())
+				connection.setRequestProperty(entry.getKey(), entry.getValue());
+
 			connection.connect();
 		} catch (MalformedURLException e) {
 			Log.e(LOGTAG, "URL parsing failed: " + url, e);
@@ -80,7 +75,8 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 		return connection;
 	}
 
-	public abstract interface BaseRequestLoadListener {
-		// FIXME: add sdk parameters and sdk action event handlers here
+	public interface ChangeSdkPropertiesListener {
+		public void onSdkParametersLoaded(HashMap<String, String> parameters);
+		public void onSdkActionsLoaded(HashMap<String, String> actions);
 	}
 }
