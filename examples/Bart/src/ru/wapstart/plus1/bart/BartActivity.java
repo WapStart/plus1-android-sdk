@@ -15,7 +15,7 @@ import java.util.Date;
 // Uncomment the following line if you want to use Plus1 WapStart Conversion SDK
 // import ru.wapstart.plus1.conversion.sdk.Plus1ConversionTracker;
 import ru.wapstart.plus1.sdk.Plus1BannerView;
-import ru.wapstart.plus1.sdk.Plus1BannerRequest;
+import ru.wapstart.plus1.sdk.Plus1Request;
 import ru.wapstart.plus1.sdk.Plus1BannerAsker;
 
 public class BartActivity extends Activity implements View.OnClickListener
@@ -52,7 +52,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 
 		mAsker =
 			new Plus1BannerAsker(
-				new Plus1BannerRequest()
+				new Plus1Request()
 					.setApplicationId(/* Place your WapStart Plus1 application id here */),
 				mBannerView
 					.enableAnimationFromTop()
