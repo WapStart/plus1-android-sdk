@@ -188,7 +188,11 @@ public final class Plus1Request {
 		return this;
 	}
 
-	public String getRequestUri() {
+	public String getUrl() {
+		return getUrl(getRequestType());
+	}
+
+	public String getUrl(RequestType requestType) {
 
 		return
 			String.format(
@@ -196,7 +200,7 @@ public final class Plus1Request {
 				getServerHost(),
 				REQUEST_VERSION,
 				getApplicationId(),
-				getRequestType().toString(),
+				requestType.toString(),
 				getUID()
 			);
 	}

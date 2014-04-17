@@ -71,8 +71,9 @@ final class InitRequestLoader extends AsyncTask<Plus1Request, Void, String> {
 	protected String doInBackground(Plus1Request... requests)
 	{
 		Plus1Request request = requests[0];
+		String requestUrl = request.getUrl(Plus1Request.RequestType.init);
 
-		HttpURLConnection connection = makeConnection(request.getRequestUri());
+		HttpURLConnection connection = makeConnection(requestUrl);
 
 		if (connection == null)
 			return null;
@@ -116,7 +117,7 @@ final class InitRequestLoader extends AsyncTask<Plus1Request, Void, String> {
 			Log.d(LOGTAG, "Unique identifier: " + uniqueId);
 
 		} catch (IOException e) {
-			Log.e(LOGTAG, "URL " + request.getRequestUri() + " doesn't exist", e);
+			Log.e(LOGTAG, "URL " + requestUrl + " doesn't exist", e);
 		} catch (Exception e) {
 			Log.e(LOGTAG, "Exception while downloading banner: " + e.getMessage(), e);
 		} finally {

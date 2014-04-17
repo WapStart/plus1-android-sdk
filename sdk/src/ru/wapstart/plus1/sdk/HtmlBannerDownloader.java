@@ -84,8 +84,9 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, HtmlBanne
 	protected HtmlBannerInfo doInBackground(Plus1Request... requests)
 	{
 		Plus1Request request = requests[0];
+		String requestUrl = request.getUrl();
 
-		HttpURLConnection connection = makeConnection(request.getRequestUri());
+		HttpURLConnection connection = makeConnection(requestUrl);
 
 		if (connection == null)
 			return null;
@@ -133,7 +134,7 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, HtmlBanne
 			Log.d(LOGTAG, "X-Adtype: "			+ bannerInfo.mBannerAdType);
 			Log.d(LOGTAG, "Banner content: "	+ bannerInfo.mBannerContent);
 		} catch (IOException e) {
-			Log.e(LOGTAG, "URL " + request.getRequestUri() + " doesn't exist", e);
+			Log.e(LOGTAG, "URL " + requestUrl + " doesn't exist", e);
 		} catch (Exception e) {
 			Log.e(LOGTAG, "Exception while downloading banner: " + e.getMessage(), e);
 		} finally {
