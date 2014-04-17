@@ -29,9 +29,7 @@
 
 package ru.wapstart.plus1.sdk;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -40,7 +38,6 @@ import android.util.Log;
 
 final class InitRequestLoader extends BaseRequestLoader<String> {
 	private static final String LOGTAG = "InitRequestLoader";
-	private static final Integer BUFFER_SIZE = 8192;
 
 	private ArrayList<InitRequestLoadListener> mInitRequestLoadListenerList =
 			new ArrayList<InitRequestLoadListener>();
@@ -49,64 +46,20 @@ final class InitRequestLoader extends BaseRequestLoader<String> {
 		mInitRequestLoadListenerList.add(listener);
 	}
 
-	@Override
-	protected String doInBackground(Plus1Request... requests)
+	protected String getRequestUrl(Plus1Request request) {
+		return request.getUrl(Plus1Request.RequestType.init);
+	}
+
+	protected UrlEncodedFormEntity getUrlEncodedFormEntity(Plus1Request request)
+		throws UnsupportedEncodingException
 	{
-		Plus1Request request = requests[0];
-		String requestUrl = request.getUrl(Plus1Request.RequestType.init);
+		return request.getUrlEncodedFormEntity();
+	}
 
-		HttpURLConnection connection = makeConnection(requestUrl);
+	protected String makeResult(String content, HttpURLConnection connection) {
+		Log.d(LOGTAG, "Unique identifier: " + content);
 
-		if (connection == null)
-			return null;
-
-		String result = "";
-		String uniqueId = null;
-
-		try {
-			UrlEncodedFormEntity postEntity = request.getUrlEncodedFormEntity();
-
-			connection.setRequestMethod("POST");
-			connection.setRequestProperty(
-				"Content-Type",
-				"application/x-www-form-urlencoded"
-			);
-			connection.setRequestProperty(
-				"Content-Length",
-				Integer.toString((int)postEntity.getContentLength())
-			);
-			postEntity.writeTo(connection.getOutputStream());
-
-			InputStream stream = connection.getInputStream();
-
-			byte[] buffer = new byte[BUFFER_SIZE];
-			int count = 0;
-
-			BufferedInputStream bufStream =
-				new BufferedInputStream(stream, BUFFER_SIZE);
-
-			while ((count = bufStream.read(buffer)) != -1) {
-				if (isCancelled())
-					return null;
-
-				result += new String(buffer, 0, count);
-			}
-
-			bufStream.close();
-
-			uniqueId = result.toString();
-
-			Log.d(LOGTAG, "Unique identifier: " + uniqueId);
-
-		} catch (IOException e) {
-			Log.e(LOGTAG, "URL " + requestUrl + " doesn't exist", e);
-		} catch (Exception e) {
-			Log.e(LOGTAG, "Exception while downloading banner: " + e.getMessage(), e);
-		} finally {
-			connection.disconnect();
-		}
-
-		return uniqueId;
+		return content;
 	}
 
 	@Override

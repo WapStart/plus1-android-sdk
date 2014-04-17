@@ -29,23 +29,33 @@
 
 package ru.wapstart.plus1.sdk;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
 public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void, T> {
 	private static final String LOGTAG = "BaseRequestLoader";
+	private static final Integer BUFFER_SIZE = 8192;
 
 	private ArrayList<ChangeSdkPropertiesListener> mChangeSdkPropertiesListenerList =
 			new ArrayList<ChangeSdkPropertiesListener>();
 	private HashMap<String, String> mRequestPropertyList =
 			new HashMap<String, String>();
+
+	abstract protected String getRequestUrl(Plus1Request request);
+	abstract protected UrlEncodedFormEntity getUrlEncodedFormEntity(Plus1Request request) throws UnsupportedEncodingException;
+	abstract protected T makeResult(String content, HttpURLConnection connection) throws IOException;
 
 	public void addChangeSdkPropertiesListener(ChangeSdkPropertiesListener listener) {
 		mChangeSdkPropertiesListenerList.add(listener);
@@ -73,6 +83,66 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 		}
 
 		return connection;
+	}
+
+	@Override
+	final protected T doInBackground(Plus1Request... requests)
+	{
+		Plus1Request request = requests[0];
+		String requestUrl = getRequestUrl(request);
+
+		HttpURLConnection connection = makeConnection(requestUrl);
+
+		if (connection == null)
+			return null;
+
+		T result = null;
+		String content = "";
+
+		try {
+			UrlEncodedFormEntity postEntity = getUrlEncodedFormEntity(request);
+
+			connection.setRequestMethod("POST");
+			connection.setRequestProperty(
+				"Content-Type",
+				"application/x-www-form-urlencoded"
+			);
+			connection.setRequestProperty(
+				"Content-Length",
+				Integer.toString((int)postEntity.getContentLength())
+			);
+			postEntity.writeTo(connection.getOutputStream());
+
+			InputStream stream = connection.getInputStream();
+
+			byte[] buffer = new byte[BUFFER_SIZE];
+			int count = 0;
+
+			BufferedInputStream bufStream =
+				new BufferedInputStream(stream, BUFFER_SIZE);
+
+			while ((count = bufStream.read(buffer)) != -1) {
+				if (isCancelled())
+					return null;
+
+				content += new String(buffer, 0, count);
+			}
+
+			bufStream.close();
+
+			// FIXME: add ChangeSdkProperties logic support
+
+			result = makeResult(content.toString(), connection);
+
+		} catch (IOException e) {
+			Log.e(LOGTAG, "URL " + requestUrl + " doesn't exist", e);
+		} catch (Exception e) {
+			Log.e(LOGTAG, "Exception while loading request: " + e.getMessage(), e);
+		} finally {
+			connection.disconnect();
+		}
+
+		return result;
 	}
 
 	public interface ChangeSdkPropertiesListener {

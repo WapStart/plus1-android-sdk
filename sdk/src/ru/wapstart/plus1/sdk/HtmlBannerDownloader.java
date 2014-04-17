@@ -29,9 +29,8 @@
 
 package ru.wapstart.plus1.sdk;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import org.apache.http.HttpStatus;
@@ -45,7 +44,6 @@ import android.util.Log;
 
 final class HtmlBannerDownloader extends BaseRequestLoader<HtmlBannerInfo> {
 	private static final String LOGTAG = "HtmlBannerDownloader";
-	private static final Integer BUFFER_SIZE = 8192;
 
 	protected class HtmlBannerInfo {
 		private Integer mResponseCode;
@@ -60,66 +58,30 @@ final class HtmlBannerDownloader extends BaseRequestLoader<HtmlBannerInfo> {
 		mDownloadListenerList.add(bannerDownloadListener);
 	}
 
-	@Override
-	protected HtmlBannerInfo doInBackground(Plus1Request... requests)
+	protected String getRequestUrl(Plus1Request request) {
+		return request.getUrl();
+	}
+
+	protected UrlEncodedFormEntity getUrlEncodedFormEntity(Plus1Request request)
+		throws UnsupportedEncodingException
 	{
-		Plus1Request request = requests[0];
-		String requestUrl = request.getUrl();
+		// FIXME: think about strict form entity
+		return request.getUrlEncodedFormEntity();
+	}
 
-		HttpURLConnection connection = makeConnection(requestUrl);
+	protected HtmlBannerInfo makeResult(String content, HttpURLConnection connection)
+		throws IOException
+	{
+		Log.d(LOGTAG, "Unique identifier: " + content);
 
-		if (connection == null)
-			return null;
+		HtmlBannerInfo bannerInfo = new HtmlBannerInfo();
+		bannerInfo.mResponseCode = connection.getResponseCode();
+		bannerInfo.mBannerContent = content;
+		bannerInfo.mBannerAdType = connection.getHeaderField("X-Adtype");
 
-		HtmlBannerInfo bannerInfo = null;
-		String result = "";
-
-		try {
-			UrlEncodedFormEntity postEntity = request.getUrlEncodedFormEntity();
-
-			connection.setRequestMethod("POST");
-			connection.setRequestProperty(
-				"Content-Type",
-				"application/x-www-form-urlencoded"
-			);
-			connection.setRequestProperty(
-				"Content-Length",
-				Integer.toString((int)postEntity.getContentLength())
-			);
-			postEntity.writeTo(connection.getOutputStream());
-
-			InputStream stream = connection.getInputStream();
-
-			byte[] buffer = new byte[BUFFER_SIZE];
-			int count = 0;
-
-			BufferedInputStream bufStream =
-				new BufferedInputStream(stream, BUFFER_SIZE);
-
-			while ((count = bufStream.read(buffer)) != -1) {
-				if (isCancelled())
-					return null;
-
-				result += new String(buffer, 0, count);
-			}
-
-			bufStream.close();
-
-			bannerInfo = new HtmlBannerInfo();
-			bannerInfo.mResponseCode = connection.getResponseCode();
-			bannerInfo.mBannerContent = result.toString();
-			bannerInfo.mBannerAdType = connection.getHeaderField("X-Adtype");
-
-			Log.d(LOGTAG, "Response code: "		+ bannerInfo.mResponseCode);
-			Log.d(LOGTAG, "X-Adtype: "			+ bannerInfo.mBannerAdType);
-			Log.d(LOGTAG, "Banner content: "	+ bannerInfo.mBannerContent);
-		} catch (IOException e) {
-			Log.e(LOGTAG, "URL " + requestUrl + " doesn't exist", e);
-		} catch (Exception e) {
-			Log.e(LOGTAG, "Exception while downloading banner: " + e.getMessage(), e);
-		} finally {
-			connection.disconnect();
-		}
+		Log.d(LOGTAG, "Response code: "		+ bannerInfo.mResponseCode);
+		Log.d(LOGTAG, "X-Adtype: "			+ bannerInfo.mBannerAdType);
+		Log.d(LOGTAG, "Banner content: "	+ bannerInfo.mBannerContent);
 
 		return bannerInfo;
 	}
