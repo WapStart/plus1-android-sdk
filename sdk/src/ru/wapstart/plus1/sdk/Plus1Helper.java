@@ -49,7 +49,7 @@ final class Plus1Helper {
 	private static final String HEX_DIGITS			= "0123456789abcdef";
 	private static final String LOGTAG				= "Plus1Helper";
 	
-	private static String clientSessionId = null;
+	private static String mClientSessionId = null;
 	
 	private Plus1Helper() { /*_*/ }
 
@@ -85,31 +85,40 @@ final class Plus1Helper {
 	}
 
 	public static String getClientSessionId(Context context) {
-		if (clientSessionId == null) {
+		if (mClientSessionId == null) {
 			SharedPreferences preferences =
 				context.getSharedPreferences(PREFERENCES_STORAGE, 0);
 
-			clientSessionId = preferences.getString(PREFERENCES_KEY, null);
+			mClientSessionId = preferences.getString(PREFERENCES_KEY, null);
 
-			if (clientSessionId == null) {
+			if (mClientSessionId == null) {
 				String androidId =
 					Secure.getString(
 						context.getContentResolver(),
 						Secure.ANDROID_ID
 					);
 
-				clientSessionId =
+				mClientSessionId =
 					androidId != null
 						? getHash(androidId)
 						: getUniqueHash();
 
-				SharedPreferences.Editor editor = preferences.edit();
-				editor.putString(PREFERENCES_KEY, clientSessionId);
-				editor.commit();
+				setClientSessionId(context, mClientSessionId);
 			}
 		}
 
-		return clientSessionId;
+		return mClientSessionId;
+	}
+
+	public static void setClientSessionId(Context context, String clientSessionId) {
+		SharedPreferences preferences =
+				context.getSharedPreferences(PREFERENCES_STORAGE, 0);
+
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.putString(PREFERENCES_KEY, clientSessionId);
+		editor.commit();
+
+		mClientSessionId = clientSessionId;
 	}
 
 	public static String getDisplayMetrics(Display display)

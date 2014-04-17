@@ -34,6 +34,7 @@ import java.util.TimerTask;
 
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.BannerAdType;
+import ru.wapstart.plus1.sdk.InitRequestLoader.InitRequestLoadListener;
 
 import android.app.Activity;
 import android.content.Context;
@@ -43,6 +44,7 @@ import android.location.Criteria;
 import android.location.LocationListener;
 import android.location.LocationProvider;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.webkit.WebView;
 
@@ -70,6 +72,17 @@ public class Plus1BannerAsker {
 
 	private Plus1BannerDownloadListener mDownloadListener	= null;
 
+	private Runnable mReInitRequestTask = new Runnable() {
+		public void run() {
+			modifyRequest(mRequest);
+
+			makeInitRequestTask().execute(mRequest);
+
+			mReInitHandler.postDelayed(this, mReInitDelay);
+		}
+	};
+	private Handler mReInitHandler = new Handler();
+
 	public static Plus1BannerAsker create(
 		Plus1Request request, Plus1BannerView view
 	) {
@@ -83,6 +96,8 @@ public class Plus1BannerAsker {
 
 	public void onPause() {
 		stop();
+
+		mReInitHandler.removeCallbacks(mReInitRequestTask);
 
 		if (!isDisabledAutoDetectLocation())
 			removeLocationUpdates();
@@ -105,6 +120,8 @@ public class Plus1BannerAsker {
 
 		if (!mView.isExpanded())
 			start();
+
+		mReInitHandler.post(mReInitRequestTask);
 
 		if (!isDisabledAutoDetectLocation())
 			requestLocationUpdates(false); // NOTE: include disabled providers
@@ -273,7 +290,8 @@ public class Plus1BannerAsker {
 		// NOTE: useful in case when timers are paused and activity was destroyed
 		new WebView(mView.getContext()).resumeTimers();
 
-		makeInitRequestTask().execute();
+		mRequest.setUid(Plus1Helper.getClientSessionId(mView.getContext()));
+
 		mInitialized = true;
 
 		return this;
@@ -402,16 +420,25 @@ public class Plus1BannerAsker {
 	private InitRequestLoader makeInitRequestTask()
 	{
 		InitRequestLoader task = new InitRequestLoader();
+		task.addLoadListener(new InitRequestLoadListener() {
+			public void onUniqueIdLoaded(String uid) {
+				mRequest.setUid(uid);
+
+				Plus1Helper.setClientSessionId(mView.getContext(), uid);
+			}
+
+			public void onUniqueIdLoadFailed() {
+				Log.w(LOGTAG, "Failed to load init request");
+			}
+		});
 		task.addRequestProperty("User-Agent", Plus1Helper.getUserAgent());
 		task.addRequestProperty("x-original-user-agent", mView.getWebViewUserAgent());
 
 		return task;
 	}
 
+	// FIXME: think about another request-update logic
 	private void modifyRequest(Plus1Request request) {
-		// FIXME: setup actual uid
-		request.setUid(Plus1Helper.getClientSessionId(mView.getContext()));
-
 		request.setDisplayMetrics(
 			Plus1Helper.getDisplayMetrics(
 				((Activity)mView.getContext())
