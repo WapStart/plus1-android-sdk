@@ -129,18 +129,12 @@ public class Plus1BannerView extends FrameLayout {
 		return mHaveCloseButton;
 	}
 
-	/**
-	 * @deprecated close button logic will be removed in future
-	 */
 	public Plus1BannerView enableCloseButton() {
 		mHaveCloseButton = true;
 
 		return this;
 	}
 
-	/**
-	 * @deprecated close button logic will be removed in future
-	 */
 	public Plus1BannerView setCloseButtonEnabled(boolean closeButtonEnabled) {
 		mHaveCloseButton = closeButtonEnabled;
 
@@ -153,9 +147,6 @@ public class Plus1BannerView extends FrameLayout {
 		return this;
 	}
 
-	/**
-	 * @deprecated close button logic will be removed in future
-	 */
 	public boolean isClosed() {
 		return mClosed;
 	}
