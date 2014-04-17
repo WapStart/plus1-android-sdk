@@ -29,6 +29,11 @@
 
 package ru.wapstart.plus1.sdk;
 
+import java.util.ArrayList;
+
+import ru.wapstart.plus1.sdk.MraidView.ViewState;
+import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.BannerAdType;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -39,11 +44,6 @@ import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.webkit.WebView;
-
-import java.util.ArrayList;
-
-import ru.wapstart.plus1.sdk.MraidView.ViewState;
-import ru.wapstart.plus1.sdk.HtmlBannerDownloader.BannerAdType;
 
 public class Plus1BannerView extends FrameLayout {
     private static final String LOGTAG = "Plus1BannerView";

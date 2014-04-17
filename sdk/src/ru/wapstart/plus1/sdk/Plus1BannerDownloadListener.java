@@ -35,10 +35,12 @@ public interface Plus1BannerDownloadListener {
 		NoHaveBanner
 	}
 
+	public static enum BannerAdType {plus1, mraid};
+
 	/**
 	 * Raised on banner successfully loaded
 	 */
-	public void onBannerLoaded();
+	public void onBannerLoaded(String content, BannerAdType adType);
 
 	/**
 	 * Raised if banner can't be load on some reason

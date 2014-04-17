@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2011, Alexander Klestov <a.klestov@co.wapstart.ru>
+ * Copyright (c) 2014, Alexander Zaytsev <a.zaytsev@co.wapstart.ru>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -38,50 +38,37 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-
-import ru.wapstart.plus1.sdk.HtmlBannerDownloader.HtmlBannerInfo;
-import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
-import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.BannerAdType;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
-final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, HtmlBannerInfo> {
-	private static final String LOGTAG = "HtmlBannerDownloader";
+final class InitRequestLoader extends AsyncTask<Plus1Request, Void, String> {
+	private static final String LOGTAG = "InitRequestLoader";
 	private static final Integer BUFFER_SIZE = 8192;
 
-	protected class HtmlBannerInfo {
-		private Integer mResponseCode;
-		private String mBannerContent;
-		private String mBannerAdType;
-	}
-
-	protected ArrayList<Plus1BannerDownloadListener> mListenerList;
+	protected ArrayList<InitRequestLoadListener> mListenerList;
 	protected HashMap<String, String> mRequestPropertyList;
 
-	public HtmlBannerDownloader() {
-		mListenerList = new ArrayList<Plus1BannerDownloadListener>();
+	public InitRequestLoader() {
+		mListenerList = new ArrayList<InitRequestLoadListener>();
 		mRequestPropertyList = new HashMap<String, String>();
 	}
 
-	public HtmlBannerDownloader addDownloadListener(
-		Plus1BannerDownloadListener bannerDownloadListener
-	) {
-		mListenerList.add(bannerDownloadListener);
+	public InitRequestLoader addLoadListener(InitRequestLoadListener listener) {
+		mListenerList.add(listener);
 
 		return this;
 	}
 
-	public HtmlBannerDownloader addRequestProperty(String key, String value) {
+	public InitRequestLoader addRequestProperty(String key, String value) {
 		mRequestPropertyList.put(key, value);
 
 		return this;
 	}
 
 	@Override
-	protected HtmlBannerInfo doInBackground(Plus1Request... requests)
+	protected String doInBackground(Plus1Request... requests)
 	{
 		Plus1Request request = requests[0];
 
@@ -90,8 +77,8 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, HtmlBanne
 		if (connection == null)
 			return null;
 
-		HtmlBannerInfo bannerInfo = null;
 		String result = "";
+		String uniqueId = null;
 
 		try {
 			UrlEncodedFormEntity postEntity = request.getUrlEncodedFormEntity();
@@ -124,14 +111,10 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, HtmlBanne
 
 			bufStream.close();
 
-			bannerInfo = new HtmlBannerInfo();
-			bannerInfo.mResponseCode = connection.getResponseCode();
-			bannerInfo.mBannerContent = result.toString();
-			bannerInfo.mBannerAdType = connection.getHeaderField("X-Adtype");
+			uniqueId = result.toString();
 
-			Log.d(LOGTAG, "Response code: "		+ bannerInfo.mResponseCode);
-			Log.d(LOGTAG, "X-Adtype: "			+ bannerInfo.mBannerAdType);
-			Log.d(LOGTAG, "Banner content: "	+ bannerInfo.mBannerContent);
+			Log.d(LOGTAG, "Unique identifier: " + uniqueId);
+
 		} catch (IOException e) {
 			Log.e(LOGTAG, "URL " + request.getRequestUri() + " doesn't exist", e);
 		} catch (Exception e) {
@@ -140,27 +123,15 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, HtmlBanne
 			connection.disconnect();
 		}
 
-		return bannerInfo;
+		return uniqueId;
 	}
 
 	@Override
-	protected void onPostExecute(HtmlBannerInfo bannerInfo) {
-		if (bannerInfo == null) {
-			notifyOnBannerLoadFailed(LoadError.DownloadFailed);
-		} else if (bannerInfo.mResponseCode.equals(HttpStatus.SC_NO_CONTENT)) {
-			notifyOnBannerLoadFailed(LoadError.NoHaveBanner);
-		} else {
-			try {
-				notifyOnBannerLoaded(
-					bannerInfo.mBannerContent,
-					BannerAdType.valueOf(bannerInfo.mBannerAdType)
-				);
-			} catch (IllegalArgumentException e) {
-				Log.e(LOGTAG, "Unsupported ad type: " + bannerInfo.mBannerAdType, e);
+	protected void onPostExecute(String uid) {
+		if (null == uid)
+			notifyOnUniqueIdLoadFailed();
 
-				notifyOnBannerLoadFailed(LoadError.UnknownAnswer);
-			}
-		}
+		notifyOnUniqueIdLoaded(uid);
 	}
 
 	protected void modifyConnection(HttpURLConnection connection) {
@@ -189,13 +160,18 @@ final class HtmlBannerDownloader extends AsyncTask<Plus1Request, Void, HtmlBanne
 		return connection;
 	}
 
-	private void notifyOnBannerLoaded(String content, BannerAdType adType) {
-		for (Plus1BannerDownloadListener listener : mListenerList)
-			listener.onBannerLoaded(content, adType);
+	private void notifyOnUniqueIdLoaded(String uid) {
+		for (InitRequestLoadListener listener : mListenerList)
+			listener.onUniqueIdLoaded(uid);
 	}
 
-	private void notifyOnBannerLoadFailed(LoadError loadError) {
-		for (Plus1BannerDownloadListener listener : mListenerList)
-			listener.onBannerLoadFailed(loadError);
+	private void notifyOnUniqueIdLoadFailed() {
+		for (InitRequestLoadListener listener : mListenerList)
+			listener.onUniqueIdLoadFailed();
+	}
+
+	public interface InitRequestLoadListener {
+		public void onUniqueIdLoaded(String uid);
+		public void onUniqueIdLoadFailed();
 	}
 }

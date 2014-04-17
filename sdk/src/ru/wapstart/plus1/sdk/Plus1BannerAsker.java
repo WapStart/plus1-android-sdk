@@ -33,6 +33,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
+import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.BannerAdType;
 
 import android.app.Activity;
 import android.content.Context;
@@ -376,17 +377,21 @@ public class Plus1BannerAsker {
 	{
 		mRefreshRetryCount = 0;
 
-		HtmlBannerDownloader task = new HtmlBannerDownloader(mView)
+		HtmlBannerDownloader task = new HtmlBannerDownloader()
 			.addDownloadListener(new Plus1BannerDownloadListener() {
-				public void onBannerLoaded() {
+				public void onBannerLoaded(String content, BannerAdType adType) {
 					mRefreshRetryCount = 0;
+
+					mView.loadAd(content, adType);
 				}
 
 				public void onBannerLoadFailed(LoadError error) {
 					if (++mRefreshRetryCount >= mRefreshRetryNum)
 						stop();
 				}
-			});
+			})
+			.addRequestProperty("User-Agent", Plus1Helper.getUserAgent())
+			.addRequestProperty("x-original-user-agent", mView.getWebViewUserAgent());
 
 		if (mDownloadListener != null)
 			task.addDownloadListener(mDownloadListener);
@@ -396,7 +401,10 @@ public class Plus1BannerAsker {
 
 	private InitRequestLoader makeInitRequestTask()
 	{
-		return new InitRequestLoader(mView);
+		return
+			new InitRequestLoader()
+			.addRequestProperty("User-Agent", Plus1Helper.getUserAgent())
+			.addRequestProperty("x-original-user-agent", mView.getWebViewUserAgent());
 	}
 
 	private void modifyRequest(Plus1Request request) {
