@@ -394,9 +394,9 @@ public class Plus1BannerAsker {
 		return task;
 	}
 
-	private InitRequestTask makeInitRequestTask()
+	private InitRequestLoader makeInitRequestTask()
 	{
-		return new InitRequestTask(mView);
+		return new InitRequestLoader(mView);
 	}
 
 	private void modifyRequest(Plus1Request request) {
