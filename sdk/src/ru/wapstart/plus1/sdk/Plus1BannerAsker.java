@@ -30,6 +30,7 @@
 package ru.wapstart.plus1.sdk;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -441,11 +442,11 @@ public class Plus1BannerAsker {
 
 	private void modifyRequestLoaderTask(BaseRequestLoader task) {
 		task.addChangeSdkPropertiesListener(new ChangeSdkPropertiesListener() {
-			public void onSdkParametersLoaded(HashMap<String, String> parameters) {
+			public void onSdkParametersLoaded(Map<String, Object> parameters) {
 				throw new UnsupportedOperationException("Not supported yet.");
 			}
 
-			public void onSdkActionsLoaded(HashMap<String, String> actions) {
+			public void onSdkActionsLoaded(Map<String, Object> actions) {
 				throw new UnsupportedOperationException("Not supported yet.");
 			}
 		});

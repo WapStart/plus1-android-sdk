@@ -36,10 +36,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.HashMap;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.json.JSONObject;
+import org.json.JSONException;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -47,10 +51,12 @@ import android.util.Log;
 public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void, T> {
 	private static final String LOGTAG = "BaseRequestLoader";
 	private static final Integer BUFFER_SIZE = 8192;
+	private static final String SDK_PARAMETERS_HEADER = "X-Plus1-SDK-Parameters";
+	private static final String SDK_ACTION_HEADER = "X-Plus1-SDK-Action";
 
-	private ArrayList<ChangeSdkPropertiesListener> mChangeSdkPropertiesListenerList =
+	private List<ChangeSdkPropertiesListener> mChangeSdkPropertiesListenerList =
 			new ArrayList<ChangeSdkPropertiesListener>();
-	private HashMap<String, String> mRequestPropertyList =
+	private Map<String, String> mRequestPropertyList =
 			new HashMap<String, String>();
 
 	abstract protected String getRequestUrl(Plus1Request request);
@@ -130,7 +136,15 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 
 			bufStream.close();
 
-			// FIXME: add ChangeSdkProperties logic support
+			Map<String, Object> parameters =
+				getMapByJson(connection.getHeaderField(SDK_PARAMETERS_HEADER));
+			Map<String, Object> actions =
+				getMapByJson(connection.getHeaderField(SDK_ACTION_HEADER));
+
+			if (!(null == parameters || parameters.isEmpty()))
+				notifyOnSdkParametersLoaded(parameters);
+			if (!(null == actions || actions.isEmpty()))
+				notifyOnSdkActionsLoaded(actions);
 
 			result = makeResult(content.toString(), connection);
 
@@ -145,8 +159,30 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 		return result;
 	}
 
+	private Map<String, Object> getMapByJson(String json) {
+		if (null != json) {
+			try {
+				return JsonHelper.toMap(new JSONObject(json));
+			} catch (JSONException e) {
+				Log.e(LOGTAG, "Found not compatible json: " + json, e);
+			}
+		}
+
+		return null;
+	}
+
+	private void notifyOnSdkParametersLoaded(Map<String, Object> parameters) {
+		for (ChangeSdkPropertiesListener listener : mChangeSdkPropertiesListenerList)
+			listener.onSdkParametersLoaded(parameters);
+	}
+
+	private void notifyOnSdkActionsLoaded(Map<String, Object> actions) {
+		for (ChangeSdkPropertiesListener listener : mChangeSdkPropertiesListenerList)
+			listener.onSdkActionsLoaded(actions);
+	}
+
 	public interface ChangeSdkPropertiesListener {
-		public void onSdkParametersLoaded(HashMap<String, String> parameters);
-		public void onSdkActionsLoaded(HashMap<String, String> actions);
+		public void onSdkParametersLoaded(Map<String, Object> parameters);
+		public void onSdkActionsLoaded(Map<String, Object> actions);
 	}
 }
