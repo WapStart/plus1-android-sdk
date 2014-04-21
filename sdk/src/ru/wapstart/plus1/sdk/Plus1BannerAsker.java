@@ -29,8 +29,6 @@
 
 package ru.wapstart.plus1.sdk;
 
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.EnumMap;
 import java.util.Map.Entry;
 
@@ -59,6 +57,7 @@ public class Plus1BannerAsker {
 	private static final String LOGTAG = "Plus1BannerAsker";
 	private static final String VALUE_OPEN_IN_BROWSER = "browser";
 	private static final String VALUE_OPEN_IN_APPLICATION = "application";
+	private static final String VALUE_RESTORE_LAST = "-1";
 
 	private Plus1Request mRequest							= null;
 	private Plus1BannerView mView							= null;
@@ -80,6 +79,11 @@ public class Plus1BannerAsker {
 	private LocationListener mLocationListener				= null;
 
 	private Plus1BannerDownloadListener mDownloadListener	= null;
+
+	private EnumMap<SdkParameter, String> mLastSdkParameterMap =
+		new EnumMap<SdkParameter, String>(SdkParameter.class);
+	private EnumMap<SdkAction, String> mLastSdkActionMap =
+		new EnumMap<SdkAction, String>(SdkAction.class);
 
 	Runnable mExecuteDownloadTask = new Runnable() {
 		public void run() {
@@ -447,16 +451,28 @@ public class Plus1BannerAsker {
 		task.addChangeSdkPropertiesListener(new ChangeSdkPropertiesListener() {
 			public void onSdkParametersLoaded(EnumMap<SdkParameter, String> parameters) {
 				for(Entry<SdkParameter, String> entry : parameters.entrySet()) {
-					switch (entry.getKey()) {
+					SdkParameter key = entry.getKey();
+					String value = entry.getValue();
+
+					if (
+						value.equals(VALUE_RESTORE_LAST)
+						&& null != mLastSdkParameterMap.get(key)
+					) {
+						value = mLastSdkParameterMap.get(key);
+					} else {
+						mLastSdkParameterMap.put(key, value);
+					}
+
+					switch (key) {
 						case refreshDelay:
-							mRefreshDelay = Integer.parseInt(entry.getValue());
+							mRefreshDelay = Integer.parseInt(value);
 							break;
 						case reInitDelay:
-							mReInitDelay = Integer.parseInt(entry.getValue());
+							mReInitDelay = Integer.parseInt(value);
 							break;
 						case openIn:
 							mView.setOpenInApplication(
-								VALUE_OPEN_IN_APPLICATION.equals(entry.getValue())
+								VALUE_OPEN_IN_APPLICATION.equals(value)
 							);
 							break;
 					}
@@ -465,9 +481,21 @@ public class Plus1BannerAsker {
 
 			public void onSdkActionsLoaded(EnumMap<SdkAction, String> actions) {
 				for(Entry<SdkAction, String> entry : actions.entrySet()) {
-					switch (entry.getKey()) {
+					SdkAction key = entry.getKey();
+					String value = entry.getValue();
+
+					if (
+						value.equals(VALUE_RESTORE_LAST)
+						&& null != mLastSdkActionMap.get(key)
+					) {
+						value = mLastSdkActionMap.get(key);
+					} else {
+						mLastSdkActionMap.put(key, value);
+					}
+
+					switch (key) {
 						case openLink:
-							openLink(entry.getValue());
+							openLink(value);
 							break;
 					}
 				}
