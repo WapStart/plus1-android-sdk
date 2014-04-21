@@ -196,7 +196,7 @@ public final class Plus1Request {
 
 		return
 			String.format(
-				"http://%s/v%d/%d.%s?uid=%s&refreshDelay=12",
+				"http://%s/v%d/%d.%s?uid=%s",
 				getServerHost(),
 				REQUEST_VERSION,
 				getApplicationId(),
