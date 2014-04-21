@@ -41,13 +41,14 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.HashMap;
+import java.util.EnumMap;
+import java.util.StringTokenizer;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.json.JSONObject;
 import org.json.JSONException;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import java.util.EnumMap;
 
 public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void, T> {
 	private static final String LOGTAG = "BaseRequestLoader";
@@ -160,10 +161,14 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 			EnumMap<SdkAction, String> actions =
 				getSdkActionsByJson(connection.getHeaderField(SDK_ACTION_HEADER));
 
+			String newUid = getUidByETag(connection.getHeaderField("ETag"));
+
 			if (!(null == parameters || parameters.isEmpty()))
 				notifyOnSdkParametersLoaded(parameters);
 			if (!(null == actions || actions.isEmpty()))
 				notifyOnSdkActionsLoaded(actions);
+			if (null != newUid)
+				notifyOnSdkChangeUid(newUid);
 
 			result = makeResult(content.toString(), connection);
 
@@ -237,6 +242,13 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 		return null;
 	}
 
+	private String getUidByETag(String value) {
+		if (null != value)
+			return new StringTokenizer(value, ":").nextToken();
+
+		return null;
+	}
+
 	private void notifyOnSdkParametersLoaded(EnumMap<SdkParameter, String> parameters) {
 		Log.d(LOGTAG, "Notify onSdkParametersLoaded");
 		for (ChangeSdkPropertiesListener listener : mChangeSdkPropertiesListenerList)
@@ -249,8 +261,15 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 			listener.onSdkActionsLoaded(actions);
 	}
 
+	private void notifyOnSdkChangeUid(String newUid) {
+		Log.d(LOGTAG, "Notify onSdkChangeUid");
+		for (ChangeSdkPropertiesListener listener : mChangeSdkPropertiesListenerList)
+			listener.onSdkChangeUid(newUid);
+	}
+
 	public interface ChangeSdkPropertiesListener {
 		public void onSdkParametersLoaded(EnumMap<SdkParameter, String> parameters);
 		public void onSdkActionsLoaded(EnumMap<SdkAction, String> actions);
+		public void onSdkChangeUid(String newUid);
 	}
 }

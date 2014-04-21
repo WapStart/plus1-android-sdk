@@ -472,6 +472,10 @@ public class Plus1BannerAsker {
 					}
 				}
 			}
+
+			public void onSdkChangeUid(String newUid) {
+				mRequest.setUid(newUid);
+			}
 		});
 
 		task.addRequestProperty("User-Agent", Plus1Helper.getUserAgent());
