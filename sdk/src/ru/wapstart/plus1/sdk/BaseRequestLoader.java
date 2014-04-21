@@ -75,15 +75,43 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 		mRequestPropertyList.put(key, value);
 	}
 
-	protected HttpURLConnection makeConnection(String url)
+	protected HttpURLConnection makeConnection(Plus1Request request)
 	{
 		HttpURLConnection connection = null;
+		String url = getRequestUrl(request);
+
+		Log.d(LOGTAG, "Request url: " + url);
 
 		try {
 			connection = (HttpURLConnection) new URL(url).openConnection();
 
-			for (Entry<String, String> entry : mRequestPropertyList.entrySet())
+			connection.setDoOutput(true);
+			connection.setRequestMethod("POST");
+
+			for (Entry<String, String> entry : mRequestPropertyList.entrySet()) {
 				connection.setRequestProperty(entry.getKey(), entry.getValue());
+
+				Log.d(
+					LOGTAG,
+					String.format(
+						"Added request property '%s' = '%s'",
+						entry.getKey(),
+						entry.getValue()
+					)
+				);
+			}
+
+			UrlEncodedFormEntity postEntity = getUrlEncodedFormEntity(request);
+
+			connection.setRequestProperty(
+				"Content-Type",
+				"application/x-www-form-urlencoded"
+			);
+			connection.setRequestProperty(
+				"Content-Length",
+				Integer.toString((int)postEntity.getContentLength())
+			);
+			postEntity.writeTo(connection.getOutputStream());
 
 			connection.connect();
 		} catch (MalformedURLException e) {
@@ -101,7 +129,7 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 		Plus1Request request = requests[0];
 		String requestUrl = getRequestUrl(request);
 
-		HttpURLConnection connection = makeConnection(requestUrl);
+		HttpURLConnection connection = makeConnection(request);
 
 		if (connection == null)
 			return null;
@@ -110,19 +138,6 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 		String content = "";
 
 		try {
-			UrlEncodedFormEntity postEntity = getUrlEncodedFormEntity(request);
-
-			connection.setRequestMethod("POST");
-			connection.setRequestProperty(
-				"Content-Type",
-				"application/x-www-form-urlencoded"
-			);
-			connection.setRequestProperty(
-				"Content-Length",
-				Integer.toString((int)postEntity.getContentLength())
-			);
-			postEntity.writeTo(connection.getOutputStream());
-
 			InputStream stream = connection.getInputStream();
 
 			byte[] buffer = new byte[BUFFER_SIZE];
@@ -223,11 +238,13 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 	}
 
 	private void notifyOnSdkParametersLoaded(EnumMap<SdkParameter, String> parameters) {
+		Log.d(LOGTAG, "Notify onSdkParametersLoaded");
 		for (ChangeSdkPropertiesListener listener : mChangeSdkPropertiesListenerList)
 			listener.onSdkParametersLoaded(parameters);
 	}
 
 	private void notifyOnSdkActionsLoaded(EnumMap<SdkAction, String> actions) {
+		Log.d(LOGTAG, "Notify onSdkActionsLoaded");
 		for (ChangeSdkPropertiesListener listener : mChangeSdkPropertiesListenerList)
 			listener.onSdkActionsLoaded(actions);
 	}

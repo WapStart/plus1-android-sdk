@@ -72,8 +72,6 @@ final class HtmlBannerDownloader extends BaseRequestLoader<HtmlBannerInfo> {
 	protected HtmlBannerInfo makeResult(String content, HttpURLConnection connection)
 		throws IOException
 	{
-		Log.d(LOGTAG, "Unique identifier: " + content);
-
 		HtmlBannerInfo bannerInfo = new HtmlBannerInfo();
 		bannerInfo.mResponseCode = connection.getResponseCode();
 		bannerInfo.mBannerContent = content;
@@ -96,7 +94,10 @@ final class HtmlBannerDownloader extends BaseRequestLoader<HtmlBannerInfo> {
 			try {
 				notifyOnBannerLoaded(
 					bannerInfo.mBannerContent,
-					BannerAdType.valueOf(bannerInfo.mBannerAdType)
+					// FIXME: type of banner must exist
+					null == bannerInfo.mBannerAdType
+						? BannerAdType.plus1
+						: BannerAdType.valueOf(bannerInfo.mBannerAdType)
 				);
 			} catch (IllegalArgumentException e) {
 				Log.e(LOGTAG, "Unsupported ad type: " + bannerInfo.mBannerAdType, e);

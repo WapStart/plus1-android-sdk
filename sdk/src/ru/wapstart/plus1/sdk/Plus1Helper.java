@@ -128,7 +128,7 @@ final class Plus1Helper {
 
 		return
 			String.format(
-				"%ux%u",
+				"%dx%d",
 				metrics.widthPixels,
 				metrics.heightPixels
 			);
@@ -144,9 +144,9 @@ final class Plus1Helper {
 
 		return
 			String.format(
-				"%ux%u",
-				view.getLayoutParams().width / density + 0.5f,
-				view.getLayoutParams().height / density + 0.5f
+				"%dx%d",
+				(int)(view.getLayoutParams().width / density + 0.5f),
+				(int)(view.getLayoutParams().height / density + 0.5f)
 			);
 	}
 

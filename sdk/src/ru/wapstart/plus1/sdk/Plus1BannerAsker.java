@@ -62,7 +62,6 @@ public class Plus1BannerAsker {
 
 	private Plus1Request mRequest							= null;
 	private Plus1BannerView mView							= null;
-	private Timer mDownloaderTimer							= null;
 	private HtmlBannerDownloader mDownloaderTask			= null;
 
 	private boolean mDisabledAutoDetectLocation				= false;
@@ -82,13 +81,28 @@ public class Plus1BannerAsker {
 
 	private Plus1BannerDownloadListener mDownloadListener	= null;
 
+	Runnable mExecuteDownloadTask = new Runnable() {
+		public void run() {
+			if (!(mView.isClosed() || mView.isExpanded())) {
+				modifyRequest(mRequest);
+
+				mDownloaderTask = makeDownloaderTask();
+				mDownloaderTask.execute(mRequest);
+			}
+
+			if (isAutoRefreshEnabled())
+				mExecuteDownloadHandler.postDelayed(this, mRefreshDelay * 1000);
+		}
+	};
+	private Handler mExecuteDownloadHandler					= new Handler();
+
 	private Runnable mReInitRequestTask = new Runnable() {
 		public void run() {
 			modifyRequest(mRequest);
 
 			makeInitRequestTask().execute(mRequest);
 
-			mReInitHandler.postDelayed(this, mReInitDelay);
+			mReInitHandler.postDelayed(this, mReInitDelay * 1000);
 		}
 	};
 	private Handler mReInitHandler = new Handler();
@@ -230,8 +244,6 @@ public class Plus1BannerAsker {
 		if (mInitialized)
 			return this;
 
-		mDownloaderTimer = new Timer();
-
 		if (!isDisabledAutoDetectLocation()) {
 			mLocationManager =
 				(LocationManager)mView.getContext().getSystemService(
@@ -322,23 +334,7 @@ public class Plus1BannerAsker {
 		if (mRequest == null || mView == null || mDownloaderTask != null)
 			return;
 
-		TimerTask task =
-			new TimerTask() {
-				public void run() {
-					if (!(mView.isClosed() || mView.isExpanded())) {
-						modifyRequest(mRequest);
-
-						mDownloaderTask = makeDownloaderTask();
-						mDownloaderTask.execute(mRequest);
-					}
-				}
-			};
-
-		if (isAutoRefreshEnabled()) {
-			mDownloaderTimer.schedule(task, 0, mRefreshDelay);
-		} else {
-			mDownloaderTimer.schedule(task, 0);
-		}
+		mExecuteDownloadHandler.post(mExecuteDownloadTask);
 	}
 
 	private void stop() {
@@ -349,7 +345,7 @@ public class Plus1BannerAsker {
 			mDownloaderTask = null;
 		}
 
-		mDownloaderTimer.cancel();
+		mExecuteDownloadHandler.removeCallbacks(mExecuteDownloadTask);
 	}
 
 	private void requestLocationUpdates() {
