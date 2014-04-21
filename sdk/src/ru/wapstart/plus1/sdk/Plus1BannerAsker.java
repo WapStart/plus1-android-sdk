@@ -29,15 +29,17 @@
 
 package ru.wapstart.plus1.sdk;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.EnumMap;
+import java.util.Map.Entry;
 
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.BannerAdType;
 import ru.wapstart.plus1.sdk.InitRequestLoader.InitRequestLoadListener;
 import ru.wapstart.plus1.sdk.BaseRequestLoader.ChangeSdkPropertiesListener;
+import ru.wapstart.plus1.sdk.BaseRequestLoader.SdkAction;
+import ru.wapstart.plus1.sdk.BaseRequestLoader.SdkParameter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -442,12 +444,26 @@ public class Plus1BannerAsker {
 
 	private void modifyRequestLoaderTask(BaseRequestLoader task) {
 		task.addChangeSdkPropertiesListener(new ChangeSdkPropertiesListener() {
-			public void onSdkParametersLoaded(Map<String, Object> parameters) {
-				throw new UnsupportedOperationException("Not supported yet.");
+			public void onSdkParametersLoaded(EnumMap<SdkParameter, String> parameters) {
+				for(Entry<SdkParameter, String> entry : parameters.entrySet()) {
+					switch (entry.getKey()) {
+						case refreshDelay:
+							break;
+						case reInitDelay:
+							break;
+						case openIn:
+							break;
+					}
+				}
 			}
 
-			public void onSdkActionsLoaded(Map<String, Object> actions) {
-				throw new UnsupportedOperationException("Not supported yet.");
+			public void onSdkActionsLoaded(EnumMap<SdkAction, String> actions) {
+				for(Entry<SdkAction, String> entry : actions.entrySet()) {
+					switch (entry.getKey()) {
+						case openLink:
+							break;
+					}
+				}
 			}
 		});
 

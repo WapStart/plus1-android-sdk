@@ -47,6 +47,7 @@ import org.json.JSONException;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import java.util.EnumMap;
 
 public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void, T> {
 	private static final String LOGTAG = "BaseRequestLoader";
@@ -58,6 +59,9 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 			new ArrayList<ChangeSdkPropertiesListener>();
 	private Map<String, String> mRequestPropertyList =
 			new HashMap<String, String>();
+
+	public static enum SdkParameter {refreshDelay, reInitDelay, openIn};
+	public static enum SdkAction {openLink};
 
 	abstract protected String getRequestUrl(Plus1Request request);
 	abstract protected UrlEncodedFormEntity getUrlEncodedFormEntity(Plus1Request request) throws UnsupportedEncodingException;
@@ -136,10 +140,10 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 
 			bufStream.close();
 
-			Map<String, Object> parameters =
-				getMapByJson(connection.getHeaderField(SDK_PARAMETERS_HEADER));
-			Map<String, Object> actions =
-				getMapByJson(connection.getHeaderField(SDK_ACTION_HEADER));
+			EnumMap<SdkParameter, String> parameters =
+				getSdkParametersByJson(connection.getHeaderField(SDK_PARAMETERS_HEADER));
+			EnumMap<SdkAction, String> actions =
+				getSdkActionsByJson(connection.getHeaderField(SDK_ACTION_HEADER));
 
 			if (!(null == parameters || parameters.isEmpty()))
 				notifyOnSdkParametersLoaded(parameters);
@@ -159,6 +163,53 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 		return result;
 	}
 
+	// FIXME: refactor and simplify
+	private EnumMap<SdkParameter, String> getSdkParametersByJson(String json) {
+		Map<String, Object> map = getMapByJson(json);
+
+		if (null == map)
+			return null;
+
+		EnumMap<SdkParameter, String> result =
+			new EnumMap<SdkParameter, String>(SdkParameter.class);
+
+		for (SdkParameter val : SdkParameter.values()) {
+			if (map.containsKey(val.toString())) {
+				result.put(
+					val,
+					String.valueOf(
+						map.get(val.toString())
+					)
+				);
+			}
+		}
+
+		return result;
+	}
+
+	private EnumMap<SdkAction, String> getSdkActionsByJson(String json) {
+		Map<String, Object> map = getMapByJson(json);
+
+		if (null == map)
+			return null;
+
+		EnumMap<SdkAction, String> result =
+			new EnumMap<SdkAction, String>(SdkAction.class);
+
+		for (SdkAction val : SdkAction.values()) {
+			if (map.containsKey(val.toString())) {
+				result.put(
+					val,
+					String.valueOf(
+						map.get(val.toString())
+					)
+				);
+			}
+		}
+
+		return result;
+	}
+
 	private Map<String, Object> getMapByJson(String json) {
 		if (null != json) {
 			try {
@@ -171,18 +222,18 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 		return null;
 	}
 
-	private void notifyOnSdkParametersLoaded(Map<String, Object> parameters) {
+	private void notifyOnSdkParametersLoaded(EnumMap<SdkParameter, String> parameters) {
 		for (ChangeSdkPropertiesListener listener : mChangeSdkPropertiesListenerList)
 			listener.onSdkParametersLoaded(parameters);
 	}
 
-	private void notifyOnSdkActionsLoaded(Map<String, Object> actions) {
+	private void notifyOnSdkActionsLoaded(EnumMap<SdkAction, String> actions) {
 		for (ChangeSdkPropertiesListener listener : mChangeSdkPropertiesListenerList)
 			listener.onSdkActionsLoaded(actions);
 	}
 
 	public interface ChangeSdkPropertiesListener {
-		public void onSdkParametersLoaded(Map<String, Object> parameters);
-		public void onSdkActionsLoaded(Map<String, Object> actions);
+		public void onSdkParametersLoaded(EnumMap<SdkParameter, String> parameters);
+		public void onSdkActionsLoaded(EnumMap<SdkAction, String> actions);
 	}
 }
