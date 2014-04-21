@@ -51,6 +51,8 @@ public class AdView extends BaseAdView {
 	private OnReadyListener mOnReadyListener;
 	private OnClickListener mOnClickListener;
 
+	private boolean mOpenInApplication	= false;
+
 	public AdView(Context context) {
 		super(context);
 
@@ -97,6 +99,10 @@ public class AdView extends BaseAdView {
 		return mOnClickListener;
 	}
 
+	public void setOpenInApplication(boolean orly) {
+		mOpenInApplication = orly;
+	}
+
 	private void disableScrollingAndZoom() {
 		setHorizontalScrollBarEnabled(false);
 		setHorizontalScrollbarOverlay(false);
@@ -126,11 +132,20 @@ public class AdView extends BaseAdView {
 					Log.w("Plus1", "Could not handle intent with URI: " + url);
 					return false;
 				}
+			} else if (mOpenInApplication) {
+				// FIXME: use another in-app browser for this ad
+				Intent intent = new Intent(getContext(), MraidBrowser.class);
+				intent.putExtra(MraidBrowser.URL_EXTRA, url);
+				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				try {
+					getContext().startActivity(intent);
+				} catch (ActivityNotFoundException e) {
+					return false;
+				}
 			} else {
-				// TODO: open in inner browser, same as mraid
-				// Default browser
 				Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
 				try {
 					getContext().startActivity(intent);
 				} catch (ActivityNotFoundException e) {

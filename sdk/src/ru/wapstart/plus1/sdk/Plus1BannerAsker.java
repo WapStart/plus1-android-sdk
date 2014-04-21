@@ -57,6 +57,9 @@ import android.webkit.WebView;
 
 public class Plus1BannerAsker {
 	private static final String LOGTAG = "Plus1BannerAsker";
+	private static final String VALUE_OPEN_IN_BROWSER = "browser";
+	private static final String VALUE_OPEN_IN_APPLICATION = "application";
+
 	private Plus1Request mRequest							= null;
 	private Plus1BannerView mView							= null;
 	private Timer mDownloaderTimer							= null;
@@ -456,7 +459,9 @@ public class Plus1BannerAsker {
 							mReInitDelay = Integer.parseInt(entry.getValue());
 							break;
 						case openIn:
-							mView.setOpenInApplication(Boolean.valueOf(entry.getValue()));
+							mView.setOpenInApplication(
+								VALUE_OPEN_IN_APPLICATION.equals(entry.getValue())
+							);
 							break;
 					}
 				}
@@ -479,6 +484,7 @@ public class Plus1BannerAsker {
 
 	private void openLink(String url)
 	{
+		// TODO: add another parametrization
 		url.replaceAll("%reinitTimeout%", String.valueOf(mReInitDelay));
 		url.replaceAll("%refreshTimeout%", String.valueOf(mRefreshDelay));
 		url.replaceAll("%uid%", mRequest.getUID());

@@ -283,6 +283,8 @@ public class Plus1BannerView extends FrameLayout {
 			}
 		});
 
+		adView.setOpenInApplication(mOpenInApplication);
+
 		return adView;
 	}
 
