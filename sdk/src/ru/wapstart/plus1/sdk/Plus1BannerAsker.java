@@ -43,11 +43,13 @@ import ru.wapstart.plus1.sdk.BaseRequestLoader.SdkParameter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.Criteria;
 import android.location.LocationListener;
 import android.location.LocationProvider;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -448,10 +450,13 @@ public class Plus1BannerAsker {
 				for(Entry<SdkParameter, String> entry : parameters.entrySet()) {
 					switch (entry.getKey()) {
 						case refreshDelay:
+							mRefreshDelay = Integer.parseInt(entry.getValue());
 							break;
 						case reInitDelay:
+							mReInitDelay = Integer.parseInt(entry.getValue());
 							break;
 						case openIn:
+							mView.setOpenInApplication(Boolean.valueOf(entry.getValue()));
 							break;
 					}
 				}
@@ -461,6 +466,7 @@ public class Plus1BannerAsker {
 				for(Entry<SdkAction, String> entry : actions.entrySet()) {
 					switch (entry.getKey()) {
 						case openLink:
+							openLink(entry.getValue());
 							break;
 					}
 				}
@@ -469,6 +475,16 @@ public class Plus1BannerAsker {
 
 		task.addRequestProperty("User-Agent", Plus1Helper.getUserAgent());
 		task.addRequestProperty("x-original-user-agent", mView.getWebViewUserAgent());
+	}
+
+	private void openLink(String url)
+	{
+		url.replaceAll("%reinitTimeout%", String.valueOf(mReInitDelay));
+		url.replaceAll("%refreshTimeout%", String.valueOf(mRefreshDelay));
+		url.replaceAll("%uid%", mRequest.getUID());
+
+		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+		mView.getContext().getApplicationContext().startActivity(intent);
 	}
 
 	// FIXME: think about another request-update logic
