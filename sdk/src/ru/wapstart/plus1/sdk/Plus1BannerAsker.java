@@ -518,6 +518,7 @@ public class Plus1BannerAsker {
 		url.replaceAll("%uid%", mRequest.getUID());
 
 		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		mView.getContext().getApplicationContext().startActivity(intent);
 	}
 
