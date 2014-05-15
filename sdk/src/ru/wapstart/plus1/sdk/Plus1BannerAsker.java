@@ -31,6 +31,10 @@ package ru.wapstart.plus1.sdk;
 
 import java.util.EnumMap;
 import java.util.Map.Entry;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.BannerAdType;
@@ -70,6 +74,7 @@ public class Plus1BannerAsker {
 	private int mLocationRefreshDelay						= 300;
 	private int mRefreshRetryNum							= 3;
 	private int mReInitDelay								= 60;
+	private int mFacebookInfoDelay							= 60;
 
 	private boolean mInitialized							= false;
 	private boolean mWebViewCorePaused						= false;
@@ -111,6 +116,61 @@ public class Plus1BannerAsker {
 	};
 	private Handler mReInitHandler = new Handler();
 
+	private Runnable mFacebookInfoTask = new Runnable() {
+		public void run() {
+			try {
+				final Class sessionCls = Class.forName("com.facebook.Session");
+				final Class userCls = Class.forName("com.facebook.model.GraphUser");
+				final Class requestCls = Class.forName("com.facebook.Request");
+				final Class callbackCls = Class.forName("com.facebook.Request$GraphUserCallback");
+
+				final Object session = sessionCls.getMethod("getActiveSession").invoke(null);
+
+				if (session != null && (Boolean)sessionCls.getMethod("isOpened").invoke(session) == true) {
+					final Object callbackInstance = Proxy.newProxyInstance(callbackCls.getClassLoader(), new Class[]{callbackCls}, new InvocationHandler() {
+						@Override
+						public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+							if(method.getName().equals("onCompleted")) {
+								if (session == sessionCls.getMethod("getActiveSession").invoke(null) && args[0] != null) {
+									mRequest.setFacebookUserHash(
+										Plus1Helper.getHash(
+											(String)userCls.getMethod("getId").invoke(args[0])
+										)
+									);
+
+									Log.d(LOGTAG, "Facebook user hash was updated: " + mRequest.getFacebookUserHash());
+								}
+
+								return 1;
+							}
+
+							return -1;
+						}
+					});
+
+					requestCls.getMethod("executeMeRequestAsync", sessionCls, callbackCls)
+						.invoke(null, session, callbackInstance);
+				}
+
+				// NOTE: loop only if no exceptions
+				mFacebookInfoHandler.postDelayed(this, mFacebookInfoDelay * 1000);
+			} catch (ClassNotFoundException e) {
+				Log.d(LOGTAG, "Application is not using facebook sdk");
+			} catch (SecurityException e) {
+				Log.w(LOGTAG, "Security exception using facebook sdk", e);
+			} catch (NoSuchMethodException e) {
+				Log.w(LOGTAG, "No such method exception in facebook sdk", e);
+			} catch (IllegalAccessException e) {
+				Log.w(LOGTAG, "Illegal access exception in facebook sdk", e);
+			} catch (InvocationTargetException e) {
+				Log.w(LOGTAG, "Invocation target exception in facebook sdk", e);
+			} catch (IllegalStateException e) {
+				Log.w(LOGTAG, "Illegal state exception in facebook sdk", e);
+			}
+		}
+	};
+	private Handler mFacebookInfoHandler = new Handler();
+
 	public static Plus1BannerAsker create(
 		Plus1Request request, Plus1BannerView view
 	) {
@@ -126,6 +186,7 @@ public class Plus1BannerAsker {
 		stop();
 
 		mReInitHandler.removeCallbacks(mReInitRequestTask);
+		mFacebookInfoHandler.removeCallbacks(mFacebookInfoTask);
 
 		if (!isDisabledAutoDetectLocation())
 			removeLocationUpdates();
@@ -150,6 +211,7 @@ public class Plus1BannerAsker {
 			start();
 
 		mReInitHandler.post(mReInitRequestTask);
+		mFacebookInfoHandler.post(mFacebookInfoTask);
 
 		if (!isDisabledAutoDetectLocation())
 			requestLocationUpdates(false); // NOTE: include disabled providers

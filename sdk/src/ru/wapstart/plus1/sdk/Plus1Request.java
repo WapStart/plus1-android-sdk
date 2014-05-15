@@ -64,6 +64,7 @@ public final class Plus1Request {
 	private String displayMetrics	= null;
 	private String containerMetrics	= null;
 	private Location location		= null;
+	private String facebookUserHash	= null;
 
 	public static Plus1Request create() {
 		return new Plus1Request();
@@ -188,6 +189,16 @@ public final class Plus1Request {
 		return this;
 	}
 
+	public String getFacebookUserHash() {
+		return facebookUserHash;
+	}
+
+	public Plus1Request setFacebookUserHash(String facebookUserHash) {
+		this.facebookUserHash = facebookUserHash;
+
+		return this;
+	}
+
 	public String getUrl() {
 		return getUrl(getRequestType());
 	}
@@ -289,6 +300,15 @@ public final class Plus1Request {
 				Locale.getDefault().getDisplayName(Locale.US)
 			)
 		);
+
+		if (getFacebookUserHash() != null) {
+			list.add(
+				new BasicNameValuePair(
+					"facebook-user-id",
+					getFacebookUserHash()
+				)
+			);
+		}
 
 		return new UrlEncodedFormEntity(list);
 	}
