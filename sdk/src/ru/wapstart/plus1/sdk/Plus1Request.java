@@ -65,6 +65,7 @@ public final class Plus1Request {
 	private String containerMetrics	= null;
 	private Location location		= null;
 	private String facebookUserHash	= null;
+	private String twitterUserHash	= null;
 
 	public static Plus1Request create() {
 		return new Plus1Request();
@@ -199,6 +200,16 @@ public final class Plus1Request {
 		return this;
 	}
 
+	public String getTwitterUserHash() {
+		return twitterUserHash;
+	}
+
+	public Plus1Request setTwitterUserHash(String twitterUserHash) {
+		this.twitterUserHash = twitterUserHash;
+
+		return this;
+	}
+
 	public String getUrl() {
 		return getUrl(getRequestType());
 	}
@@ -306,6 +317,15 @@ public final class Plus1Request {
 				new BasicNameValuePair(
 					"facebook-user-id",
 					getFacebookUserHash()
+				)
+			);
+		}
+
+		if (getTwitterUserHash() != null) {
+			list.add(
+				new BasicNameValuePair(
+					"twitter-user-id",
+					getTwitterUserHash()
 				)
 			);
 		}

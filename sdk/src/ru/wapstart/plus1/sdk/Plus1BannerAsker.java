@@ -30,9 +30,11 @@
 package ru.wapstart.plus1.sdk;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map.Entry;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
@@ -75,6 +77,7 @@ public class Plus1BannerAsker {
 	private int mRefreshRetryNum							= 3;
 	private int mReInitDelay								= 60;
 	private int mFacebookInfoDelay							= 60;
+	private int mTwitterInfoDelay							= 60;
 
 	private boolean mInitialized							= false;
 	private boolean mWebViewCorePaused						= false;
@@ -134,7 +137,9 @@ public class Plus1BannerAsker {
 								if (session == sessionCls.getMethod("getActiveSession").invoke(null) && args[0] != null) {
 									mRequest.setFacebookUserHash(
 										Plus1Helper.getHash(
-											(String)userCls.getMethod("getId").invoke(args[0])
+											String.valueOf(
+												userCls.getMethod("getId").invoke(args[0])
+											)
 										)
 									);
 
@@ -171,6 +176,79 @@ public class Plus1BannerAsker {
 	};
 	private Handler mFacebookInfoHandler = new Handler();
 
+	private Runnable mTwitterInfoTask = new Runnable() {
+		public void run() {
+			try {
+				final Class factoryCls = Class.forName("twitter4j.TwitterFactory");
+				final Class twitterCls = Class.forName("twitter4j.TwitterImpl");
+				final Class configCls = Class.forName("twitter4j.conf.Configuration");
+
+				// TODO: search another way to get configuration
+				Field hackedMap = twitterCls.getDeclaredField("implicitParamsMap");
+				hackedMap.setAccessible(true);
+				HashMap hashMap = (HashMap)hackedMap.get(null);
+
+				for (Object conf : hashMap.keySet()) {
+					boolean allowAuth =
+						configCls.getMethod("getOAuthConsumerKey").invoke(conf) != null
+						&& configCls.getMethod("getOAuthConsumerSecret").invoke(conf) != null;
+
+					if (allowAuth) {
+						if ((Boolean)configCls.getMethod("isApplicationOnlyAuthEnabled").invoke(conf)) {
+							allowAuth =
+								configCls.getMethod("getOAuth2TokenType").invoke(conf) != null
+								&& configCls.getMethod("getOAuth2AccessToken").invoke(conf) != null;
+						} else {
+							allowAuth =
+								configCls.getMethod("getOAuthAccessToken").invoke(conf) != null
+								&& configCls.getMethod("getOAuthAccessTokenSecret").invoke(conf) != null;
+						}
+					} else {
+						allowAuth =
+							configCls.getMethod("getUser").invoke(conf) != null
+							&& configCls.getMethod("getPassword").invoke(conf) != null;
+					}
+
+					if (allowAuth) {
+						Object twitter = factoryCls.getMethod("getInstance").invoke(
+							factoryCls.getConstructor(configCls).newInstance(conf)
+						);
+
+						mRequest.setTwitterUserHash(
+							Plus1Helper.getHash(
+								String.valueOf(
+									twitterCls.getMethod("getId").invoke(twitter)
+								)
+							)
+						);
+
+						Log.d(LOGTAG, "Twitter user hash was updated: " + mRequest.getTwitterUserHash());
+
+						break;
+					}
+				}
+
+				// NOTE: loop only if no exceptions
+				mTwitterInfoHandler.postDelayed(this, mTwitterInfoDelay * 1000);
+			} catch (ClassNotFoundException e) {
+				Log.d(LOGTAG, "Application is not using twitter4j sdk");
+			} catch (NoSuchMethodException e) {
+				Log.w(LOGTAG, "No such method exception in twitter4j sdk", e);
+			} catch (IllegalAccessException e) {
+				Log.w(LOGTAG, "Illegal access exception in twitter4j sdk", e);
+			} catch (InvocationTargetException e) {
+				Log.w(LOGTAG, "Invocation target exception in twitter4j sdk", e);
+			} catch (NoSuchFieldException e) {
+				Log.w(LOGTAG, "No such field exception in twitter4j sdk", e);
+			} catch (InstantiationException e) {
+				Log.w(LOGTAG, "Instantiation exception in twitter4j sdk", e);
+			} catch (IllegalArgumentException e) {
+				Log.w(LOGTAG, "Illegal argument exception in twitter4j sdk", e);
+			}
+		}
+	};
+	private Handler mTwitterInfoHandler = new Handler();
+
 	public static Plus1BannerAsker create(
 		Plus1Request request, Plus1BannerView view
 	) {
@@ -187,6 +265,7 @@ public class Plus1BannerAsker {
 
 		mReInitHandler.removeCallbacks(mReInitRequestTask);
 		mFacebookInfoHandler.removeCallbacks(mFacebookInfoTask);
+		mTwitterInfoHandler.removeCallbacks(mTwitterInfoTask);
 
 		if (!isDisabledAutoDetectLocation())
 			removeLocationUpdates();
@@ -212,6 +291,7 @@ public class Plus1BannerAsker {
 
 		mReInitHandler.post(mReInitRequestTask);
 		mFacebookInfoHandler.post(mFacebookInfoTask);
+		mTwitterInfoHandler.post(mTwitterInfoTask);
 
 		if (!isDisabledAutoDetectLocation())
 			requestLocationUpdates(false); // NOTE: include disabled providers
