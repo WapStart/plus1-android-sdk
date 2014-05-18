@@ -61,7 +61,7 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 	private Map<String, String> mRequestPropertyList =
 			new HashMap<String, String>();
 
-	public static enum SdkParameter {refreshDelay, reInitDelay, openIn};
+	public static enum SdkParameter {refreshDelay, refreshRetryNum, reInitDelay, facebookInfoDelay, twitterInfoDelay, openIn};
 	public static enum SdkAction {openLink};
 
 	abstract protected String getRequestUrl(Plus1Request request);

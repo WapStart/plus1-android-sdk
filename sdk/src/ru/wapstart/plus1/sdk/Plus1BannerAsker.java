@@ -609,8 +609,17 @@ public class Plus1BannerAsker {
 						case refreshDelay:
 							mRefreshDelay = Integer.parseInt(value);
 							break;
+						case refreshRetryNum:
+							mRefreshRetryNum = Integer.parseInt(value);
+							break;
 						case reInitDelay:
 							mReInitDelay = Integer.parseInt(value);
+							break;
+						case facebookInfoDelay:
+							mFacebookInfoDelay = Integer.parseInt(value);
+							break;
+						case twitterInfoDelay:
+							mTwitterInfoDelay = Integer.parseInt(value);
 							break;
 						case openIn:
 							mView.setOpenInApplication(
@@ -655,8 +664,11 @@ public class Plus1BannerAsker {
 	private void openLink(String url)
 	{
 		// TODO: add another parametrization
-		url.replaceAll("%reinitTimeout%", String.valueOf(mReInitDelay));
-		url.replaceAll("%refreshTimeout%", String.valueOf(mRefreshDelay));
+		url.replaceAll("%reInitDelay%", String.valueOf(mReInitDelay));
+		url.replaceAll("%refreshRetryNum%", String.valueOf(mRefreshRetryNum));
+		url.replaceAll("%refreshDelay%", String.valueOf(mRefreshDelay));
+		url.replaceAll("%facebookInfoDelay%", String.valueOf(mFacebookInfoDelay));
+		url.replaceAll("%twitterInfoDelay%", String.valueOf(mTwitterInfoDelay));
 		url.replaceAll("%uid%", mRequest.getUID());
 
 		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
