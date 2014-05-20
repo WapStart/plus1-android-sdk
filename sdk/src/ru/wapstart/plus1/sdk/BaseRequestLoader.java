@@ -61,6 +61,8 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 	private Map<String, String> mRequestPropertyList =
 			new HashMap<String, String>();
 
+	private String mCachedEtag = null;
+
 	public static enum SdkParameter {refreshDelay, refreshRetryNum, reInitDelay, facebookInfoDelay, twitterInfoDelay, openIn};
 	public static enum SdkAction {openLink};
 
@@ -85,6 +87,16 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 
 		try {
 			connection = (HttpURLConnection) new URL(url).openConnection();
+
+			if (null == mCachedEtag)
+				mCachedEtag = request.getUID() + "_0";
+
+			connection.setRequestProperty(
+				"If-None-Match",
+				null == mCachedEtag
+					? request.getUID() + "_0"
+					: mCachedEtag
+			);
 
 			connection.setDoOutput(true);
 			connection.setRequestMethod("POST");
@@ -161,7 +173,13 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 			EnumMap<SdkAction, String> actions =
 				getSdkActionsByJson(connection.getHeaderField(SDK_ACTION_HEADER));
 
-			String newUid = getUidByETag(connection.getHeaderField("ETag"));
+			String newUid = null;
+			String newEtag = connection.getHeaderField("ETag");
+
+			if (null != newEtag && !newEtag.equals(mCachedEtag)) {
+				mCachedEtag = newEtag;
+				newUid = getUidByETag(newEtag);
+			}
 
 			if (!(null == parameters || parameters.isEmpty()))
 				notifyOnSdkParametersLoaded(parameters);
