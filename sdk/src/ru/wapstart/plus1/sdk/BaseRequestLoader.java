@@ -42,7 +42,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.HashMap;
 import java.util.EnumMap;
-import java.util.StringTokenizer;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.json.JSONObject;
 import org.json.JSONException;
@@ -264,7 +263,7 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 
 	private String getUidByETag(String value) {
 		if (null != value)
-			return new StringTokenizer(value, "_").nextToken();
+			return value.substring(0, value.lastIndexOf("_"));
 
 		return null;
 	}
