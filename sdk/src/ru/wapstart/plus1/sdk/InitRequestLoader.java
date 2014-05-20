@@ -64,10 +64,10 @@ final class InitRequestLoader extends BaseRequestLoader<String> {
 
 	@Override
 	protected void onPostExecute(String uid) {
-		if (null == uid)
+		if (null != uid)
+			notifyOnUniqueIdLoaded(uid);
+		else
 			notifyOnUniqueIdLoadFailed();
-
-		notifyOnUniqueIdLoaded(uid);
 	}
 
 	private void notifyOnUniqueIdLoaded(String uid) {
