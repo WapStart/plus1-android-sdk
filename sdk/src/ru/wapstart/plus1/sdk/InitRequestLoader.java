@@ -57,7 +57,7 @@ final class InitRequestLoader extends BaseRequestLoader<String> {
 	}
 
 	protected String makeResult(String content, HttpURLConnection connection) {
-		Log.d(LOGTAG, "Unique identifier: " + content);
+		Log.d(LOGTAG, "Unique identifier (UID): " + content);
 
 		return content;
 	}

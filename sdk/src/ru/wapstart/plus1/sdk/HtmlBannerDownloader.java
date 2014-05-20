@@ -78,8 +78,10 @@ final class HtmlBannerDownloader extends BaseRequestLoader<HtmlBannerInfo> {
 		bannerInfo.mBannerAdType = connection.getHeaderField("X-Adtype");
 
 		Log.d(LOGTAG, "Response code: "		+ bannerInfo.mResponseCode);
-		Log.d(LOGTAG, "X-Adtype: "			+ bannerInfo.mBannerAdType);
-		Log.d(LOGTAG, "Banner content: "	+ bannerInfo.mBannerContent);
+		if (!bannerInfo.mResponseCode.equals(HttpStatus.SC_NO_CONTENT)) {
+			Log.d(LOGTAG, "X-Adtype: "			+ bannerInfo.mBannerAdType);
+			Log.d(LOGTAG, "Banner content: "	+ bannerInfo.mBannerContent);
+		}
 
 		return bannerInfo;
 	}

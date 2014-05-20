@@ -178,6 +178,8 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 
 			if (null != newEtag && !newEtag.equals(mCachedEtag)) {
 				mCachedEtag = newEtag;
+				Log.d(LOGTAG, "New cached ETag: " + mCachedEtag);
+
 				newUid = getUidByETag(newEtag);
 			}
 

@@ -275,14 +275,17 @@ public class Plus1BannerAsker {
 							mRequest.setLimitAdTrackingEnabled(
 								(Boolean)adIdClientInfoCls.getMethod("isLimitAdTrackingEnabled").invoke(adInfo)
 							);
+
+							Log.d(LOGTAG, "Google Advertising Id: " + mRequest.getAdvertisingId());
+							Log.d(LOGTAG, "Limit Ad Tracking is " + (mRequest.isLimitAdTrackingEnabled() ? "ENABLED" : "DISABLED"));
 						}
 					} catch (Exception e) {
-						Log.d(LOGTAG, "Unable to obtain AdvertisingIdClient.getAdvertisingIdInfo()");
+						Log.d(LOGTAG, "Unable to obtain AdvertisingIdClient.getAdvertisingIdInfo() (Google Play Services is not available)");
 					}
 				}
 			}).start();
 		} catch (ClassNotFoundException e) {
-			Log.d(LOGTAG, "Application is not using Google Play Market sdk");
+			Log.d(LOGTAG, "Application is not using Google Play Services sdk");
 		}
 	}
 
