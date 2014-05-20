@@ -66,6 +66,8 @@ public final class Plus1Request {
 	private Location location		= null;
 	private String facebookUserHash	= null;
 	private String twitterUserHash	= null;
+	private String advertisingId	= null;
+	private boolean limitAdTrackingEnabled	= false;
 
 	public static Plus1Request create() {
 		return new Plus1Request();
@@ -210,6 +212,26 @@ public final class Plus1Request {
 		return this;
 	}
 
+	public String getAdvertisingId() {
+		return advertisingId;
+	}
+
+	public Plus1Request setAdvertisingId(String advertisingId) {
+		this.advertisingId = advertisingId;
+
+		return this;
+	}
+
+	public boolean isLimitAdTrackingEnabled() {
+		return limitAdTrackingEnabled;
+	}
+
+	public Plus1Request setLimitAdTrackingEnabled(Boolean limitAdTrackingEnabled) {
+		this.limitAdTrackingEnabled = limitAdTrackingEnabled.booleanValue();
+
+		return this;
+	}
+
 	public String getUrl() {
 		return getUrl(getRequestType());
 	}
@@ -254,7 +276,7 @@ public final class Plus1Request {
 			);
 		}
 
-		if ((types != null) && !types.isEmpty()) {
+		if (types != null && !types.isEmpty()) {
 			for (BannerType bannerType : types) {
 				list.add(
 					new BasicNameValuePair(
@@ -327,6 +349,21 @@ public final class Plus1Request {
 					"twitter-user-id",
 					getTwitterUserHash()
 				)
+			);
+		}
+
+		if (getAdvertisingId() != null) {
+			list.add(
+				new BasicNameValuePair(
+					"advertising-id",
+					getAdvertisingId()
+				)
+			);
+		}
+
+		if (isLimitAdTrackingEnabled()) {
+			list.add(
+				new BasicNameValuePair("limit-ad-tracking-enabled", "1")
 			);
 		}
 

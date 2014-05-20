@@ -244,7 +244,7 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 
 	private String getUidByETag(String value) {
 		if (null != value)
-			return new StringTokenizer(value, ":").nextToken();
+			return new StringTokenizer(value, "_").nextToken();
 
 		return null;
 	}

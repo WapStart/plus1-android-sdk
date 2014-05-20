@@ -255,6 +255,37 @@ public class Plus1BannerAsker {
 		return new Plus1BannerAsker(request, view);
 	}
 
+	public void asyncFetchAdvertisingInfo(final Context context) {
+		try {
+			final Class adIdClientCls = Class.forName("com.google.android.gms.ads.identifier.AdvertisingIdClient");
+			final Class adIdClientInfoCls = Class.forName("com.google.android.gms.ads.identifier.AdvertisingIdClient$Info");
+
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						Object adInfo =
+							adIdClientCls.getMethod("getAdvertisingIdInfo", Context.class)
+								.invoke(null, context);
+
+						if (adInfo != null) {
+							mRequest.setAdvertisingId(
+								(String)adIdClientInfoCls.getMethod("getId").invoke(adInfo)
+							);
+							mRequest.setLimitAdTrackingEnabled(
+								(Boolean)adIdClientInfoCls.getMethod("isLimitAdTrackingEnabled").invoke(adInfo)
+							);
+						}
+					} catch (Exception e) {
+						Log.d(LOGTAG, "Unable to obtain AdvertisingIdClient.getAdvertisingIdInfo()");
+					}
+				}
+			}).start();
+		} catch (ClassNotFoundException e) {
+			Log.d(LOGTAG, "Application is not using Google Play Market sdk");
+		}
+	}
+
 	public Plus1BannerAsker(Plus1Request request, Plus1BannerView view) {
 		mRequest = request;
 		mView = view;
@@ -297,6 +328,8 @@ public class Plus1BannerAsker {
 			requestLocationUpdates(false); // NOTE: include disabled providers
 
 		mView.onResume();
+
+		asyncFetchAdvertisingInfo(mView.getContext());
 
 		if (mWebViewCorePaused) {
 			new WebView(mView.getContext()).resumeTimers();
