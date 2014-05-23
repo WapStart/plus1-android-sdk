@@ -35,6 +35,7 @@ import java.security.NoSuchAlgorithmException;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.util.Log;
 import android.view.Display;
 import android.util.DisplayMetrics;
@@ -100,6 +101,29 @@ final class Plus1Helper {
 			context.getSharedPreferences(Constants.PREFERENCES_STORAGE, 0).edit()
 				.putBoolean(key, value.booleanValue())
 				.commit();
+	}
+
+	public static String getAndroidId(Context context) {
+		return
+			android.provider.Settings.Secure.getString(
+				context.getContentResolver(),
+				android.provider.Settings.Secure.ANDROID_ID
+			);
+	}
+
+	public static String getBuildSerial() {
+		try {
+			String serial = (String)Build.class.getField("SERIAL").get(null);
+			if (
+				!serial.equals(Build.class.getField("UNKNOWN").get(null))
+				&& !serial.equals("00000000000000") // NOTE: bugs on some devices
+			)
+				return serial;
+		} catch (Exception e) {
+			// NOTE: may be API < 9
+		}
+
+		return null;
 	}
 
 	public static String getDisplayMetrics(Display display)

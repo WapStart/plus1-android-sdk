@@ -68,6 +68,8 @@ public final class Plus1Request {
 	private String twitterUserHash	= null;
 	private String advertisingId	= null;
 	private Boolean limitAdTrackingEnabled	= null;
+	private String androidId		= null;
+	private String buildSerial		= null;
 
 	public static Plus1Request create() {
 		return new Plus1Request();
@@ -239,6 +241,26 @@ public final class Plus1Request {
 		return this;
 	}
 
+	public String getAndroidId() {
+		return androidId;
+	}
+
+	public Plus1Request setAndroidId(String androidId) {
+		this.androidId = androidId;
+
+		return this;
+	}
+
+	public String getBuildSerial() {
+		return buildSerial;
+	}
+
+	public Plus1Request setBuildSerial(String buildSerial) {
+		this.buildSerial = buildSerial;
+
+		return this;
+	}
+
 	public String getUrl() {
 		return getUrl(getRequestType());
 	}
@@ -381,6 +403,18 @@ public final class Plus1Request {
 					"twitter-user-id",
 					getTwitterUserHash()
 				)
+			);
+		}
+
+		if (getAndroidId() != null) {
+			list.add(
+				new BasicNameValuePair("android-id", getAndroidId())
+			);
+		}
+
+		if (getBuildSerial() != null) {
+			list.add(
+				new BasicNameValuePair("android-build-serial", getBuildSerial())
 			);
 		}
 

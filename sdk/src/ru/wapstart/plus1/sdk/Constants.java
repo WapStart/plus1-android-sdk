@@ -30,7 +30,7 @@
 package ru.wapstart.plus1.sdk;
 
 public class Constants {
-	protected static final String PREFERENCES_STORAGE				= "Plus1WapStart";
+	protected static final String PREFERENCES_STORAGE				= "Plus1WapStart.xml";
 	protected static final String PREFERENCES_KEY_LOCK_TASK_PREFIX	= "lock_task_";
 	protected static final String PREFERENCES_KEY_UID				= "uid";
 	protected static final String PREFERENCES_KEY_FACEBOOK_USER_ID	= "facebook_user_id";

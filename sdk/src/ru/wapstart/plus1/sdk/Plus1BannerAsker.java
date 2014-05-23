@@ -549,6 +549,16 @@ public class Plus1BannerAsker {
 					mView.getContext(),
 					Constants.PREFERENCES_KEY_TWITTER_USER_ID
 				)
+			)
+			.setAndroidId(
+				Plus1Helper.getHash(
+					Plus1Helper.getAndroidId(mView.getContext())
+				)
+			)
+			.setBuildSerial(
+				Plus1Helper.getHash(
+					Plus1Helper.getBuildSerial()
+				)
 			);
 
 		// NOTE: useful in case when timers are paused and activity was destroyed
