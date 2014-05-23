@@ -31,9 +31,23 @@ package ru.wapstart.plus1.sdk;
 
 public class Constants {
 	protected static final String PREFERENCES_STORAGE				= "Plus1WapStart";
+	protected static final String PREFERENCES_KEY_LOCK_TASK_PREFIX	= "lock_task_";
 	protected static final String PREFERENCES_KEY_UID				= "uid";
 	protected static final String PREFERENCES_KEY_FACEBOOK_USER_ID	= "facebook_user_id";
 	protected static final String PREFERENCES_KEY_TWITTER_USER_ID	= "twitter_user_id";
+	protected static final String PREFERENCES_KEY_ADVERTISING_ID	= "advertising_id";
+	protected static final String PREFERENCES_KEY_LIMIT_AD_TRACKING_ENABLED	= "limit_ad_tracking_enabled";
+	protected static final String PREFERENCES_KEY_REINIT_TASK_REFRESH		= "reinit_task_refresh";
+	protected static final String PREFERENCES_KEY_ADVERTISING_ID_REFRESH	= "advertising_id_refresh";
+	protected static final String PREFERENCES_KEY_FACEBOOK_INFO_REFRESH		= "facebook_info_refresh";
+	protected static final String PREFERENCES_KEY_TWITTER_INFO_REFRESH		= "twitter_info_refresh";
+
+	protected static final int DEFAULTS_BANNER_REFRESH_INTERVAL			= 10;
+	protected static final int DEFAULTS_REFRESH_RETRY_NUM				= 3;
+	protected static final int DEFAULTS_LOCATION_REFRESH_INTERVAL		= 300;
+	protected static final int DEFAULTS_REINIT_INTERVAL					= 3600;
+	protected static final int DEFAULTS_FACEBOOK_INFO_REFRESH_INTERVAL	= 60;
+	protected static final int DEFAULTS_TWITTER_INFO_REFRESH_INTERVAL	= 60;
 
 	protected static final String PLACEHOLDER_REINIT_DELAY				= "%reinitDelay%";
 	protected static final String PLACEHOLDER_REFRESH_RETRY_NUM			= "%refreshRetryNum%";

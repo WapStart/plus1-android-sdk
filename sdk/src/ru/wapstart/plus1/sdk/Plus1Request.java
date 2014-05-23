@@ -67,7 +67,7 @@ public final class Plus1Request {
 	private String facebookUserHash	= null;
 	private String twitterUserHash	= null;
 	private String advertisingId	= null;
-	private boolean limitAdTrackingEnabled	= false;
+	private Boolean limitAdTrackingEnabled	= null;
 
 	public static Plus1Request create() {
 		return new Plus1Request();
@@ -227,11 +227,14 @@ public final class Plus1Request {
 	}
 
 	public boolean isLimitAdTrackingEnabled() {
-		return limitAdTrackingEnabled;
+		if (limitAdTrackingEnabled != null)
+			return limitAdTrackingEnabled.booleanValue();
+
+		return false;
 	}
 
 	public Plus1Request setLimitAdTrackingEnabled(Boolean limitAdTrackingEnabled) {
-		this.limitAdTrackingEnabled = limitAdTrackingEnabled.booleanValue();
+		this.limitAdTrackingEnabled = limitAdTrackingEnabled;
 
 		return this;
 	}

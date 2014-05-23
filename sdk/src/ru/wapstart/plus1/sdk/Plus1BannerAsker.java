@@ -29,11 +29,13 @@
 
 package ru.wapstart.plus1.sdk;
 
+import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -64,6 +66,9 @@ public class Plus1BannerAsker {
 	private static final String VALUE_OPEN_IN_BROWSER = "browser";
 	private static final String VALUE_OPEN_IN_APPLICATION = "application";
 	private static final String VALUE_RESTORE_LAST = "-1";
+	private static final String TASK_LOCK_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	private static final int TASK_LOCK_TIME_DEFAULT = 3600; // 1 hour
+	private static final int TASK_LOCK_TIME_WEEK = 604800; // 7 days
 
 	private Plus1Request mRequest							= null;
 	private Plus1BannerView mView							= null;
@@ -72,12 +77,13 @@ public class Plus1BannerAsker {
 	private boolean mDisabledAutoDetectLocation				= false;
 	private boolean mRemoveBannersOnPause					= false;
 	private boolean mDisabledWebViewCorePausing				= false;
-	private int mRefreshDelay								= 10;
-	private int mLocationRefreshDelay						= 300;
-	private int mRefreshRetryNum							= 3;
-	private int mReInitDelay								= 60;
-	private int mFacebookInfoDelay							= 60;
-	private int mTwitterInfoDelay							= 60;
+
+	private int mRefreshDelay			= Constants.DEFAULTS_BANNER_REFRESH_INTERVAL;
+	private int mLocationRefreshDelay	= Constants.DEFAULTS_LOCATION_REFRESH_INTERVAL;
+	private int mRefreshRetryNum		= Constants.DEFAULTS_REFRESH_RETRY_NUM;
+	private int mReInitDelay			= Constants.DEFAULTS_REINIT_INTERVAL;
+	private int mFacebookInfoDelay		= Constants.DEFAULTS_FACEBOOK_INFO_REFRESH_INTERVAL;
+	private int mTwitterInfoDelay		= Constants.DEFAULTS_FACEBOOK_INFO_REFRESH_INTERVAL;
 
 	private boolean mInitialized							= false;
 	private boolean mWebViewCorePaused						= false;
@@ -93,9 +99,11 @@ public class Plus1BannerAsker {
 	private EnumMap<SdkAction, String> mLastSdkActionMap =
 		new EnumMap<SdkAction, String>(SdkAction.class);
 
+	private static enum InnerTask {reinitTask, advertisingIdTask, facebookInfoTask, twitterInfoTask};
+
 	Runnable mExecuteDownloadTask = new Runnable() {
 		public void run() {
-			if (!(mView.isClosed() || mView.isExpanded()) && mRequest.hasUID()) {
+			if (!(mView.isClosed() || mView.isExpanded())) {
 				modifyRequest(mRequest);
 
 				mDownloaderTask = makeDownloaderTask();
@@ -114,7 +122,8 @@ public class Plus1BannerAsker {
 
 			makeInitRequestTask().execute(mRequest);
 
-			mReinitHandler.postDelayed(this, mReInitDelay * 1000);
+			if (!hasLockForTask(InnerTask.reinitTask))
+				mReinitHandler.postDelayed(this, mReInitDelay * 1000);
 		}
 	};
 	private Handler mReinitHandler = new Handler();
@@ -143,7 +152,16 @@ public class Plus1BannerAsker {
 										)
 									);
 
+									Plus1Helper.setStorageValue(
+										mView.getContext(),
+										Constants.PREFERENCES_KEY_FACEBOOK_USER_ID,
+										mRequest.getFacebookUserHash()
+									);
+
 									Log.d(LOGTAG, "Facebook user hash was updated: " + mRequest.getFacebookUserHash());
+
+									mFacebookInfoHandler.removeCallbacks(mFacebookInfoTask);
+									setLockForTask(InnerTask.facebookInfoTask, TASK_LOCK_TIME_DEFAULT);
 								}
 
 								return 1;
@@ -157,20 +175,13 @@ public class Plus1BannerAsker {
 						.invoke(null, session, callbackInstance);
 				}
 
-				// NOTE: loop only if no exceptions
-				mFacebookInfoHandler.postDelayed(this, mFacebookInfoDelay * 1000);
+				if (!hasLockForTask(InnerTask.facebookInfoTask))
+					mFacebookInfoHandler.postDelayed(this, mFacebookInfoDelay * 1000);
 			} catch (ClassNotFoundException e) {
 				Log.d(LOGTAG, "Application is not using facebook sdk");
-			} catch (SecurityException e) {
-				Log.w(LOGTAG, "Security exception using facebook sdk", e);
-			} catch (NoSuchMethodException e) {
-				Log.w(LOGTAG, "No such method exception in facebook sdk", e);
-			} catch (IllegalAccessException e) {
-				Log.w(LOGTAG, "Illegal access exception in facebook sdk", e);
-			} catch (InvocationTargetException e) {
-				Log.w(LOGTAG, "Invocation target exception in facebook sdk", e);
-			} catch (IllegalStateException e) {
-				Log.w(LOGTAG, "Illegal state exception in facebook sdk", e);
+				setLockForTask(InnerTask.facebookInfoTask, TASK_LOCK_TIME_WEEK);
+			} catch (Exception e) {
+				Log.w(LOGTAG, "Some error occurred while using facebook sdk", e);
 			}
 		}
 	};
@@ -222,28 +233,26 @@ public class Plus1BannerAsker {
 							)
 						);
 
+						Plus1Helper.setStorageValue(
+							mView.getContext(),
+							Constants.PREFERENCES_KEY_TWITTER_USER_ID,
+							mRequest.getTwitterUserHash()
+						);
+
 						Log.d(LOGTAG, "Twitter user hash was updated: " + mRequest.getTwitterUserHash());
 
-						break;
+						setLockForTask(InnerTask.twitterInfoTask, TASK_LOCK_TIME_DEFAULT);
+						return;
 					}
 				}
 
-				// NOTE: loop only if no exceptions
-				mTwitterInfoHandler.postDelayed(this, mTwitterInfoDelay * 1000);
+				if (!hasLockForTask(InnerTask.twitterInfoTask))
+					mTwitterInfoHandler.postDelayed(this, mTwitterInfoDelay * 1000);
 			} catch (ClassNotFoundException e) {
 				Log.d(LOGTAG, "Application is not using twitter4j sdk");
-			} catch (NoSuchMethodException e) {
-				Log.w(LOGTAG, "No such method exception in twitter4j sdk", e);
-			} catch (IllegalAccessException e) {
-				Log.w(LOGTAG, "Illegal access exception in twitter4j sdk", e);
-			} catch (InvocationTargetException e) {
-				Log.w(LOGTAG, "Invocation target exception in twitter4j sdk", e);
-			} catch (NoSuchFieldException e) {
-				Log.w(LOGTAG, "No such field exception in twitter4j sdk", e);
-			} catch (InstantiationException e) {
-				Log.w(LOGTAG, "Instantiation exception in twitter4j sdk", e);
-			} catch (IllegalArgumentException e) {
-				Log.w(LOGTAG, "Illegal argument exception in twitter4j sdk", e);
+				setLockForTask(InnerTask.twitterInfoTask, TASK_LOCK_TIME_WEEK);
+			} catch (Exception e) {
+				Log.w(LOGTAG, "Some error occurred while using facebook sdk", e);
 			}
 		}
 	};
@@ -276,16 +285,31 @@ public class Plus1BannerAsker {
 								(Boolean)adIdClientInfoCls.getMethod("isLimitAdTrackingEnabled").invoke(adInfo)
 							);
 
+							Plus1Helper.setStorageValue(
+								mView.getContext(),
+								Constants.PREFERENCES_KEY_ADVERTISING_ID,
+								mRequest.getAdvertisingId()
+							);
+							Plus1Helper.setStorageBooleanValue(
+								mView.getContext(),
+								Constants.PREFERENCES_KEY_LIMIT_AD_TRACKING_ENABLED,
+								mRequest.isLimitAdTrackingEnabled()
+							);
+
 							Log.d(LOGTAG, "Google Advertising Id: " + mRequest.getAdvertisingId());
 							Log.d(LOGTAG, "Limit Ad Tracking is " + (mRequest.isLimitAdTrackingEnabled() ? "ENABLED" : "DISABLED"));
+
+							setLockForTask(InnerTask.advertisingIdTask, TASK_LOCK_TIME_DEFAULT);
 						}
 					} catch (Exception e) {
 						Log.d(LOGTAG, "Unable to obtain AdvertisingIdClient.getAdvertisingIdInfo() (Google Play Services is not available)");
+						setLockForTask(InnerTask.advertisingIdTask, TASK_LOCK_TIME_WEEK);
 					}
 				}
 			}).start();
 		} catch (ClassNotFoundException e) {
 			Log.d(LOGTAG, "Application is not using Google Play Services sdk");
+			setLockForTask(InnerTask.advertisingIdTask, TASK_LOCK_TIME_WEEK);
 		}
 	}
 
@@ -323,16 +347,17 @@ public class Plus1BannerAsker {
 		if (!mView.isExpanded())
 			start();
 
-		mReinitHandler.post(mReinitRequestTask);
-		mFacebookInfoHandler.post(mFacebookInfoTask);
-		mTwitterInfoHandler.post(mTwitterInfoTask);
-
 		if (!isDisabledAutoDetectLocation())
 			requestLocationUpdates(false); // NOTE: include disabled providers
 
 		mView.onResume();
 
-		asyncFetchAdvertisingInfo(mView.getContext());
+		if (!hasLockForTask(InnerTask.advertisingIdTask))
+			asyncFetchAdvertisingInfo(mView.getContext());
+		if (!hasLockForTask(InnerTask.facebookInfoTask))
+			mFacebookInfoHandler.post(mFacebookInfoTask);
+		if (!hasLockForTask(InnerTask.twitterInfoTask))
+			mTwitterInfoHandler.post(mTwitterInfoTask);
 
 		if (mWebViewCorePaused) {
 			new WebView(mView.getContext()).resumeTimers();
@@ -426,6 +451,9 @@ public class Plus1BannerAsker {
 		if (mInitialized)
 			return this;
 
+		if (!hasLockForTask(InnerTask.reinitTask))
+			mReinitHandler.post(mReinitRequestTask);
+
 		if (!isDisabledAutoDetectLocation()) {
 			mLocationManager =
 				(LocationManager)mView.getContext().getSystemService(
@@ -491,12 +519,40 @@ public class Plus1BannerAsker {
 				}
 			});
 
+		mRequest
+			.setUid(
+				Plus1Helper.getStorageValue(
+					mView.getContext(),
+					Constants.PREFERENCES_KEY_UID
+				)
+			)
+			.setAdvertisingId(
+				Plus1Helper.getStorageValue(
+					mView.getContext(),
+					Constants.PREFERENCES_KEY_ADVERTISING_ID
+				)
+			)
+			.setLimitAdTrackingEnabled(
+				Plus1Helper.getStorageBooleanValue(
+					mView.getContext(),
+					Constants.PREFERENCES_KEY_LIMIT_AD_TRACKING_ENABLED
+				)
+			)
+			.setFacebookUserHash(
+				Plus1Helper.getStorageValue(
+					mView.getContext(),
+					Constants.PREFERENCES_KEY_FACEBOOK_USER_ID
+				)
+			)
+			.setTwitterUserHash(
+				Plus1Helper.getStorageValue(
+					mView.getContext(),
+					Constants.PREFERENCES_KEY_TWITTER_USER_ID
+				)
+			);
+
 		// NOTE: useful in case when timers are paused and activity was destroyed
 		new WebView(mView.getContext()).resumeTimers();
-
-		mRequest.setUid(
-			Plus1Helper.getStorageValue(mView.getContext(), Constants.PREFERENCES_KEY_UID)
-		);
 
 		mInitialized = true;
 
@@ -619,6 +675,9 @@ public class Plus1BannerAsker {
 				);
 
 				mRequest.setUid(uid);
+				Log.w(LOGTAG, "UID was updated by init request: " + uid);
+
+				setLockForTask(InnerTask.reinitTask, TASK_LOCK_TIME_DEFAULT);
 			}
 
 			public void onUniqueIdLoadFailed() {
@@ -730,5 +789,40 @@ public class Plus1BannerAsker {
 		request.setContainerMetrics(
 			Plus1Helper.getContainerMetrics(mView)
 		);
+	}
+
+	private void setLockForTask(InnerTask task, long seconds) {
+		SimpleDateFormat df = new SimpleDateFormat(TASK_LOCK_DATE_FORMAT);
+
+		Plus1Helper.setStorageValue(
+			mView.getContext(),
+			Constants.PREFERENCES_KEY_LOCK_TASK_PREFIX + task.toString(),
+			df.format(new Date(System.currentTimeMillis() + seconds * 1000))
+		);
+
+		Log.d(
+			LOGTAG,
+			String.format("Locking task %s for %d seconds", task.toString(), seconds)
+		);
+	}
+
+	private boolean hasLockForTask(InnerTask task) {
+		SimpleDateFormat df = new SimpleDateFormat(TASK_LOCK_DATE_FORMAT);
+
+		String key = Constants.PREFERENCES_KEY_LOCK_TASK_PREFIX + task.toString();
+		String dateValue = Plus1Helper.getStorageValue(mView.getContext(), key);
+
+		if (dateValue != null) {
+			try {
+				if (df.parse(dateValue).after(new Date()))
+					return true;
+
+				Plus1Helper.removeStorageValue(mView.getContext(), key);
+			} catch (ParseException e) {
+				Log.e(LOGTAG, "Strange date format in preferences: " + dateValue, e);
+			}
+		}
+
+		return false;
 	}
 }

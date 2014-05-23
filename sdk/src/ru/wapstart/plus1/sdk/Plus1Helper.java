@@ -34,6 +34,7 @@ import java.security.NoSuchAlgorithmException;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.Display;
 import android.util.DisplayMetrics;
@@ -74,6 +75,30 @@ final class Plus1Helper {
 		return
 			context.getSharedPreferences(Constants.PREFERENCES_STORAGE, 0).edit()
 				.putString(key, value)
+				.commit();
+	}
+
+	public static boolean removeStorageValue(Context context, String key) {
+		return
+			context.getSharedPreferences(Constants.PREFERENCES_STORAGE, 0).edit()
+				.remove(key)
+				.commit();
+	}
+
+	public static Boolean getStorageBooleanValue(Context context, String key) {
+		SharedPreferences preferences =
+			context.getSharedPreferences(Constants.PREFERENCES_STORAGE, 0);
+
+		return
+			preferences.contains(key)
+				? Boolean.valueOf(preferences.getBoolean(key, false))
+				: null;
+	}
+
+	public static boolean setStorageBooleanValue(Context context, String key, Boolean value) {
+		return
+			context.getSharedPreferences(Constants.PREFERENCES_STORAGE, 0).edit()
+				.putBoolean(key, value.booleanValue())
 				.commit();
 	}
 
