@@ -95,6 +95,10 @@ public final class Plus1Request {
 		return this;
 	}
 
+	public boolean hasUID() {
+		return uid != null;
+	}
+
 	public String getUID() {
 		return uid;
 	}

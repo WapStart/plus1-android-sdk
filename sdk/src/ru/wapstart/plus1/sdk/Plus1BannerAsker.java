@@ -95,7 +95,7 @@ public class Plus1BannerAsker {
 
 	Runnable mExecuteDownloadTask = new Runnable() {
 		public void run() {
-			if (!(mView.isClosed() || mView.isExpanded())) {
+			if (!(mView.isClosed() || mView.isExpanded()) && mRequest.hasUID()) {
 				modifyRequest(mRequest);
 
 				mDownloaderTask = makeDownloaderTask();
@@ -108,16 +108,16 @@ public class Plus1BannerAsker {
 	};
 	private Handler mExecuteDownloadHandler					= new Handler();
 
-	private Runnable mReInitRequestTask = new Runnable() {
+	private Runnable mReinitRequestTask = new Runnable() {
 		public void run() {
 			modifyRequest(mRequest);
 
 			makeInitRequestTask().execute(mRequest);
 
-			mReInitHandler.postDelayed(this, mReInitDelay * 1000);
+			mReinitHandler.postDelayed(this, mReInitDelay * 1000);
 		}
 	};
-	private Handler mReInitHandler = new Handler();
+	private Handler mReinitHandler = new Handler();
 
 	private Runnable mFacebookInfoTask = new Runnable() {
 		public void run() {
@@ -297,7 +297,7 @@ public class Plus1BannerAsker {
 	public void onPause() {
 		stop();
 
-		mReInitHandler.removeCallbacks(mReInitRequestTask);
+		mReinitHandler.removeCallbacks(mReinitRequestTask);
 		mFacebookInfoHandler.removeCallbacks(mFacebookInfoTask);
 		mTwitterInfoHandler.removeCallbacks(mTwitterInfoTask);
 
@@ -323,7 +323,7 @@ public class Plus1BannerAsker {
 		if (!mView.isExpanded())
 			start();
 
-		mReInitHandler.post(mReInitRequestTask);
+		mReinitHandler.post(mReinitRequestTask);
 		mFacebookInfoHandler.post(mFacebookInfoTask);
 		mTwitterInfoHandler.post(mTwitterInfoTask);
 
@@ -494,7 +494,9 @@ public class Plus1BannerAsker {
 		// NOTE: useful in case when timers are paused and activity was destroyed
 		new WebView(mView.getContext()).resumeTimers();
 
-		mRequest.setUid(Plus1Helper.getClientSessionId(mView.getContext()));
+		mRequest.setUid(
+			Plus1Helper.getStorageValue(mView.getContext(), Constants.PREFERENCES_KEY_UID)
+		);
 
 		mInitialized = true;
 
@@ -610,13 +612,17 @@ public class Plus1BannerAsker {
 		InitRequestLoader task = new InitRequestLoader();
 		task.addInitRequestLoadListener(new InitRequestLoadListener() {
 			public void onUniqueIdLoaded(String uid) {
-				mRequest.setUid(uid);
+				Plus1Helper.setStorageValue(
+					mView.getContext(),
+					Constants.PREFERENCES_KEY_UID,
+					uid
+				);
 
-				Plus1Helper.setClientSessionId(mView.getContext(), uid);
+				mRequest.setUid(uid);
 			}
 
 			public void onUniqueIdLoadFailed() {
-				Log.w(LOGTAG, "Failed to load init request");
+				Log.w(LOGTAG, "Failed to load UID by init request");
 			}
 		});
 
@@ -700,12 +706,12 @@ public class Plus1BannerAsker {
 	private void openLink(String url)
 	{
 		// TODO: add another parametrization
-		url.replaceAll("%reInitDelay%", String.valueOf(mReInitDelay));
-		url.replaceAll("%refreshRetryNum%", String.valueOf(mRefreshRetryNum));
-		url.replaceAll("%refreshDelay%", String.valueOf(mRefreshDelay));
-		url.replaceAll("%facebookInfoDelay%", String.valueOf(mFacebookInfoDelay));
-		url.replaceAll("%twitterInfoDelay%", String.valueOf(mTwitterInfoDelay));
-		url.replaceAll("%uid%", mRequest.getUID());
+		url.replaceAll(Constants.PLACEHOLDER_REINIT_DELAY, String.valueOf(mReInitDelay));
+		url.replaceAll(Constants.PLACEHOLDER_REFRESH_RETRY_NUM, String.valueOf(mRefreshRetryNum));
+		url.replaceAll(Constants.PLACEHOLDER_BANNER_REFRESH_INTERVAL, String.valueOf(mRefreshDelay));
+		url.replaceAll(Constants.PLACEHOLDER_FACEBOOK_INFO_REFRESH_INTERVAL, String.valueOf(mFacebookInfoDelay));
+		url.replaceAll(Constants.PLACEHOLDER_TWITTER_INFO_REFRESH_INTERVAL, String.valueOf(mTwitterInfoDelay));
+		url.replaceAll(Constants.PLACEHOLDER_UID, mRequest.getUID());
 
 		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

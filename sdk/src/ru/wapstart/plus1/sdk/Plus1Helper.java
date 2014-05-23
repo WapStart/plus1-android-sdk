@@ -31,38 +31,18 @@ package ru.wapstart.plus1.sdk;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Calendar;
-import java.util.Random;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.util.Log;
-import android.util.DisplayMetrics;
-import android.provider.Settings.Secure;
 import android.view.Display;
+import android.util.DisplayMetrics;
 
 final class Plus1Helper {
+	private static final String HEX_DIGITS	= "0123456789abcdef";
+	private static final String LOGTAG		= "Plus1Helper";
 
-	private static final String PREFERENCES_STORAGE = "WapstartPlus1";
-	private static final String PREFERENCES_KEY		= "session";
-	private static final String HEX_DIGITS			= "0123456789abcdef";
-	private static final String LOGTAG				= "Plus1Helper";
-	
-	private static String mClientSessionId = null;
-	
 	private Plus1Helper() { /*_*/ }
-
-	public static String getUniqueHash()
-	{
-		String uniqueStr = Calendar.getInstance().getTime().toString();
-		Random rnd = new Random();
-
-		for (int i = 0; i < 10; i++)
-			uniqueStr += rnd.nextInt(255);
-
-		return getHash(uniqueStr);
-	}
 
 	public static String getHash(String text)
 	{
@@ -84,41 +64,17 @@ final class Plus1Helper {
 			+ android.os.Build.MODEL;
 	}
 
-	public static String getClientSessionId(Context context) {
-		if (mClientSessionId == null) {
-			SharedPreferences preferences =
-				context.getSharedPreferences(PREFERENCES_STORAGE, 0);
-
-			mClientSessionId = preferences.getString(PREFERENCES_KEY, null);
-
-			if (mClientSessionId == null) {
-				String androidId =
-					Secure.getString(
-						context.getContentResolver(),
-						Secure.ANDROID_ID
-					);
-
-				mClientSessionId =
-					androidId != null
-						? getHash(androidId)
-						: getUniqueHash();
-
-				setClientSessionId(context, mClientSessionId);
-			}
-		}
-
-		return mClientSessionId;
+	public static String getStorageValue(Context context, String key) {
+		return
+			context.getSharedPreferences(Constants.PREFERENCES_STORAGE, 0)
+				.getString(key, null);
 	}
 
-	public static void setClientSessionId(Context context, String clientSessionId) {
-		SharedPreferences preferences =
-				context.getSharedPreferences(PREFERENCES_STORAGE, 0);
-
-		SharedPreferences.Editor editor = preferences.edit();
-		editor.putString(PREFERENCES_KEY, clientSessionId);
-		editor.commit();
-
-		mClientSessionId = clientSessionId;
+	public static boolean setStorageValue(Context context, String key, String value) {
+		return
+			context.getSharedPreferences(Constants.PREFERENCES_STORAGE, 0).edit()
+				.putString(key, value)
+				.commit();
 	}
 
 	public static String getDisplayMetrics(Display display)
