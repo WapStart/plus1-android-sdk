@@ -196,6 +196,16 @@ public final class Plus1Request {
 		return this;
 	}
 
+	public String getAdvertisingId() {
+		return advertisingId;
+	}
+
+	public Plus1Request setAdvertisingId(String advertisingId) {
+		this.advertisingId = advertisingId;
+
+		return this;
+	}
+
 	public String getFacebookUserHash() {
 		return facebookUserHash;
 	}
@@ -212,16 +222,6 @@ public final class Plus1Request {
 
 	public Plus1Request setTwitterUserHash(String twitterUserHash) {
 		this.twitterUserHash = twitterUserHash;
-
-		return this;
-	}
-
-	public String getAdvertisingId() {
-		return advertisingId;
-	}
-
-	public Plus1Request setAdvertisingId(String advertisingId) {
-		this.advertisingId = advertisingId;
 
 		return this;
 	}
@@ -244,27 +244,74 @@ public final class Plus1Request {
 	}
 
 	public String getUrl(RequestType requestType) {
-
-		return
+		String url =
 			String.format(
-				"http://%s/v%d/%d.%s?uid=%s",
+				"http://%s/v%d/%d.%s",
 				getServerHost(),
 				REQUEST_VERSION,
 				getApplicationId(),
-				requestType.toString(),
-				getUID()
+				requestType.toString()
 			);
+
+		if (hasUID())
+			url += "?uid=" + getUID();
+
+		return url;
 	}
 
-	public UrlEncodedFormEntity getUrlEncodedFormEntity()
+	public UrlEncodedFormEntity getUrlEncodedFormEntity(RequestType requestType)
 		throws UnsupportedEncodingException
 	{
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
 
+		addBaseParamsToList(list);
+
+		if (requestType.equals(RequestType.init))
+			addDeviceParamsToList(list);
+
+		return new UrlEncodedFormEntity(list);
+	}
+
+	private void addBaseParamsToList(List<NameValuePair> list)
+	{
 		list.add(new BasicNameValuePair("platform", "Android"));
 		list.add(new BasicNameValuePair("version", Build.VERSION.RELEASE));
 		list.add(new BasicNameValuePair("sdkver", SDK_VERSION));
 
+		if (types != null && !types.isEmpty()) {
+			for (BannerType bannerType : types) {
+				list.add(
+					new BasicNameValuePair(
+						"type[]",
+						String.valueOf(bannerType.ordinal())
+					)
+				);
+			}
+		}
+
+		list.add(
+			new BasicNameValuePair(
+				"container-metrics",
+				getContainerMetrics()
+			)
+		);
+
+		if (getLocation() != null) {
+			list.add(
+				new BasicNameValuePair(
+					"location",
+					String.format(
+						"%s;%s",
+						getLocation().getLatitude(),
+						getLocation().getLongitude()
+					)
+				)
+			);
+		}
+	}
+
+	private void addDeviceParamsToList(List<NameValuePair> list)
+	{
 		if (!getGender().equals(Gender.Unknown)) {
 			list.add(
 				new BasicNameValuePair(
@@ -279,30 +326,6 @@ public final class Plus1Request {
 				new BasicNameValuePair(
 					"age",
 					String.valueOf(getAge())
-				)
-			);
-		}
-
-		if (types != null && !types.isEmpty()) {
-			for (BannerType bannerType : types) {
-				list.add(
-					new BasicNameValuePair(
-						"type[]",
-						String.valueOf(bannerType.ordinal())
-					)
-				);
-			}
-		}
-
-		if (getLocation() != null) {
-			list.add(
-				new BasicNameValuePair(
-					"location",
-					String.format(
-						"%s;%s",
-						getLocation().getLatitude(),
-						getLocation().getLongitude()
-					)
 				)
 			);
 		}
@@ -322,24 +345,26 @@ public final class Plus1Request {
 
 		list.add(
 			new BasicNameValuePair(
+				"preferred-locale",
+				Locale.getDefault().getDisplayName(Locale.US)
+			)
+		);
+
+		list.add(
+			new BasicNameValuePair(
 				"display-metrics",
 				getDisplayMetrics()
 			)
 		);
 
-		list.add(
-			new BasicNameValuePair(
-				"container-metrics",
-				getContainerMetrics()
-			)
-		);
-
-		list.add(
-			new BasicNameValuePair(
-				"preferred-locale",
-				Locale.getDefault().getDisplayName(Locale.US)
-			)
-		);
+		if (getAdvertisingId() != null) {
+			list.add(
+				new BasicNameValuePair(
+					"google-advertising-id",
+					getAdvertisingId()
+				)
+			);
+		}
 
 		if (getFacebookUserHash() != null) {
 			list.add(
@@ -359,21 +384,10 @@ public final class Plus1Request {
 			);
 		}
 
-		if (getAdvertisingId() != null) {
-			list.add(
-				new BasicNameValuePair(
-					"advertising-id",
-					getAdvertisingId()
-				)
-			);
-		}
-
 		if (isLimitAdTrackingEnabled()) {
 			list.add(
 				new BasicNameValuePair("limit-ad-tracking-enabled", "1")
 			);
 		}
-
-		return new UrlEncodedFormEntity(list);
 	}
 }

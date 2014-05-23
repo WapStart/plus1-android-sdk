@@ -65,8 +65,7 @@ final class HtmlBannerDownloader extends BaseRequestLoader<HtmlBannerInfo> {
 	protected UrlEncodedFormEntity getUrlEncodedFormEntity(Plus1Request request)
 		throws UnsupportedEncodingException
 	{
-		// FIXME: think about strict form entity
-		return request.getUrlEncodedFormEntity();
+		return request.getUrlEncodedFormEntity(Plus1Request.RequestType.html);
 	}
 
 	protected HtmlBannerInfo makeResult(String content, HttpURLConnection connection)

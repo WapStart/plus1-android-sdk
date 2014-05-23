@@ -87,15 +87,12 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 		try {
 			connection = (HttpURLConnection) new URL(url).openConnection();
 
-			if (null == mCachedEtag)
-				mCachedEtag = request.getUID() + "_0";
+			if (request.hasUID()) {
+				if (null == mCachedEtag)
+					mCachedEtag = request.getUID() + "_0";
 
-			connection.setRequestProperty(
-				"If-None-Match",
-				null == mCachedEtag
-					? request.getUID() + "_0"
-					: mCachedEtag
-			);
+				connection.setRequestProperty("If-None-Match", mCachedEtag);
+			}
 
 			connection.setDoOutput(true);
 			connection.setRequestMethod("POST");

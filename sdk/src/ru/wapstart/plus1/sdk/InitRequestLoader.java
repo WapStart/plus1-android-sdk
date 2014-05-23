@@ -53,7 +53,7 @@ final class InitRequestLoader extends BaseRequestLoader<String> {
 	protected UrlEncodedFormEntity getUrlEncodedFormEntity(Plus1Request request)
 		throws UnsupportedEncodingException
 	{
-		return request.getUrlEncodedFormEntity();
+		return request.getUrlEncodedFormEntity(Plus1Request.RequestType.init);
 	}
 
 	protected String makeResult(String content, HttpURLConnection connection) {
