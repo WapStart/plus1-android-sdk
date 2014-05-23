@@ -32,13 +32,13 @@ package ru.wapstart.plus1.sdk;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.util.Log;
-import android.view.Display;
 import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 final class Plus1Helper {
 	private static final String HEX_DIGITS	= "0123456789abcdef";
@@ -104,11 +104,16 @@ final class Plus1Helper {
 	}
 
 	public static String getAndroidId(Context context) {
-		return
+		String androidId =
 			android.provider.Settings.Secure.getString(
 				context.getContentResolver(),
 				android.provider.Settings.Secure.ANDROID_ID
 			);
+
+		if (androidId != null)
+			return getHash(androidId);
+
+		return null;
 	}
 
 	public static String getBuildSerial() {
@@ -118,7 +123,7 @@ final class Plus1Helper {
 				!serial.equals(Build.class.getField("UNKNOWN").get(null))
 				&& !serial.equals("00000000000000") // NOTE: bugs on some devices
 			)
-				return serial;
+				return getHash(serial);
 		} catch (Exception e) {
 			// NOTE: may be API < 9
 		}
@@ -126,10 +131,12 @@ final class Plus1Helper {
 		return null;
 	}
 
-	public static String getDisplayMetrics(Display display)
+	public static String getDisplayMetrics(Context context)
 	{
+		WindowManager windowManager = (WindowManager)context.getSystemService(Context.WINDOW_SERVICE);
+
 		DisplayMetrics metrics = new DisplayMetrics();
-		display.getMetrics(metrics);
+		windowManager.getDefaultDisplay().getMetrics(metrics);
 
 		return
 			String.format(
@@ -139,10 +146,31 @@ final class Plus1Helper {
 			);
 	}
 
+	public static String getDisplayOrientation(Context context)
+	{
+		String text;
+
+		switch (context.getResources().getConfiguration().orientation) {
+			case Configuration.ORIENTATION_PORTRAIT:
+				text = "portrait";
+				break;
+			case Configuration.ORIENTATION_LANDSCAPE:
+				text = "landscape";
+				break;
+			case Configuration.ORIENTATION_SQUARE:
+				text = "square";
+				break;
+			default:
+				text = null;
+		};
+
+		return text;
+	}
+
 	public static String getContainerMetrics(Plus1BannerView view)
 	{
 		float density =
-			((Activity)view.getContext())
+			view.getContext()
 				.getResources()
 				.getDisplayMetrics()
 				.density;

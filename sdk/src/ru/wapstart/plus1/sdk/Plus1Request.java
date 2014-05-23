@@ -42,11 +42,8 @@ import org.apache.http.protocol.HTTP;
 
 import android.location.Location;
 import android.os.Build;
-import java.util.Locale;
 
 public final class Plus1Request {
-	// FIXME: move constant to somewhere
-	private static final String SDK_VERSION = "2.3.0";
 	private static final Integer REQUEST_VERSION = 3;
 
 	public static enum Gender {Unknown, Male, Female};
@@ -61,7 +58,9 @@ public final class Plus1Request {
 	private Gender gender			= Gender.Unknown;
 	private String login			= null;
 	private Set<BannerType> types	= null;
+	private String preferredLocale	= null;
 	private String displayMetrics	= null;
+	private String displayOrientation = null;
 	private String containerMetrics	= null;
 	private Location location		= null;
 	private String facebookUserHash	= null;
@@ -111,12 +110,32 @@ public final class Plus1Request {
 		return this;
 	}
 
+	public String getPreferredLocale() {
+		return preferredLocale;
+	}
+
+	public Plus1Request setPreferredLocale(String locale) {
+		this.preferredLocale = locale;
+
+		return this;
+	}
+
 	public String getDisplayMetrics() {
 		return displayMetrics;
 	}
 
 	public Plus1Request setDisplayMetrics(String metrics) {
 		this.displayMetrics = metrics;
+
+		return this;
+	}
+
+	public String getDisplayOrientation() {
+		return displayOrientation;
+	}
+
+	public Plus1Request setDisplayOrientation(String orientation) {
+		this.displayOrientation = orientation;
 
 		return this;
 	}
@@ -298,7 +317,7 @@ public final class Plus1Request {
 	{
 		list.add(new BasicNameValuePair("platform", "Android"));
 		list.add(new BasicNameValuePair("version", Build.VERSION.RELEASE));
-		list.add(new BasicNameValuePair("sdkver", SDK_VERSION));
+		list.add(new BasicNameValuePair("sdkver", Constants.SDK_VERSION));
 
 		if (types != null && !types.isEmpty()) {
 			for (BannerType bannerType : types) {
@@ -311,12 +330,23 @@ public final class Plus1Request {
 			}
 		}
 
-		list.add(
-			new BasicNameValuePair(
-				"container-metrics",
-				getContainerMetrics()
-			)
-		);
+		if (getDisplayOrientation() != null) {
+			list.add(
+				new BasicNameValuePair(
+					"display-orientation",
+					getDisplayOrientation()
+				)
+			);
+		}
+
+		if (getContainerMetrics() != null) {
+			list.add(
+				new BasicNameValuePair(
+					"container-metrics",
+					getContainerMetrics()
+				)
+			);
+		}
 
 		if (getLocation() != null) {
 			list.add(
@@ -365,19 +395,23 @@ public final class Plus1Request {
 			}
 		}
 
-		list.add(
-			new BasicNameValuePair(
-				"preferred-locale",
-				Locale.getDefault().getDisplayName(Locale.US)
-			)
-		);
+		if (getPreferredLocale() != null) {
+			list.add(
+				new BasicNameValuePair(
+					"preferred-locale",
+					getPreferredLocale()
+				)
+			);
+		}
 
-		list.add(
-			new BasicNameValuePair(
-				"display-metrics",
-				getDisplayMetrics()
-			)
-		);
+		if (getDisplayMetrics() != null) {
+			list.add(
+				new BasicNameValuePair(
+					"display-metrics",
+					getDisplayMetrics()
+				)
+			);
+		}
 
 		if (getAdvertisingId() != null) {
 			list.add(

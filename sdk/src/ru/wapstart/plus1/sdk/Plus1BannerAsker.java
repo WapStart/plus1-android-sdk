@@ -32,6 +32,7 @@ package ru.wapstart.plus1.sdk;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map.Entry;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
@@ -47,7 +48,6 @@ import ru.wapstart.plus1.sdk.BaseRequestLoader.ChangeSdkPropertiesListener;
 import ru.wapstart.plus1.sdk.BaseRequestLoader.SdkAction;
 import ru.wapstart.plus1.sdk.BaseRequestLoader.SdkParameter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -104,8 +104,6 @@ public class Plus1BannerAsker {
 	Runnable mExecuteDownloadTask = new Runnable() {
 		public void run() {
 			if (!(mView.isClosed() || mView.isExpanded())) {
-				modifyRequest(mRequest);
-
 				mDownloaderTask = makeDownloaderTask();
 				mDownloaderTask.execute(mRequest);
 			}
@@ -118,8 +116,6 @@ public class Plus1BannerAsker {
 
 	private Runnable mReinitRequestTask = new Runnable() {
 		public void run() {
-			modifyRequest(mRequest);
-
 			makeInitRequestTask().execute(mRequest);
 
 			if (!hasLockForTask(InnerTask.reinitTask))
@@ -551,14 +547,22 @@ public class Plus1BannerAsker {
 				)
 			)
 			.setAndroidId(
-				Plus1Helper.getHash(
-					Plus1Helper.getAndroidId(mView.getContext())
-				)
+				Plus1Helper.getAndroidId(mView.getContext())
 			)
 			.setBuildSerial(
-				Plus1Helper.getHash(
-					Plus1Helper.getBuildSerial()
-				)
+				Plus1Helper.getBuildSerial()
+			)
+			.setPreferredLocale(
+				Locale.getDefault().getDisplayName(Locale.US)
+			)
+			.setDisplayMetrics(
+				Plus1Helper.getDisplayMetrics(mView.getContext())
+			)
+			.setDisplayOrientation(
+				Plus1Helper.getDisplayOrientation(mView.getContext())
+			)
+			.setContainerMetrics(
+				Plus1Helper.getContainerMetrics(mView)
 			);
 
 		// NOTE: useful in case when timers are paused and activity was destroyed
@@ -576,6 +580,8 @@ public class Plus1BannerAsker {
 			start();
 		} else
 			Log.w(LOGTAG, "Banner view is expanded, so refresh was prevented");
+
+		Log.d(LOGTAG, "TEST: " + mView.getContext().getResources().getConfiguration().orientation);
 	}
 
 	private void start() {
@@ -785,20 +791,6 @@ public class Plus1BannerAsker {
 		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		mView.getContext().getApplicationContext().startActivity(intent);
-	}
-
-	// FIXME: think about another request-update logic
-	private void modifyRequest(Plus1Request request) {
-		request.setDisplayMetrics(
-			Plus1Helper.getDisplayMetrics(
-				((Activity)mView.getContext())
-					.getWindowManager().getDefaultDisplay()
-			)
-		);
-
-		request.setContainerMetrics(
-			Plus1Helper.getContainerMetrics(mView)
-		);
 	}
 
 	private void setLockForTask(InnerTask task, long seconds) {
