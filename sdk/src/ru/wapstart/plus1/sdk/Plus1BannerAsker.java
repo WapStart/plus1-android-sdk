@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map.Entry;
 import java.text.SimpleDateFormat;
-import java.text.ParseException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -86,6 +85,7 @@ public class Plus1BannerAsker {
 	private int mTwitterInfoDelay		= Constants.DEFAULTS_FACEBOOK_INFO_REFRESH_INTERVAL;
 
 	private boolean mInitialized							= false;
+	private boolean mLocationRequestUpdatesEnabled			= false;
 	private boolean mWebViewCorePaused						= false;
 	private int mRefreshRetryCount							= 0;
 
@@ -424,6 +424,11 @@ public class Plus1BannerAsker {
 	public Plus1BannerAsker setLocationRefreshDelay(int delayInSeconds) {
 		mLocationRefreshDelay = delayInSeconds;
 
+		if (!isDisabledAutoDetectLocation() && mLocationRequestUpdatesEnabled) {
+			removeLocationUpdates();
+			requestLocationUpdates(false);
+		}
+
 		return this;
 	}
 
@@ -630,6 +635,8 @@ public class Plus1BannerAsker {
 				mLocationListener
 			);
 
+			mLocationRequestUpdatesEnabled = true;
+
 			if (mRequest.getLocation() == null) {
 				mRequest.setLocation(
 					mLocationManager.getLastKnownLocation(provider)
@@ -651,6 +658,8 @@ public class Plus1BannerAsker {
 
 	private void removeLocationUpdates() {
 		mLocationManager.removeUpdates(mLocationListener);
+
+		mLocationRequestUpdatesEnabled = false;
 	}
 
 	private HtmlBannerDownloader makeDownloaderTask()
@@ -729,6 +738,8 @@ public class Plus1BannerAsker {
 						case refreshRetryNum:
 							mRefreshRetryNum = Integer.parseInt(value);
 							break;
+						case locationRefreshDelay:
+							setLocationRefreshDelay(Integer.parseInt(value));
 						case reInitDelay:
 							mReInitDelay = Integer.parseInt(value);
 							break;
@@ -811,7 +822,7 @@ public class Plus1BannerAsker {
 	private boolean hasLockForTask(InnerTask task) {
 		SimpleDateFormat df = new SimpleDateFormat(TASK_LOCK_DATE_FORMAT);
 
-		String key = Constants.PREFERENCES_KEY_LOCK_TASK_PREFIX + task.toString();
+/*		String key = Constants.PREFERENCES_KEY_LOCK_TASK_PREFIX + task.toString();
 		String dateValue = Plus1Helper.getStorageValue(mView.getContext(), key);
 
 		if (dateValue != null) {
@@ -823,7 +834,7 @@ public class Plus1BannerAsker {
 			} catch (ParseException e) {
 				Log.e(LOGTAG, "Strange date format in preferences: " + dateValue, e);
 			}
-		}
+		}*/
 
 		return false;
 	}
