@@ -100,6 +100,7 @@ final public class Plus1AdAnimator extends FrameLayout {
 
 		if (mCurrentView != null) {
 			mBaseView.removeView(mCurrentView);
+			mCurrentView.removeAllViews();
 			mCurrentView.destroy();
 			mCurrentView = null;
 		}

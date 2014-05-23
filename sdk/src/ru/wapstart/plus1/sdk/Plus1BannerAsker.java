@@ -657,9 +657,11 @@ public class Plus1BannerAsker {
 	}
 
 	private void removeLocationUpdates() {
-		mLocationManager.removeUpdates(mLocationListener);
+		if (mLocationRequestUpdatesEnabled) {
+			mLocationManager.removeUpdates(mLocationListener);
 
-		mLocationRequestUpdatesEnabled = false;
+			mLocationRequestUpdatesEnabled = false;
+		}
 	}
 
 	private HtmlBannerDownloader makeDownloaderTask()
