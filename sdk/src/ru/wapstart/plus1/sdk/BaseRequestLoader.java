@@ -89,7 +89,7 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 
 			if (request.hasUID()) {
 				if (null == mCachedEtag)
-					mCachedEtag = request.getUID() + "_0";
+					mCachedEtag = request.getUID();
 
 				connection.setRequestProperty("If-None-Match", mCachedEtag);
 			}
@@ -259,8 +259,14 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 	}
 
 	private String getUidByETag(String value) {
-		if (null != value)
-			return value.substring(0, value.lastIndexOf("_"));
+		if (null != value) {
+			int index = value.lastIndexOf(":");
+
+			return
+				index > 0
+					? value.substring(0, index)
+					: value;
+		}
 
 		return null;
 	}
