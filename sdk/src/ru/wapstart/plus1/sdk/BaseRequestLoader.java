@@ -169,6 +169,23 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 			EnumMap<SdkAction, String> actions =
 				getSdkActionsByJson(connection.getHeaderField(SDK_ACTION_HEADER));
 
+			Log.d(
+				LOGTAG,
+				String.format(
+					"%s header: %s",
+					SDK_PARAMETERS_HEADER,
+					connection.getHeaderField(SDK_PARAMETERS_HEADER)
+				)
+			);
+			Log.d(
+				LOGTAG,
+				String.format(
+					"%s header: %s",
+					SDK_ACTION_HEADER,
+					connection.getHeaderField(SDK_ACTION_HEADER)
+				)
+			);
+
 			String newUid = null;
 			String newEtag = connection.getHeaderField("ETag");
 

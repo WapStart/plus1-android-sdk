@@ -64,8 +64,8 @@ final class InitRequestLoader extends BaseRequestLoader<String> {
 
 	@Override
 	protected void onPostExecute(String uid) {
-		if (null != uid)
-			notifyOnUniqueIdLoaded(uid);
+		if (null != uid && validateUid(uid))
+			notifyOnUniqueIdLoaded(uid.trim());
 		else
 			notifyOnUniqueIdLoadFailed();
 	}
@@ -78,6 +78,16 @@ final class InitRequestLoader extends BaseRequestLoader<String> {
 	private void notifyOnUniqueIdLoadFailed() {
 		for (InitRequestLoadListener listener : mInitRequestLoadListenerList)
 			listener.onUniqueIdLoadFailed();
+	}
+
+	private boolean validateUid(String uid)
+	{
+		if (uid.matches("\\S+\\n?"))
+			return true;
+
+		Log.e(LOGTAG, "Retrieve strage UID: " + uid);
+
+		return false;
 	}
 
 	public interface InitRequestLoadListener {
