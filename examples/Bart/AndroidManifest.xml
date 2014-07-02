@@ -30,6 +30,6 @@
             -->
 		</activity>
 
-		<activity android:name="ru.wapstart.plus1.sdk.MraidBrowser" />
+		<activity android:name="ru.wapstart.plus1.sdk.ApplicationBrowser" />
 	</application>
 </manifest> 

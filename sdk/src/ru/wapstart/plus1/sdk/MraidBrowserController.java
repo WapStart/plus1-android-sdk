@@ -20,8 +20,8 @@ class MraidBrowserController extends MraidAbstractController {
 		}
 
 		Context context = getView().getContext();
-		Intent i = new Intent(context, MraidBrowser.class);
-		i.putExtra(MraidBrowser.URL_EXTRA, url);
+		Intent i = new Intent(context, ApplicationBrowser.class);
+		i.putExtra(ApplicationBrowser.URL_EXTRA, url);
 		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		context.startActivity(i);
 	}

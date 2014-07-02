@@ -15,7 +15,7 @@ import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-public class MraidBrowser extends Activity {
+public class ApplicationBrowser extends Activity {
 
 	public static final String URL_EXTRA = "extra_url";
 
@@ -43,7 +43,7 @@ public class MraidBrowser extends Activity {
 			public void onReceivedError(WebView view, int errorCode, String description,
 					String failingUrl) {
 				Activity a = (Activity) view.getContext();
-				Toast.makeText(a, "MRAID error: " + description, Toast.LENGTH_SHORT).show();
+				Toast.makeText(a, "Browser error: " + description, Toast.LENGTH_SHORT).show();
 			}
 
 			@Override
@@ -117,7 +117,7 @@ public class MraidBrowser extends Activity {
 		closeButton.setBackgroundColor(Color.TRANSPARENT);
 		closeButton.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				MraidBrowser.this.finish();
+				ApplicationBrowser.this.finish();
 			}
 		});
 	}

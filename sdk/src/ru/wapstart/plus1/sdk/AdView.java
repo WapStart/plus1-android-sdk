@@ -133,8 +133,8 @@ public class AdView extends BaseAdView {
 				}
 			} else if (mOpenInApplication) {
 				// FIXME: use another in-app browser for this ad
-				Intent intent = new Intent(getContext(), MraidBrowser.class);
-				intent.putExtra(MraidBrowser.URL_EXTRA, url);
+				Intent intent = new Intent(getContext(), ApplicationBrowser.class);
+				intent.putExtra(ApplicationBrowser.URL_EXTRA, url);
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				try {
 					getContext().startActivity(intent);
