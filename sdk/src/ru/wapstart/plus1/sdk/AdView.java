@@ -51,7 +51,7 @@ public class AdView extends BaseAdView {
 	private OnReadyListener mOnReadyListener;
 	private OnClickListener mOnClickListener;
 
-	private boolean mOpenInApplication	= false;
+	private boolean mOpenInBrowser	= false;
 
 	public AdView(Context context) {
 		super(context);
@@ -98,8 +98,8 @@ public class AdView extends BaseAdView {
 		return mOnClickListener;
 	}
 
-	public void setOpenInApplication(boolean orly) {
-		mOpenInApplication = orly;
+	public void setOpenInBrowser(boolean orly) {
+		mOpenInBrowser = orly;
 	}
 
 	private void disableScrollingAndZoom() {
@@ -131,20 +131,19 @@ public class AdView extends BaseAdView {
 					Log.w("Plus1", "Could not handle intent with URI: " + url);
 					return false;
 				}
-			} else if (mOpenInApplication) {
-				// FIXME: use another in-app browser for this ad
-				Intent intent = new Intent(getContext(), ApplicationBrowser.class);
-				intent.putExtra(ApplicationBrowser.URL_EXTRA, url);
+			} else if (mOpenInBrowser) {
+				Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
 				try {
 					getContext().startActivity(intent);
 				} catch (ActivityNotFoundException e) {
 					return false;
 				}
 			} else {
-				Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+				Intent intent = new Intent(getContext(), ApplicationBrowser.class);
+				intent.putExtra(ApplicationBrowser.URL_EXTRA, url);
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
 				try {
 					getContext().startActivity(intent);
 				} catch (ActivityNotFoundException e) {

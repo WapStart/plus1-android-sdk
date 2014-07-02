@@ -752,8 +752,8 @@ public class Plus1BannerAsker {
 							mTwitterInfoDelay = Integer.parseInt(value);
 							break;
 						case openIn:
-							mView.setOpenInApplication(
-								VALUE_OPEN_IN_APPLICATION.equals(value)
+							mView.setOpenInBrowser(
+								VALUE_OPEN_IN_BROWSER.equals(value)
 							);
 							break;
 					}

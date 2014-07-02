@@ -55,7 +55,7 @@ public class Plus1BannerView extends FrameLayout {
 	private Animation mShowAnimation	= null;
 	private String mWebViewUserAgent	= null;
 
-	private boolean mOpenInApplication	= false;
+	private boolean mOpenInBrowser		= false;
 	private boolean mHaveCloseButton	= false;
 	private boolean mClosed				= false;
 	private boolean mInitialized		= false;
@@ -141,8 +141,8 @@ public class Plus1BannerView extends FrameLayout {
 		return this;
 	}
 
-	public Plus1BannerView setOpenInApplication(boolean orly) {
-		mOpenInApplication = orly;
+	public Plus1BannerView setOpenInBrowser(boolean orly) {
+		mOpenInBrowser = orly;
 
 		return this;
 	}
@@ -283,7 +283,7 @@ public class Plus1BannerView extends FrameLayout {
 			}
 		});
 
-		adView.setOpenInApplication(mOpenInApplication);
+		adView.setOpenInBrowser(mOpenInBrowser);
 
 		return adView;
 	}
