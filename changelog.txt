@@ -1,3 +1,6 @@
+Plus1 WapStart Android SDK 2.2.4, 2014-06-05
+- Remove obsolete method call
+
 Plus1 WapStart Android SDK 2.2.3, 2013-08-19
 - Update debug settings in Bart project to default
 
