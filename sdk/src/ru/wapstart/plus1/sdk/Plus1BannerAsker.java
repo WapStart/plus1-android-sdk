@@ -793,13 +793,17 @@ public class Plus1BannerAsker {
 
 	private void openLink(String url)
 	{
+		Log.d(LOGTAG, "Open link url template: " + url);
+
 		// TODO: add another parametrization
-		url.replaceAll(Constants.PLACEHOLDER_REINIT_DELAY, String.valueOf(mReInitDelay));
-		url.replaceAll(Constants.PLACEHOLDER_REFRESH_RETRY_NUM, String.valueOf(mRefreshRetryNum));
-		url.replaceAll(Constants.PLACEHOLDER_BANNER_REFRESH_INTERVAL, String.valueOf(mRefreshDelay));
-		url.replaceAll(Constants.PLACEHOLDER_FACEBOOK_INFO_REFRESH_INTERVAL, String.valueOf(mFacebookInfoDelay));
-		url.replaceAll(Constants.PLACEHOLDER_TWITTER_INFO_REFRESH_INTERVAL, String.valueOf(mTwitterInfoDelay));
-		url.replaceAll(Constants.PLACEHOLDER_UID, mRequest.getUID());
+		url = url.replaceAll(Constants.PLACEHOLDER_REINIT_DELAY, String.valueOf(mReInitDelay));
+		url = url.replaceAll(Constants.PLACEHOLDER_REFRESH_RETRY_NUM, String.valueOf(mRefreshRetryNum));
+		url = url.replaceAll(Constants.PLACEHOLDER_BANNER_REFRESH_INTERVAL, String.valueOf(mRefreshDelay));
+		url = url.replaceAll(Constants.PLACEHOLDER_FACEBOOK_INFO_REFRESH_INTERVAL, String.valueOf(mFacebookInfoDelay));
+		url = url.replaceAll(Constants.PLACEHOLDER_TWITTER_INFO_REFRESH_INTERVAL, String.valueOf(mTwitterInfoDelay));
+		url = url.replaceAll(Constants.PLACEHOLDER_UID, mRequest.getUID());
+
+		Log.d(LOGTAG, "Open link url after replacements: " + url);
 
 		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
