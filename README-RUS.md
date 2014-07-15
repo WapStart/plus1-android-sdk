@@ -31,7 +31,7 @@ Plus1 WapStart Android SDK распространяется под свобод�
 
 При этом **ACCESS_FINE_LOCATION** не является обязательным, но рекомендуется для подбора релевантных рекламных объявлений.
 
-Если ваше приложение использует геолокацию, вы можете самостоятельно устанавливать текущее местоположение (см. описание интерфейсов - [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md)). При этом рекомендуется отключать автоматическое определение местоположения в SDK (метод *disableAutoDetectLocation()* в [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md)).
+Если ваше приложение использует геолокацию, вы можете самостоятельно устанавливать текущее местоположение (см. описание интерфейсов - [Plus1Request](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1Request.md)). При этом рекомендуется отключать автоматическое определение местоположения в SDK (метод *disableAutoDetectLocation()* в [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md)).
 
 В блок *<application>* требуется добавить информацию об используемых Activity:
 
@@ -41,11 +41,11 @@ Plus1 WapStart Android SDK распространяется под свобод�
 		...
 	</activity>
 
-	<activity android:name="ru.wapstart.plus1.sdk.MraidBrowser" />
+	<activity android:name="ru.wapstart.plus1.sdk.ApplicationBrowser" />
 </application>
 ```
 
-*[MraidBrowser](https://github.com/WapStart/plus1-android-sdk/blob/master/sdk/src/ru/wapstart/plus1/sdk/MraidBrowser.java)* используется для перехода по ссылкам баннеров формата Rich Media внутри приложения.
+*[ApplicationBrowser](https://github.com/WapStart/plus1-android-sdk/blob/master/sdk/src/ru/wapstart/plus1/sdk/ApplicationBrowser.java)* используется для перехода по ссылкам баннеров внутри приложения.
 
 ## Настройка тестового приложения
 Для работы тестового приложения вам нужно передать идентификатор площадки [Plus1 WapStart](https://plus1.wapstart.ru) в методе **setApplicationId()** в файле *[BartActivity.java](https://github.com/WapStart/plus1-android-sdk/blob/master/examples/Bart/src/ru/wapstart/plus1/bart/BartActivity.java#L51)*.
@@ -82,11 +82,11 @@ View адаптировано под размер 320x50. Рекомендует
 
 ```java
 import ru.wapstart.plus1.sdk.Plus1BannerView;
-import ru.wapstart.plus1.sdk.Plus1BannerRequest;
+import ru.wapstart.plus1.sdk.Plus1Request;
 import ru.wapstart.plus1.sdk.Plus1BannerAsker;
 ```
 
-На этапе инициализации создайте и настройте объекты [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md) и [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md) следующим образом:
+На этапе инициализации создайте и настройте объекты [Plus1Request](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1Request.md) и [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md) следующим образом:
 
 ```java
 @Override
@@ -102,7 +102,7 @@ protected void onCreate(Bundle savedInstanceState)
 
 	mAsker =
 		new Plus1BannerAsker(
-			new Plus1BannerRequest()
+			new Plus1Request()
 				.setApplicationId(...),
 			mBannerView
 				.enableAnimationFromTop()
@@ -152,7 +152,7 @@ public boolean onKeyDown(int keyCode, KeyEvent event) {
 
 Для подробного ознакомления смотрите описания интерфейсов и классов, а также исходные коды sdk:
 * [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md) - отвечает за получение объявлений с сервера
-* [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md) - отвечает за хранение информации о пользователе и формирование запроса к серверу
+* [Plus1Request](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1Request.md) - отвечает за хранение информации о пользователе и формирование запроса к серверу
 * [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) - отвечает за отображение объявления
 * [Plus1BannerDownloadListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerDownloadListener.md) - интерфейс наблюдателя загрузки баннера
 * [Plus1BannerViewStateListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerViewStateListener.md) - интерфейс наблюдателя за состоянием видимости [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md)  

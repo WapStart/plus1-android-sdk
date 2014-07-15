@@ -1,6 +1,6 @@
 Plus1BannerAsker
 ================
-Отвечает за получение объявлений с сервера. Взаимодействует с [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md), [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) и Activity вашего приложения.
+Отвечает за получение объявлений с сервера. Взаимодействует с [Plus1Request](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1Request.md), [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) и Activity вашего приложения.
 
 Основные методы
 ------------------

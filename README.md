@@ -31,7 +31,7 @@ The application must have permissions to access the Internet and the current loc
 
 **ACCESS_FINE_LOCATION** is optional but it is recommended for matching the relevant ads.
 
-If your application is using geolocation, you can set the current location by yourself (see more - [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md)). It is recommended to turn off the automatic location detection in the SDK (method *disableAutoDetectLocation()* in [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md)).
+If your application is using geolocation, you can set the current location by yourself (see more - [Plus1Request](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1Request.md)). It is recommended to turn off the automatic location detection in the SDK (method *disableAutoDetectLocation()* in [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md)).
 
 You need to add the information about the used Activity to the*<application>* block:
 
@@ -41,11 +41,11 @@ You need to add the information about the used Activity to the*<application>* bl
 		...
 	</activity>
 
-	<activity android:name="ru.wapstart.plus1.sdk.MraidBrowser" />
+	<activity android:name="ru.wapstart.plus1.sdk.ApplicationBrowser" />
 </application>
 ```
 
-*[MraidBrowser](https://github.com/WapStart/plus1-android-sdk/blob/master/sdk/src/ru/wapstart/plus1/sdk/MraidBrowser.java)* is using for Rich Media.
+*[ApplicationBrowser](https://github.com/WapStart/plus1-android-sdk/blob/master/sdk/src/ru/wapstart/plus1/sdk/ApplicationBrowser.java)* is using for open banners in application context.
 
 ## Test application setup
 For correct test app working you must transfer a [Plus1 WapStart](https://plus1.wapstart.ru) unique site identifier in the method **setApplicationId()** in the *[BartActivity.java](https://github.com/WapStart/plus1-android-sdk/blob/master/examples/Bart/src/ru/wapstart/plus1/bart/BartActivity.java#L51)* file.
@@ -82,11 +82,11 @@ Turn on the necessary classes in the file of your Activity where you are plannin
 
 ```java
 import ru.wapstart.plus1.sdk.Plus1BannerView;
-import ru.wapstart.plus1.sdk.Plus1BannerRequest;
+import ru.wapstart.plus1.sdk.Plus1Request;
 import ru.wapstart.plus1.sdk.Plus1BannerAsker;
 ```
 
-On the initialization step, create and setup the objects [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerReques.md) and [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md) like it is provided below:
+On the initialization step, create and setup the objects [Plus1Request](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1Request.md) and [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md) like it is provided below:
 
 ```java
 @Override
@@ -102,7 +102,7 @@ protected void onCreate(Bundle savedInstanceState)
 
 	mAsker =
 		new Plus1BannerAsker(
-			new Plus1BannerRequest()
+			new Plus1Request()
 				.setApplicationId(...),
 			mBannerView
 				.enableAnimationFromTop()
@@ -152,7 +152,7 @@ public boolean onKeyDown(int keyCode, KeyEvent event) {
 
 You can find the detailed descriptions of the classes, interfaces and the source code below:
 * [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md) - about the ads from the server
-* [Plus1BannerRequest](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerRequest.md) - about the user information storage and the requests from the server
+* [Plus1Request](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1Request.md) - about the user information storage and the requests from the server
 * [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) - about the displaying of the ads
 * [Plus1BannerDownloadListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerDownloadListener.md) - the interface of the observer of the banner loading
 * [Plus1BannerViewStateListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerViewStateListener.md) - the interface of the observer of the visiability status [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md)  
