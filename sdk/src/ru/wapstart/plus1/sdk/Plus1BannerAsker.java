@@ -64,7 +64,7 @@ public class Plus1BannerAsker {
 	private static final String LOGTAG = "Plus1BannerAsker";
 	private static final String VALUE_OPEN_IN_BROWSER = "browser";
 	private static final String VALUE_OPEN_IN_APPLICATION = "application";
-	private static final String VALUE_RESTORE_LAST = "-1";
+	private static final String VALUE_CANCEL = "-1";
 	private static final String TASK_LOCK_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 	private static final int TASK_LOCK_TIME_DEFAULT = 3600; // 1 hour
 	private static final int TASK_LOCK_TIME_WEEK = 604800; // 7 days
@@ -94,10 +94,8 @@ public class Plus1BannerAsker {
 
 	private Plus1BannerDownloadListener mDownloadListener	= null;
 
-	private EnumMap<SdkParameter, String> mLastSdkParameterMap =
+	private EnumMap<SdkParameter, String> mBackupParameterMap =
 		new EnumMap<SdkParameter, String>(SdkParameter.class);
-	private EnumMap<SdkAction, String> mLastSdkActionMap =
-		new EnumMap<SdkAction, String>(SdkAction.class);
 
 	private static enum InnerTask {reinitTask, advertisingIdTask, facebookInfoTask, twitterInfoTask};
 
@@ -724,13 +722,13 @@ public class Plus1BannerAsker {
 					SdkParameter key = entry.getKey();
 					String value = entry.getValue();
 
-					if (
-						value.equals(VALUE_RESTORE_LAST)
-						&& null != mLastSdkParameterMap.get(key)
-					) {
-						value = mLastSdkParameterMap.get(key);
-					} else {
-						mLastSdkParameterMap.put(key, value);
+					if (value.equals(VALUE_CANCEL)) {
+						if (mBackupParameterMap.containsKey(key)) {
+							value = mBackupParameterMap.get(key);
+							mBackupParameterMap.remove(key);
+						}
+					} else if (!mBackupParameterMap.containsKey(key)) {
+						mBackupParameterMap.put(key, value);
 					}
 
 					switch (key) {
@@ -764,15 +762,6 @@ public class Plus1BannerAsker {
 				for(Entry<SdkAction, String> entry : actions.entrySet()) {
 					SdkAction key = entry.getKey();
 					String value = entry.getValue();
-
-					if (
-						value.equals(VALUE_RESTORE_LAST)
-						&& null != mLastSdkActionMap.get(key)
-					) {
-						value = mLastSdkActionMap.get(key);
-					} else {
-						mLastSdkActionMap.put(key, value);
-					}
 
 					switch (key) {
 						case openLink:
