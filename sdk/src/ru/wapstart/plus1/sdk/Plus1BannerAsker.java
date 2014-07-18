@@ -122,7 +122,7 @@ public class Plus1BannerAsker {
 	};
 	private Handler mReinitHandler = new Handler();
 
-	private Runnable mFacebookInfoTask = new Runnable() {
+	final private Runnable mFacebookInfoTask = new Runnable() {
 		public void run() {
 			try {
 				final Class sessionCls = Class.forName("com.facebook.Session");
@@ -181,8 +181,9 @@ public class Plus1BannerAsker {
 	};
 	private Handler mFacebookInfoHandler = new Handler();
 
-	private Runnable mTwitterInfoTask = new Runnable() {
+	final private Runnable mTwitterInfoTask = new Runnable() {
 		public void run() {
+			Log.d(LOGTAG, "TwitterInfoTask running");
 			try {
 				final Class factoryCls = Class.forName("twitter4j.TwitterFactory");
 				final Class twitterCls = Class.forName("twitter4j.TwitterImpl");
@@ -246,7 +247,7 @@ public class Plus1BannerAsker {
 				Log.d(LOGTAG, "Application is not using twitter4j sdk");
 				setLockForTask(InnerTask.twitterInfoTask, TASK_LOCK_TIME_WEEK);
 			} catch (Exception e) {
-				Log.w(LOGTAG, "Some error occurred while using facebook sdk", e);
+				Log.w(LOGTAG, "Some error occurred while using twitter4j sdk", e);
 			}
 		}
 	};
