@@ -29,36 +29,36 @@
 
 package ru.wapstart.plus1.sdk;
 
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map.Entry;
-import java.text.SimpleDateFormat;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-
-import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
-import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.BannerAdType;
-import ru.wapstart.plus1.sdk.InitRequestLoader.InitRequestLoadListener;
 import ru.wapstart.plus1.sdk.BaseRequestLoader.ChangeSdkPropertiesListener;
 import ru.wapstart.plus1.sdk.BaseRequestLoader.SdkAction;
 import ru.wapstart.plus1.sdk.BaseRequestLoader.SdkParameter;
+import ru.wapstart.plus1.sdk.InitRequestLoader.InitRequestLoadListener;
+import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.BannerAdType;
+import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
 
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationManager;
 import android.location.Criteria;
+import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.webkit.WebView;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class Plus1BannerAsker {
 	private static final String LOGTAG = "Plus1BannerAsker";
@@ -183,7 +183,6 @@ public class Plus1BannerAsker {
 
 	final private Runnable mTwitterInfoTask = new Runnable() {
 		public void run() {
-			Log.d(LOGTAG, "TwitterInfoTask running");
 			try {
 				final Class factoryCls = Class.forName("twitter4j.TwitterFactory");
 				final Class twitterCls = Class.forName("twitter4j.TwitterImpl");
@@ -192,7 +191,8 @@ public class Plus1BannerAsker {
 				// TODO: search another way to get configuration
 				Field hackedMap = twitterCls.getDeclaredField("implicitParamsMap");
 				hackedMap.setAccessible(true);
-				HashMap hashMap = (HashMap)hackedMap.get(null);
+				HashMap hashMap = new HashMap();
+				hashMap.putAll((Map)hackedMap.get(null));
 
 				for (Object conf : hashMap.keySet()) {
 					boolean allowAuth =
