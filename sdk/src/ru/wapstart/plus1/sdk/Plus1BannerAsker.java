@@ -724,10 +724,11 @@ public class Plus1BannerAsker {
 					String value = entry.getValue();
 
 					if (value.equals(VALUE_CANCEL)) {
-						if (mBackupParameterMap.containsKey(key)) {
-							value = mBackupParameterMap.get(key);
-							mBackupParameterMap.remove(key);
-						}
+						if (!mBackupParameterMap.containsKey(key))
+							continue;
+
+						value = mBackupParameterMap.get(key);
+						mBackupParameterMap.remove(key);
 					} else if (!mBackupParameterMap.containsKey(key)) {
 						mBackupParameterMap.put(key, value);
 					}
