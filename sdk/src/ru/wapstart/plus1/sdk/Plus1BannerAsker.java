@@ -722,40 +722,51 @@ public class Plus1BannerAsker {
 				for(Entry<SdkParameter, String> entry : parameters.entrySet()) {
 					SdkParameter key = entry.getKey();
 					String value = entry.getValue();
+					String prevValue = null;
+					boolean cancelLogic = value.equals(VALUE_CANCEL);
 
-					if (value.equals(VALUE_CANCEL)) {
+					if (cancelLogic) {
 						if (!mBackupParameterMap.containsKey(key))
 							continue;
 
 						value = mBackupParameterMap.get(key);
 						mBackupParameterMap.remove(key);
-					} else if (!mBackupParameterMap.containsKey(key)) {
-						mBackupParameterMap.put(key, value);
 					}
 
 					switch (key) {
 						case refreshDelay:
+							prevValue = String.valueOf(mRefreshDelay);
 							mRefreshDelay = Integer.parseInt(value);
 							break;
 						case refreshRetryNum:
+							prevValue = String.valueOf(mRefreshRetryNum);
 							mRefreshRetryNum = Integer.parseInt(value);
 							break;
 						case locationRefreshDelay:
+							prevValue = String.valueOf(mLocationRefreshDelay);
 							setLocationRefreshDelay(Integer.parseInt(value));
 						case reInitDelay:
+							prevValue = String.valueOf(mReInitDelay);
 							mReInitDelay = Integer.parseInt(value);
 							break;
 						case facebookInfoDelay:
+							prevValue = String.valueOf(mFacebookInfoDelay);
 							mFacebookInfoDelay = Integer.parseInt(value);
 							break;
 						case twitterInfoDelay:
+							prevValue = String.valueOf(mTwitterInfoDelay);
 							mTwitterInfoDelay = Integer.parseInt(value);
 							break;
 						case openIn:
+							prevValue = VALUE_OPEN_IN_BROWSER; // default
 							mView.setOpenInBrowser(
 								VALUE_OPEN_IN_BROWSER.equals(value)
 							);
 							break;
+					}
+
+					if (!cancelLogic && !mBackupParameterMap.containsKey(key)) {
+						mBackupParameterMap.put(key, prevValue);
 					}
 				}
 			}
