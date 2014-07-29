@@ -46,6 +46,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.EnumMap;
@@ -53,7 +54,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-
 import ru.wapstart.plus1.sdk.BaseRequestLoader.ChangeSdkPropertiesListener;
 import ru.wapstart.plus1.sdk.BaseRequestLoader.SdkAction;
 import ru.wapstart.plus1.sdk.BaseRequestLoader.SdkParameter;
@@ -857,7 +857,7 @@ public class Plus1BannerAsker {
 	private boolean hasLockForTask(InnerTask task) {
 		SimpleDateFormat df = new SimpleDateFormat(TASK_LOCK_DATE_FORMAT);
 
-/*		String key = Constants.PREFERENCES_KEY_LOCK_TASK_PREFIX + task.toString();
+		String key = Constants.PREFERENCES_KEY_LOCK_TASK_PREFIX + task.toString();
 		String dateValue = Plus1Helper.getStorageValue(mView.getContext(), key);
 
 		if (dateValue != null) {
@@ -869,7 +869,7 @@ public class Plus1BannerAsker {
 			} catch (ParseException e) {
 				Log.e(LOGTAG, "Strange date format in preferences: " + dateValue, e);
 			}
-		}*/
+		}
 
 		return false;
 	}
