@@ -58,6 +58,7 @@ public class BartActivity extends Activity implements View.OnClickListener
 					.enableAnimationFromTop()
 					.enableCloseButton()
 			)
+			.setCallbackUrl("wsp1bart://ru.wapstart.plus1.bart")
 			.setRefreshDelay(10); // default value
 
 		mBannerView

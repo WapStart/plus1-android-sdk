@@ -57,4 +57,5 @@ public class Constants {
 	protected static final String PLACEHOLDER_FACEBOOK_INFO_REFRESH_INTERVAL	= "%facebookInfoRefreshInterval%";
 	protected static final String PLACEHOLDER_TWITTER_INFO_REFRESH_INTERVAL		= "%twitterInfoRefreshInterval%";
 	protected static final String PLACEHOLDER_UID						= "%uid%";
+	protected static final String PLACEHOLDER_ENCODED_CALLBACK			= "%encodedCallback%";
 }

@@ -19,6 +19,13 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 
+			<intent-filter>
+				<data android:scheme="wsp1bart" android:host="ru.wapstart.plus1.bart" />
+				<action android:name="android.intent.action.VIEW"/>
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+			</intent-filter>
+
 			<!-- Uncomment the block bellow if you want to use Plus1 WapStart Conversion SDK -->
 			<!--
 			<intent-filter>

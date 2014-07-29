@@ -196,12 +196,12 @@ public abstract class BaseRequestLoader<T> extends AsyncTask<Plus1Request, Void,
 				newUid = getUidByETag(newEtag);
 			}
 
+			if (null != newUid)
+				notifyOnSdkChangeUid(newUid);
 			if (!(null == parameters || parameters.isEmpty()))
 				notifyOnSdkParametersLoaded(parameters);
 			if (!(null == actions || actions.isEmpty()))
 				notifyOnSdkActionsLoaded(actions);
-			if (null != newUid)
-				notifyOnSdkChangeUid(newUid);
 
 			result = makeResult(content.toString(), connection);
 

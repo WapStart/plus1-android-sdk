@@ -29,13 +29,6 @@
 
 package ru.wapstart.plus1.sdk;
 
-import ru.wapstart.plus1.sdk.BaseRequestLoader.ChangeSdkPropertiesListener;
-import ru.wapstart.plus1.sdk.BaseRequestLoader.SdkAction;
-import ru.wapstart.plus1.sdk.BaseRequestLoader.SdkParameter;
-import ru.wapstart.plus1.sdk.InitRequestLoader.InitRequestLoadListener;
-import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.BannerAdType;
-import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
-
 import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
@@ -48,6 +41,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.webkit.WebView;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -60,7 +54,20 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import ru.wapstart.plus1.sdk.BaseRequestLoader.ChangeSdkPropertiesListener;
+import ru.wapstart.plus1.sdk.BaseRequestLoader.SdkAction;
+import ru.wapstart.plus1.sdk.BaseRequestLoader.SdkParameter;
+import ru.wapstart.plus1.sdk.InitRequestLoader.InitRequestLoadListener;
+import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.BannerAdType;
+import ru.wapstart.plus1.sdk.Plus1BannerDownloadListener.LoadError;
+
 public class Plus1BannerAsker {
+	public final class CallbackUrlNotDefinedException extends RuntimeException {
+		private CallbackUrlNotDefinedException(String detailMessage) {
+			super(detailMessage);
+		}
+	}
+
 	private static final String LOGTAG = "Plus1BannerAsker";
 	private static final String VALUE_OPEN_IN_BROWSER = "browser";
 	private static final String VALUE_OPEN_IN_APPLICATION = "application";
@@ -88,6 +95,8 @@ public class Plus1BannerAsker {
 	private boolean mLocationRequestUpdatesEnabled			= false;
 	private boolean mWebViewCorePaused						= false;
 	private int mRefreshRetryCount							= 0;
+
+	private String mCallbackUrl								= null;
 
 	private LocationManager mLocationManager				= null;
 	private LocationListener mLocationListener				= null;
@@ -431,6 +440,12 @@ public class Plus1BannerAsker {
 		return this;
 	}
 
+	public Plus1BannerAsker setCallbackUrl(String callbackUrl) {
+		mCallbackUrl = callbackUrl;
+
+		return this;
+	}
+
 	public boolean isAutoRefreshEnabled() {
 		return mRefreshDelay > 0;
 	}
@@ -450,6 +465,9 @@ public class Plus1BannerAsker {
 	public Plus1BannerAsker init() {
 		if (mInitialized)
 			return this;
+
+		if (mCallbackUrl == null)
+			throw new CallbackUrlNotDefinedException("You must define callback url");
 
 		if (!hasLockForTask(InnerTask.reinitTask))
 			mReinitHandler.post(mReinitRequestTask);
@@ -804,6 +822,15 @@ public class Plus1BannerAsker {
 		url = url.replaceAll(Constants.PLACEHOLDER_FACEBOOK_INFO_REFRESH_INTERVAL, String.valueOf(mFacebookInfoDelay));
 		url = url.replaceAll(Constants.PLACEHOLDER_TWITTER_INFO_REFRESH_INTERVAL, String.valueOf(mTwitterInfoDelay));
 		url = url.replaceAll(Constants.PLACEHOLDER_UID, mRequest.getUID());
+
+		try {
+			url = url.replaceAll(
+				Constants.PLACEHOLDER_ENCODED_CALLBACK,
+				Base64.encodeBytes(mCallbackUrl.getBytes(), Base64.URL_SAFE)
+			);
+		} catch (IOException e) {
+			Log.e(LOGTAG, "Failed to encode callback url: " + mCallbackUrl, e);
+		}
 
 		Log.d(LOGTAG, "Open link url after replacements: " + url);
 
