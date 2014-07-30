@@ -15,14 +15,11 @@ Plus1BannerView
   Добавление наблюдателя к Plus1BannerView.  
   Описание наблюдателей смотрите ниже в данном документе.
 
-* `public Plus1BannerView enableCloseButton()`  
+* `public Plus1BannerView isHaveCloseButton()`  
+  `public Plus1BannerView enableCloseButton()`  
   `public Plus1BannerView setCloseButtonEnabled(boolean closeButtonEnabled)`  
   Управление видимостью кнопки закрытия баннера. По умолчанию кнопка отображаться не будет.  
   // **устарело с версии 2.2.0**: в дальнейшем оба метода будут удалены, по возможности не используйте их
-
-* `public Plus1BannerView setAutorefreshEnabled(boolean enabled)`  
-  Включает или отключает автообновление баннеров.  
-  // **устарело с версии 2.2.0**: используйте методы Plus1BannerAsker.start() и Plus1BannerAsker.stop() для управления обновлениями баннера
 
 Остальные public-методы, не описанные в этом документе, используются для взаимодействия классов sdk, и могут быть использованы в отладочных целях.
 

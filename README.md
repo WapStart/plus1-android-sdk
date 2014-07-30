@@ -22,6 +22,23 @@ Plus1 WapStart Android SDK is under the terms of the BSD license (as is).
 3. Follow these steps to set up the manifest.
 
 ## Manifest configuration
+The first step is adding custom url-scheme and the host. It is a necessary action in order to be able to return to the App from Browser after syncing cookie of user.
+
+Example:
+
+```xml
+<intent-filter>
+	<data android:scheme="wsp1bart" android:host="ru.wapstart.plus1.bart" />
+	<action android:name="android.intent.action.VIEW"/>
+	<category android:name="android.intent.category.DEFAULT" />
+	<category android:name="android.intent.category.BROWSABLE" />
+</intent-filter>
+```
+
+For the test application scheme is *wsp1bart://*
+
+**Attention:** scheme-host combination must be unique to provide the return to your application.
+
 The application must have permissions to access the Internet and the current location for correct SDK working:
 
 ```xml
@@ -108,6 +125,7 @@ protected void onCreate(Bundle savedInstanceState)
 				.enableAnimationFromTop()
 				.enableCloseButton()
 		)
+		.setCallbackUrl(...)
 
 }
 ```
