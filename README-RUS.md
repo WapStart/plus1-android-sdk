@@ -187,8 +187,6 @@ public boolean onKeyDown(int keyCode, KeyEvent event) {
 * [Plus1Request](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1Request.md) - отвечает за хранение информации о пользователе и формирование запроса к серверу
 * [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) - отвечает за отображение объявления
 * [Plus1BannerDownloadListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerDownloadListener.md) - интерфейс наблюдателя загрузки баннера
-* [Plus1BannerViewStateListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerViewStateListener.md) - интерфейс наблюдателя за состоянием видимости [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md)  
-  // **устарело с версии 2.2.0**: используйте новые наблюдатели - Plus1BannerView.OnShowListener(), Plus1BannerView.OnHideListener(), Plus1BannerView.OnCloseButtonListener() и прочие
 
 ## Обработка событий от SDK в приложении
 Часто возникают ситуации, когда в приложении необходима реакция на какое-то событие, связанное с баннером. Для этого в [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) предусмотрены *наблюдатели*:

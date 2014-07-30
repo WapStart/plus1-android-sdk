@@ -187,8 +187,6 @@ You can find the detailed descriptions of the classes, interfaces and the source
 * [Plus1Request](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1Request.md) - about the user information storage and the requests from the server
 * [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) - about the displaying of the ads
 * [Plus1BannerDownloadListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerDownloadListener.md) - the interface of the observer of the banner loading
-* [Plus1BannerViewStateListener](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerViewStateListener.md) - the interface of the observer of the visiability status [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md)  
-  // **deprecated since 2.2.0**: use new listeners - Plus1BannerView.OnShowListener(), Plus1BannerView.OnHideListener(), Plus1BannerView.OnCloseButtonListener() and so on
 
 ## SDK events processing by application
 There are often situations when the application requires reaction to event associated with a banner. There are observers in [Plus1BannerView](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerView.md) for this case:
