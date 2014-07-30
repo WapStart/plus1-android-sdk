@@ -132,6 +132,20 @@ protected void onCreate(Bundle savedInstanceState)
 
 В методе **setApplicationId()** задайте идентификатор вашей рекламной площадки. Его можно узнать на странице **Код для площадки** после регистрации в сети [Plus1 WapStart](https://plus1.wapstart.ru) и добавления площадки типа Android.
 
+Установите *callback url* методом **setCallbackUrl()** согласно вашим настройкам манифеста.
+
+Пример:
+
+```java
+        mAsker =
+                new Plus1BannerAsker(
+			...
+                )
+                .setCallbackUrl("wsp1bart://ru.wapstart.plus1.bart")
+
+}
+```
+
 Затем необходимо предусмотреть вызов обработчиков *onResume()* и *onPause()* класса [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md):
 
 ```java

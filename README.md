@@ -132,6 +132,20 @@ protected void onCreate(Bundle savedInstanceState)
 
 You must set the unique identifier of your site in the **setApplicationId()** method. You can find it on the **Код для площадки** page after signing up for a [Plus1 WapStart](https://plus1.wapstart.ru) account and adding the Android application to the account.
 
+Set the *callback url* using method **setCallbackUrl()** with your preferences of manifest.
+
+Пример:
+
+```java
+        mAsker =
+                new Plus1BannerAsker(
+                        ...
+                )
+                .setCallbackUrl("wsp1bart://ru.wapstart.plus1.bart")
+
+}
+```
+
 Then it is necessary to provide the call of *onResume()* and *onPause()* handlers of the [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md) class:
 
 ```java
