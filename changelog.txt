@@ -1,3 +1,7 @@
+Plus1 WapStart Android SDK 2.3.0, 2014-07-30
+- Plus1 WapStart API v3 implemented
+- Small bug fixes
+
 Plus1 WapStart Android SDK 2.2.4, 2014-06-05
 - Remove obsolete method call
 
