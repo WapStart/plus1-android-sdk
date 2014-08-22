@@ -41,6 +41,7 @@ import android.view.View;
 import android.view.MotionEvent;
 
 public class AdView extends BaseAdView {
+	private static final String LOGTAG = "AdView";
 
 	private OnTouchListener mTouchListener = new OnTouchListener() {
 		public boolean onTouch(View v, MotionEvent event) {
@@ -113,31 +114,15 @@ public class AdView extends BaseAdView {
 	private class AdWebViewClient extends WebViewClient {
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
-			// Handle phone intents
-			if (
-				   url.startsWith("tel:")
-				|| url.startsWith("voicemail:")
-				|| url.startsWith("sms:")
-				|| url.startsWith("mailto:")
-				|| url.startsWith("geo:")
-				|| url.startsWith("google.streetview:")
-			) {
+
+			if (mOpenInBrowser || Plus1Helper.isIntentUrl(url)) {
 				Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
 				try {
 					getContext().startActivity(intent);
 				} catch (ActivityNotFoundException e) {
-					Log.w("Plus1", "Could not handle intent with URI: " + url);
-					return false;
-				}
-			} else if (mOpenInBrowser) {
-				Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-				try {
-					getContext().startActivity(intent);
-				} catch (ActivityNotFoundException e) {
+					Log.e(LOGTAG, "Could not handle intent with URI: " + url);
 					return false;
 				}
 			} else {
@@ -147,6 +132,7 @@ public class AdView extends BaseAdView {
 				try {
 					getContext().startActivity(intent);
 				} catch (ActivityNotFoundException e) {
+					Log.e(LOGTAG, "Could not start ApplicationBrowser" + url);
 					return false;
 				}
 			}

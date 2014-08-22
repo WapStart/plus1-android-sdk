@@ -183,6 +183,27 @@ final class Plus1Helper {
 			);
 	}
 
+	public static boolean isIntentUrl(String url)
+	{
+		return isCommonIntentUrl(url) || isPlayMarketIntentUrl(url);
+	}
+
+	public static boolean isCommonIntentUrl(String url)
+	{
+		return
+			url.startsWith("tel:")
+			|| url.startsWith("voicemail:")
+			|| url.startsWith("sms:")
+			|| url.startsWith("mailto:")
+			|| url.startsWith("geo:")
+			|| url.startsWith("google.streetview:");
+	}
+
+	public static boolean isPlayMarketIntentUrl(String url)
+	{
+		return url.startsWith("market:");
+	}
+
 	private static String SHA1(String text) throws NoSuchAlgorithmException
 	{
 		MessageDigest md = MessageDigest.getInstance("SHA-1");

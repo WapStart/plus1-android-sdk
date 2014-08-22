@@ -1,10 +1,13 @@
 package ru.wapstart.plus1.sdk;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -16,8 +19,8 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 public class ApplicationBrowser extends Activity {
-
 	public static final String URL_EXTRA = "extra_url";
+	private static final String LOGTAG = "ApplicationBrowser";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -42,13 +45,52 @@ public class ApplicationBrowser extends Activity {
 			@Override
 			public void onReceivedError(WebView view, int errorCode, String description,
 					String failingUrl) {
+
 				Activity a = (Activity) view.getContext();
 				Toast.makeText(a, "Browser error: " + description, Toast.LENGTH_SHORT).show();
+
+				Log.e(
+					LOGTAG,
+					String.format(
+						"Browser error %s (errorCode=%d) when loading url '%s'",
+						description,
+						errorCode,
+						failingUrl
+					)
+				);
 			}
 
 			@Override
 			public boolean shouldOverrideUrlLoading(WebView view, String url) {
-				view.loadUrl(url);
+
+				if (Plus1Helper.isIntentUrl(url)) {
+					Uri uri = Uri.parse(url);
+					Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+					try {
+						view.getContext().startActivity(intent);
+					} catch (ActivityNotFoundException e) {
+						if (Plus1Helper.isPlayMarketIntentUrl(url)) {
+							String playUrl = "http://play.google.com/store/apps/" + uri.getHost() + "?" + uri.getQuery();
+							Log.i(
+								LOGTAG,
+								String.format(
+									"Could not open link '%s' because Google Play app is not installed, we will open the app store link: '%s'",
+									url,
+									playUrl
+								)
+							);
+							view.loadUrl(playUrl);
+						} else {
+							Log.e(LOGTAG, "Could not handle intent with URI: " + url);
+							return false;
+						}
+					}
+				} else {
+					view.loadUrl(url);
+				}
+
 				return true;
 			}
 
