@@ -1,3 +1,6 @@
+Plus1 WapStart Android SDK 2.3.1, 2014-08-25
+- Added workaround for Google Play Market redirect links
+
 Plus1 WapStart Android SDK 2.3.0, 2014-07-30
 - Plus1 WapStart API v3 implemented
 - Small bug fixes
