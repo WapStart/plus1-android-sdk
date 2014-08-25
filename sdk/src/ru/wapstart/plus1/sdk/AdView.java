@@ -116,12 +116,27 @@ public class AdView extends BaseAdView {
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
 
 			if (mOpenInBrowser || Plus1Helper.isIntentUrl(url)) {
-				Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+				Uri uri = Uri.parse(url);
+				Intent intent = new Intent(Intent.ACTION_VIEW, uri);
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
 				try {
 					getContext().startActivity(intent);
 				} catch (ActivityNotFoundException e) {
+					if (Plus1Helper.isPlayMarketIntentUrl(url)) {
+						String playUrl = "http://play.google.com/store/apps/" + uri.getHost() + "?" + uri.getQuery();
+						Log.i(
+							LOGTAG,
+							String.format(
+								"Could not open link '%s' because Google Play app is not installed, we will open the app store link: '%s'",
+								url,
+								playUrl
+							)
+						);
+
+						return this.shouldOverrideUrlLoading(view, playUrl);
+					}
+
 					Log.e(LOGTAG, "Could not handle intent with URI: " + url);
 					return false;
 				}
