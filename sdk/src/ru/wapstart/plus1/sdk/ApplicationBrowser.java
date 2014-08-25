@@ -70,6 +70,7 @@ public class ApplicationBrowser extends Activity {
 
 					try {
 						view.getContext().startActivity(intent);
+						ApplicationBrowser.this.finish();
 					} catch (ActivityNotFoundException e) {
 						if (Plus1Helper.isPlayMarketIntentUrl(url)) {
 							String playUrl = "http://play.google.com/store/apps/" + uri.getHost() + "?" + uri.getQuery();
