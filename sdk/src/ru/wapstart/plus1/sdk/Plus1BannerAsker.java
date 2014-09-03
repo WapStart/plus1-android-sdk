@@ -338,10 +338,14 @@ public class Plus1BannerAsker {
 			mView.onPause();
 
 		if (!isDisabledWebViewCorePausing() && !mWebViewCorePaused) {
+			try{
 			new WebView(mView.getContext()).pauseTimers();
 			Log.d(LOGTAG, "WebView core thread was PAUSED");
 
 			mWebViewCorePaused = true;
+			}catch(OutOfMemoryError ex){
+				ex.printStackTrace();
+			}
 		}
 	}
 
@@ -364,10 +368,14 @@ public class Plus1BannerAsker {
 			mTwitterInfoHandler.post(mTwitterInfoTask);
 
 		if (mWebViewCorePaused) {
+			try{
 			new WebView(mView.getContext()).resumeTimers();
 			Log.d(LOGTAG, "WebView core thread was RESUMED");
 
 			mWebViewCorePaused = false;
+			}catch(OutOfMemoryError ex){
+				ex.printStackTrace();
+			}
 		}
 	}
 
