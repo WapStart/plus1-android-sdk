@@ -29,19 +29,19 @@
 
 package ru.wapstart.plus1.sdk;
 
-import java.util.HashSet;
-import java.util.Set;
+import android.location.Location;
+import android.net.Uri;
+import android.os.Build;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
-
-import android.location.Location;
-import android.os.Build;
 
 public final class Plus1Request {
 	private static final Integer REQUEST_VERSION = 3;
@@ -69,6 +69,8 @@ public final class Plus1Request {
 	private Boolean limitAdTrackingEnabled	= null;
 	private String androidId		= null;
 	private String buildSerial		= null;
+
+	private boolean disabledOpenLinkAction = false;
 
 	public static Plus1Request create() {
 		return new Plus1Request();
@@ -280,24 +282,47 @@ public final class Plus1Request {
 		return this;
 	}
 
+	public boolean isDisabledOpenLinkAction() {
+		return disabledOpenLinkAction;
+	}
+
+	/**
+	 * NOTE: This method disables interactions with default browser
+	 *        on initial sdk requests. This may be helpful if you didn't
+	 *        announced app scheme in manifest file or if you want to
+	 *        neutralize possible negative effect of "jumping to the browser".
+	 */
+	public Plus1Request setDisabledOpenLinkAction(boolean orly) {
+		this.disabledOpenLinkAction = orly;
+
+		return this;
+	}
+
 	public String getUrl() {
 		return getUrl(getRequestType());
 	}
 
 	public String getUrl(RequestType requestType) {
-		String url =
+		Uri.Builder builder = new Uri.Builder();
+
+		builder.scheme("http");
+		builder.authority(getServerHost());
+		builder.path(
 			String.format(
-				"http://%s/v%d/%d.%s",
-				getServerHost(),
+				"v%d/%d.%s",
 				REQUEST_VERSION,
 				getApplicationId(),
 				requestType.toString()
-			);
+			)
+		);
 
 		if (hasUID())
-			url += "?uid=" + getUID();
+			builder.appendQueryParameter("uid", getUID());
 
-		return url;
+		if (isDisabledOpenLinkAction())
+			builder.appendQueryParameter("disabledOpenLinkAction", "1");
+
+		return builder.build().toString();
 	}
 
 	public UrlEncodedFormEntity getUrlEncodedFormEntity(RequestType requestType)

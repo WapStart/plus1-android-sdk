@@ -83,7 +83,6 @@ public class Plus1BannerAsker {
 	private boolean mDisabledAutoDetectLocation				= false;
 	private boolean mRemoveBannersOnPause					= false;
 	private boolean mDisabledWebViewCorePausing				= false;
-	private boolean mDisabledOpenLinkAction					= false;
 
 	private int mRefreshDelay			= Constants.DEFAULTS_BANNER_REFRESH_INTERVAL;
 	private int mLocationRefreshDelay	= Constants.DEFAULTS_LOCATION_REFRESH_INTERVAL;
@@ -416,22 +415,6 @@ public class Plus1BannerAsker {
 	 */
 	public Plus1BannerAsker setDisabledWebViewCorePausing(boolean orly) {
 		mDisabledWebViewCorePausing = orly;
-
-		return this;
-	}
-
-	public boolean isDisabledOpenLinkAction() {
-		return mDisabledOpenLinkAction;
-	}
-
-	/**
-	 * NOTE: This method disables interactions with default browser
-	 *        on initial sdk requests. This may be helpful if you didn't
-	 *        announced app scheme in manifest file or if you want to
-	 *        neutralize possible negative effect of "jumping to the browser".
-	 */
-	public Plus1BannerAsker setDisabledOpenLinkAction(boolean orly) {
-		mDisabledOpenLinkAction = orly;
 
 		return this;
 	}
@@ -821,11 +804,11 @@ public class Plus1BannerAsker {
 
 					switch (key) {
 						case openLink:
-							if (mDisabledOpenLinkAction) {
-								Log.i(
+							if (mRequest.isDisabledOpenLinkAction()) {
+								Log.w(
 									LOGTAG,
 									String.format(
-										"Open link action received, but disabled by application. Url was '%s'",
+										"'Open link' action was received, but actually disabled by request. Url was '%s'",
 										value
 									)
 								);
