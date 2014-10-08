@@ -83,6 +83,7 @@ public class Plus1BannerAsker {
 	private boolean mDisabledAutoDetectLocation				= false;
 	private boolean mRemoveBannersOnPause					= false;
 	private boolean mDisabledWebViewCorePausing				= false;
+	private boolean mDisabledOpenLinkAction					= false;
 
 	private int mRefreshDelay			= Constants.DEFAULTS_BANNER_REFRESH_INTERVAL;
 	private int mLocationRefreshDelay	= Constants.DEFAULTS_LOCATION_REFRESH_INTERVAL;
@@ -405,16 +406,32 @@ public class Plus1BannerAsker {
 
 	/**
 	 * NOTE: This method is useful when you are using WebView instances
-	 *       in another activities of your application. Please note, when
-	 *       WebView core thread is running, all banners of activity still
-	 *       working in background. The important thing is whether they are
-	 *       consuming CPU cycles. To reduce this effect, please remove all
-	 *       banners when you pausing activity. Use setRemoveBannersOnPause()
-	 *       method to remove them automatically on pausing asker.
+	 *        in another activities of your application. Please note, when
+	 *        WebView core thread is running, all banners of activity still
+	 *        working in background. The important thing is whether they are
+	 *        consuming CPU cycles. To reduce this effect, please remove all
+	 *        banners when you pausing activity. Use setRemoveBannersOnPause()
+	 *        method to remove them automatically on pausing asker.
 	 * @see setRemoveBannersOnPause() method
 	 */
 	public Plus1BannerAsker setDisabledWebViewCorePausing(boolean orly) {
 		mDisabledWebViewCorePausing = orly;
+
+		return this;
+	}
+
+	public boolean isDisabledOpenLinkAction() {
+		return mDisabledOpenLinkAction;
+	}
+
+	/**
+	 * NOTE: This method disables interactions with default browser
+	 *        on initial sdk requests. This may be helpful if you didn't
+	 *        announced app scheme in manifest file or if you want to
+	 *        neutralize possible negative effect of "jumping to the browser".
+	 */
+	public Plus1BannerAsker setDisabledOpenLinkAction(boolean orly) {
+		mDisabledOpenLinkAction = orly;
 
 		return this;
 	}
@@ -804,7 +821,17 @@ public class Plus1BannerAsker {
 
 					switch (key) {
 						case openLink:
-							openLink(value);
+							if (mDisabledOpenLinkAction) {
+								Log.i(
+									LOGTAG,
+									String.format(
+										"Open link action received, but disabled by application. Url was '%s'",
+										value
+									)
+								);
+							} else {
+								openLink(value);
+							}
 							break;
 					}
 				}
