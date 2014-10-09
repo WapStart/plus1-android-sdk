@@ -22,7 +22,7 @@ Plus1 WapStart Android SDK is under the terms of the BSD license (as is).
 3. Follow these steps to set up the manifest.
 
 ## Manifest configuration
-The first step is adding custom url-scheme and the host. It is a necessary action in order to be able to return to the App from Browser after syncing cookie of user.
+The first step is adding custom url-scheme and the host. It is a necessary action in order to be able to return to the App from Browser after syncing cookie of user. If you are using *setDisabledOpenLinkAction(true)* of [Plus1Request](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1Request.md), you may skip this section (not recommended).
 
 Example:
 
@@ -50,7 +50,7 @@ The application must have permissions to access the Internet and the current loc
 
 If your application is using geolocation, you can set the current location by yourself (see more - [Plus1Request](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1Request.md)). It is recommended to turn off the automatic location detection in the SDK (method *disableAutoDetectLocation()* in [Plus1BannerAsker](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1BannerAsker.md)).
 
-You need to add the information about the used Activity to the*<application>* block:
+You need to add the information about the used Activity to the *<application>* block:
 
 ```xml
 <application android:label="Bart" android:icon="@drawable/icon">
@@ -67,7 +67,7 @@ You need to add the information about the used Activity to the*<application>* bl
 ## Test application setup
 For correct test app working you must transfer a [Plus1 WapStart](https://plus1.wapstart.ru) unique site identifier in the method **setApplicationId()** in the *[BartActivity.java](https://github.com/WapStart/plus1-android-sdk/blob/master/examples/Bart/src/ru/wapstart/plus1/bart/BartActivity.java#L51)* file.
 
-You can find the unique site identifier on the **Код для площадки** page after signing up for a [Plus1 WapStart](https://plus1.wapstart.ru) account and adding the Android application to the account.
+You can find the unique site identifier on the **Adspace code** page after signing up for a [Plus1 WapStart](https://plus1.wapstart.ru) account and adding the Android application to the account.
 
 
 # SDK using
@@ -130,11 +130,11 @@ protected void onCreate(Bundle savedInstanceState)
 }
 ```
 
-You must set the unique identifier of your site in the **setApplicationId()** method. You can find it on the **Код для площадки** page after signing up for a [Plus1 WapStart](https://plus1.wapstart.ru) account and adding the Android application to the account.
+You must set the unique identifier of your site in the **setApplicationId()** method. You can find it on the **Adspace code** page after signing up for a [Plus1 WapStart](https://plus1.wapstart.ru) account and adding the Android application to the account.
 
-Set the *callback url* using method **setCallbackUrl()** with your preferences of manifest.
+Set the *callback url* using method **setCallbackUrl()** with your preferences of manifest. If you are using *setDisabledOpenLinkAction(true)* of [Plus1Request](https://github.com/WapStart/plus1-android-sdk/blob/master/doc/Plus1Request.md), it can be unnecessary (not recommended).
 
-Пример:
+Example:
 
 ```java
         mAsker =

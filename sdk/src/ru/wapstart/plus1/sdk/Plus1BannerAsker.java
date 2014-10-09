@@ -474,7 +474,7 @@ public class Plus1BannerAsker {
 		if (mInitialized)
 			return this;
 
-		if (mCallbackUrl == null)
+		if (!mRequest.isDisabledOpenLinkAction() && mCallbackUrl == null)
 			throw new CallbackUrlNotDefinedException("You must define callback url");
 
 		if (!hasLockForTask(InnerTask.reinitTask))
