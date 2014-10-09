@@ -91,7 +91,7 @@ final class HtmlBannerDownloader extends BaseRequestLoader<HtmlBannerInfo> {
 			notifyOnBannerLoadFailed(LoadError.DownloadFailed);
 		} else if (bannerInfo.mResponseCode.equals(HttpStatus.SC_NO_CONTENT)) {
 			notifyOnBannerLoadFailed(LoadError.NoHaveBanner);
-		} else {
+		} else if (bannerInfo.mResponseCode.equals(HttpStatus.SC_OK)) {
 			try {
 				notifyOnBannerLoaded(
 					bannerInfo.mBannerContent,
@@ -105,6 +105,14 @@ final class HtmlBannerDownloader extends BaseRequestLoader<HtmlBannerInfo> {
 
 				notifyOnBannerLoadFailed(LoadError.UnknownAnswer);
 			}
+		} else {
+			Log.e(
+				LOGTAG,
+				"An error occurred on the server. Status code was "
+					+ bannerInfo.mResponseCode.toString()
+			);
+
+			notifyOnBannerLoadFailed(LoadError.UnknownAnswer);
 		}
 	}
 
