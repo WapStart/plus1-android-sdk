@@ -420,7 +420,7 @@ public class MraidView extends BaseAdView {
 
 		@Override
 		public void onPageFinished(WebView view, String url) {
-			if (!mHasFiredReadyEvent) {
+			if (!mHasFiredReadyEvent && mDisplayController != null) {
 				mDisplayController.initializeJavaScriptState();
 				fireChangeEventForProperty(
 					MraidPlacementTypeProperty.createWithType(mPlacementType)
