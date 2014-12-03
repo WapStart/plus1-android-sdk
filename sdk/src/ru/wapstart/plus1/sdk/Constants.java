@@ -30,7 +30,7 @@
 package ru.wapstart.plus1.sdk;
 
 public class Constants {
-	public static final String SDK_VERSION							= "2.3.2";
+	public static final String SDK_VERSION							= "2.3.3";
 
 	protected static final String PREFERENCES_STORAGE				= "Plus1WapStart.xml";
 	protected static final String PREFERENCES_KEY_LOCK_TASK_PREFIX	= "lock_task_";

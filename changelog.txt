@@ -1,3 +1,7 @@
+Plus1 WapStart Android SDK 2.3.3, 2014-12-03
+- Workaround for multiple calls of WebViewClient.onPageFinished(), see
+  https://codereview.chromium.org/68763012/ for details
+
 Plus1 WapStart Android SDK 2.3.2, 2014-10-10
 - Added disabledOpenLinkAction feature
 
