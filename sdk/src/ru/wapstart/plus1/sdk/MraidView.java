@@ -158,11 +158,7 @@ public class MraidView extends BaseAdView {
 	public void loadHtmlData(String data) {
 		data = completeHtml(data);
 
-		// Inject the MRAID JavaScript bridge.
-		if (mMraidPath == null)
-			mMraidPath = "file://" + copyRawResourceToFilesDir(R.raw.mraid, "mraid.js");
-
-		data = data.replace("<head>", "<head><script src='" + mMraidPath + "'></script>");
+		data = data.replace("<head>", "<head><script src='" + getMraidPath() + "'></script>");
 
 		loadDataWithBaseURL(null, data, "text/html", "UTF-8", null);
 	}
@@ -170,7 +166,10 @@ public class MraidView extends BaseAdView {
 	@Override
 	public void loadUrl(String url) {
 		if (url.startsWith("file:")) {
-			super.loadUrl(url);
+			if (url == getMraidPath()) {
+				super.loadUrl(url);
+			}
+
 			return;
 		}
 
@@ -523,6 +522,15 @@ public class MraidView extends BaseAdView {
 			Log.d(LOGTAG, message);
 			return false;
 		}
+	}
+
+	private String getMraidPath() {
+		// Inject the MRAID JavaScript bridge.
+		if (mMraidPath == null) {
+			mMraidPath = "file://" + copyRawResourceToFilesDir(R.raw.mraid, "mraid.js");
+		}
+
+		return mMraidPath;
 	}
 
 	public interface OnExpandListener {

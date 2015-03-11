@@ -39,6 +39,7 @@ public class ApplicationBrowser extends Activity {
 
 	private void initializeWebView(Intent intent) {
 		WebView webView = (WebView) findViewById(R.id.webView);
+		webView.getSettings().setAllowFileAccess(false);
 		webView.getSettings().setJavaScriptEnabled(true);
 		webView.loadUrl(intent.getStringExtra(URL_EXTRA));
 		webView.setWebViewClient(new WebViewClient() {
